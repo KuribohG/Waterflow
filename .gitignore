@@ -1,0 +1,6 @@
+x64/*
+FluidSimulation/x64/*
+.vs/*
+Debug/*
+cmake-build-debug/*
+.idea/*
