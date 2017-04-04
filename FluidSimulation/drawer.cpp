@@ -1,26 +1,23 @@
 #include "drawer.h"
 
-BYT pixels[SHOW_SIZE_X * SHOW_SIZE_Y * 4 * 5];
 
-void ScreenCoor_to_ClipCoor(Float &x, Float &y, int screenid = 0) {
+static void ScreenCoor_to_ClipCoor(Float &x, Float &y, SCREENID_T screenid) {
 	//x *= (SHOW_SIZE_X / GRID_SIZE_X);
 	//y *= (SHOW_SIZE_Y / GRID_SIZE_Y);
-	x = (x + screenid*SHOW_SIZE_X) * 2 / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0;
-	y = y * 2 / (SHOW_SIZE_Y) - 1.0;
+	x = (x + screenid*SHOW_SIZE_X) * 2 / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0f;
+	y = y * 2 / (SHOW_SIZE_Y) - 1.0f;
 }
-void GridCoor_to_ClipCoor(Float &x, Float &y, int screenid = 0) {
+static void GridCoor_to_ClipCoor(Float &x, Float &y, SCREENID_T screenid) {
 	x *= (SHOW_SIZE_X / GRID_SIZE_Y);
 	y *= (SHOW_SIZE_Y / GRID_SIZE_Z);
-	x = (x + screenid*SHOW_SIZE_X) * 2 / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0;
-	y = y * 2 / (SHOW_SIZE_Y)-1.0;
+	x = (x + screenid*SHOW_SIZE_X) * 2 / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0f;
+	y = y * 2 / (SHOW_SIZE_Y)- 1.0f;
 }
 
-
-void Draw_Density(Float *density, int screenid) {
+void Draw_Density_2d(Float *density, SCREENID_T screenid) {
 	printf("draw density\n");
 	assert(screenid < 5);
 	glBegin(GL_POINTS);
-	int p = 0;
 	for (int is = 0; is < SHOW_SIZE_X; is++) {
 		for (int js = 0; js < SHOW_SIZE_Y; js++) {
 			int i = is*GRID_SIZE_Y / SHOW_SIZE_X;
@@ -44,12 +41,12 @@ void Draw_Density(Float *density, int screenid) {
 	//glDrawPixels(SHOW_SIZE_X, SHOW_SIZE_Y, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 }
 
-void Draw_Velocity(int i, Float *vxs, Float *vys, Float *vzs, int screenid) {
+void Draw_Velocity_2d(int i, Float*, Float *vys, Float *vzs, SCREENID_T screenid) {
 	printf("draw velocity\n");
 	for (int j = 0; j < GRID_SIZE_Y; j ++) {
 		for (int k = 0; k < GRID_SIZE_Z; k ++) {
 			int j0 = j, k0 = k;
-			Float vy = vys[ID(i, j0, k0)] / 10.0, vz = vzs[ID(i, j0, k0)] / 10.0;
+			Float vy = vys[ID(i, j0, k0)] / 10.0f, vz = vzs[ID(i, j0, k0)] / 10.0f;
 			//printf("%f %f\n", vy, vz);
 			Float y0 = j0, z0 = k0;
 			Float y1 = j0 + vy, z1 = k0 + vz;
@@ -73,3 +70,4 @@ void Draw_Velocity(int i, Float *vxs, Float *vys, Float *vzs, int screenid) {
 	}
 	glFlush();
 }
+

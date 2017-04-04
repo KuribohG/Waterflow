@@ -6,7 +6,7 @@
 #include <cstring>
 #include <cmath>
 #include <cassert>
-#include <gl/glut.h>
+#include <GL/glut.h>
 using namespace std;
 
 typedef char BYT;
