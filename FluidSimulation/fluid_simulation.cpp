@@ -92,7 +92,7 @@ void FluidSimulation::init_Density_3d()
                 {
                     sef thu = ray;
                     if (thu.len() < EPS<Float>) break;
-                    p3df pPos = thu.p1 + (thu.p2 - thu.p1) * (0.001 / thu.len());
+                    p3df pPos = thu.p1 + (thu.p2 - thu.p1) * (0.05 / thu.len());
 
                     if (pPos.to_int() == thu.p2.to_int()) break;
                     int x, y, z; tie(x, y, z) = pPos.to_int();
