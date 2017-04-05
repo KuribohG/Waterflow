@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include <tuple>
 #include <algorithm>
 #include <cstring>
 #include <cmath>
@@ -32,7 +33,6 @@ const int SHOW_SIZE_Y = 512;
 const int GRID_SIZE_X = 10;
 const int GRID_SIZE_Y = 64;
 const int GRID_SIZE_Z = 64;
-
 inline int ID(int x, int y, int z) {
     assert(0 <= x&&x < GRID_SIZE_X);
     assert(0 <= y&&y < GRID_SIZE_Y);
