@@ -33,6 +33,7 @@ const int SHOW_SIZE_Y = 512;
 const int GRID_SIZE_X = 10;
 const int GRID_SIZE_Y = 64;
 const int GRID_SIZE_Z = 64;
+#define assert(x) if (!(x)) { asm("int $3"); }
 inline int ID(int x, int y, int z) {
     assert(0 <= x&&x < GRID_SIZE_X);
     assert(0 <= y&&y < GRID_SIZE_Y);

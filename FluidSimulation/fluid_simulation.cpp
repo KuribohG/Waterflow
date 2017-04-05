@@ -77,7 +77,8 @@ using sef = Segment<Float>;
 using cuf = Cuboid<Float>;
 void FluidSimulation::init_Density_3d()
 {
-    p3df vrp(30, 32, 0), vpn(-1, 0, 0), uvp(0, 0, 1), vvp(vpn.cross(uvp)), prp(50, 32, 32);
+    double ang = -M_PI / 3;
+    p3df vrp(30, 32, 0), vpn(-cos(ang), sin(ang), 0), uvp(0, 0, 1), vvp(vpn.cross(uvp)), prp(50, 32, 32);
     cuf jar(p3df(0, 0, 0), p3df(GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z));
     for (int i = 0; i < SHOW_SIZE_X; ++i)
         for (int j = 0; j < SHOW_SIZE_Y; ++j)
@@ -90,15 +91,16 @@ void FluidSimulation::init_Density_3d()
                 while (true)
                 {
                     sef thu = ray;
-                    thu.p1 = thu.p1 + (thu.p2 - thu.p1) * (0.1 / thu.len());
+                    if (thu.len() < EPS<Float>) break;
+                    p3df pPos = thu.p1 + (thu.p2 - thu.p1) * (0.001 / thu.len());
 
-                    if (thu.p1.to_int() == thu.p2.to_int()) break;
-                    int x, y, z; tie(x, y, z) = thu.p1.to_int();
+                    if (pPos.to_int() == thu.p2.to_int()) break;
+                    int x, y, z; tie(x, y, z) = pPos.to_int();
 
                     thu.Clip(cuf(p3df(x, y, z), p3df(x + 1, y + 1, z + 1)));
 
                     lightPath[i][j].push_back(make_pair(ID(x, y, z), thu.len()));
-                    ray.p2 = thu.p1;
+                    ray.p1 = thu.p2;
                 }
             } catch(int err) { fprintf(stderr, "err: %d\n", err); }
 }
