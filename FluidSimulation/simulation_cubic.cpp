@@ -10,7 +10,7 @@ SimulationCubic::SimulationCubic(void){
     density = (Float*) calloc(GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z, sizeof(Float));
     s = (Float*)calloc(GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z, sizeof(Float));
     mask = (int*) calloc(GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z, sizeof(int));
-    printf("allocated\n");
+    LOGM("allocated\n");
     for (int i = 0; i < GRID_SIZE_X; i++) {
         for (int j = 0; j < GRID_SIZE_Y; j++) {
             mask[ID(i, j, 0)] = mask[ID(i, j, GRID_SIZE_Z - 1)] = SOLID;
@@ -26,7 +26,7 @@ SimulationCubic::SimulationCubic(void){
             mask[ID(0, j, k)] = mask[ID(GRID_SIZE_X - 1, j, k)] = SOLID;
         }
     }
-    printf("masked\n");
+    LOGM("masked\n");
     for (int i = 0; i < GRID_SIZE_X; i++) {
         //cout << i << endl;
         for (int j = 0; j < GRID_SIZE_Y; j++) {
@@ -60,7 +60,7 @@ SimulationCubic::SimulationCubic(void){
             }
         }
     }
-    printf("randomed\n");
+    LOGM("randomed\n");
 }
 
 SimulationCubic::~SimulationCubic() {
@@ -152,17 +152,17 @@ void SimulationCubic::Linear_Solve(int axis, Float *x, Float *x0, Float a, Float
     }
     /*for (int j = 240; j < 255; j++) {
         for (int k = 240; k < 255; k++) {
-            printf("%f ", x[ID(2, j, k)]);
+            LOGM("%f ", x[ID(2, j, k)]);
         }
-        printf("\n");
-    }printf("\n");*/
+        LOGM("\n");
+    }LOGM("\n");*/
     Bound_Solid(axis, x);
 }
 
 void SimulationCubic::Diffuse(int axis, Float *x, Float *x0, Float diff, Float dt, int iter) {//diffusion is blurring
     //solve x from x0
     Float a = dt*diff;
-    printf("diffusion parameter: %d\n", iter);
+    LOGM("diffusion parameter: %d\n", iter);
     Linear_Solve(axis, x, x0, a, 6 * a + 1, iter);
 }
 
@@ -226,7 +226,7 @@ void SimulationCubic::Advect(int axis, Float *density, Float *density0, Float *v
                     //Float x = i;
                     Float y = j - TIME_DELTA*vy[ID(i, j, k)];
                     Float z = k - TIME_DELTA*vz[ID(i, j, k)];
-                    //printf("%f %f %f\n", TIME_DELTA*vx[ID(i, j, k)], TIME_DELTA*vy[ID(i, j, k)], TIME_DELTA*vz[ID(i, j, k)]);
+                    //LOGM("%f %f %f\n", TIME_DELTA*vx[ID(i, j, k)], TIME_DELTA*vy[ID(i, j, k)], TIME_DELTA*vz[ID(i, j, k)]);
                     x = Clip(x, 0.5, GRID_SIZE_X + 0.5);
                     y = Clip(y, 0.5, GRID_SIZE_Y + 0.5);
                     z = Clip(z, 0.5, GRID_SIZE_Z + 0.5);
@@ -238,9 +238,8 @@ void SimulationCubic::Advect(int axis, Float *density, Float *density0, Float *v
     Bound_Solid(axis, density);
 }
 
-
 void SimulationCubic::Step_Time(void){
-    printf("cubic step time \n");
+    LOGM("cubic step time \n");
 
     //velocity-evolution
     //Diffuse(0, vx0, vx, viscosity, TIME_DELTA, LINSOLVER_ITER);
@@ -251,7 +250,7 @@ void SimulationCubic::Step_Time(void){
     //swap(vx, vx0);
     //swap(vy, vy0);
     //swap(vz, vz0);
-    cout << "advect x:\n";
+    LOGM( "advect x:\n");
     //Advect(0, vx, vx0, vx0, vy0, vz0);
     Advect(1, vy, vy0, vx0, vy0, vz0);
     Advect(2, vz, vz0, vx0, vy0, vz0);
@@ -267,19 +266,19 @@ void SimulationCubic::Step_Time(void){
     Float sm = 0;
     for (int j = 0; j < GRID_SIZE_Y; j++) {
         for (int k = 0;k<GRID_SIZE_Z; k++) {
-            //printf("%f ", s[ID(2, j, k)]);
+            //LOGM("%f ", s[ID(2, j, k)]);
             sm += s[ID(2, j, k)];
         }
-        //printf("\n");
-    }printf("%f \n",sm);
+        //LOGM("\n");
+    }LOGM("%f \n",sm);
     Advect(-1, density, s, vx, vy, vz);
     //now stored in density
     //memcpy(density, s, sizeof(Float)*GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z);
     /*for (int j = 0; j < 10; j++) {
         for (int k = 0; k < 10; k++) {
-            printf("%f ", density[ID(2, j, k)]);
+            LOGM("%f ", density[ID(2, j, k)]);
         }
-        printf("\n");
-    }printf("\n");*/
-    //printf("density: %lf\n", density[0]);
+        LOGM("\n");
+    }LOGM("\n");*/
+    //LOGM("density: %lf\n", density[0]);
 }

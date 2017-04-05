@@ -102,6 +102,6 @@ void FluidSimulation::init_Density_3d()
                     lightPath[i][j].push_back(make_pair(ID(x, y, z), thu.len()));
                     ray.p1 = thu.p2;
                 }
-            } catch(int err) { fprintf(stderr, "err: %d\n", err); }
+            } catch(int err) { LOGM("err: %d\n", err); }
 }
 

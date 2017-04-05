@@ -11,9 +11,14 @@
 #include <list>
 #include <GL/glut.h>
 using namespace std;
-
 typedef char BYT;
 typedef float Float;
+
+#ifdef NDEBUG
+#define LOGM(...) void(0)
+#else
+#define LOGM(...)  fprintf(stderr,  __VA_ARGS__)
+#endif
 
 template<class T> constexpr T EPS = 0;
 template<> constexpr float EPS<float> = 1e-3;
@@ -33,7 +38,7 @@ const int SHOW_SIZE_Y = 512;
 const int GRID_SIZE_X = 10;
 const int GRID_SIZE_Y = 64;
 const int GRID_SIZE_Z = 64;
-#define assert(x) if (!(x)) { asm("int $3"); }
+//#define assert(x) if (!(x)) { asm("int $3"); }
 inline int ID(int x, int y, int z) {
     assert(0 <= x&&x < GRID_SIZE_X);
     assert(0 <= y&&y < GRID_SIZE_Y);
