@@ -20,9 +20,8 @@ typedef float Float;
 #define LOGM(...)  fprintf(stderr,  __VA_ARGS__)
 #endif
 
-template<class T> constexpr T EPS = 0;
-template<> constexpr float EPS<float> = 1e-3;
-template<> constexpr double EPS<double> = 1e-9;
+constexpr Float  EPS = 1e-3f;
+
 
 const int FPS = 100;
 

@@ -20,64 +20,63 @@ void FluidSimulation::Step_Time(void){
 
 }
 
-template<class T> struct P_3d
+struct P_3d
 {
-    T x, y, z;
-    P_3d(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
-    template<class T2> P_3d(P_3d<T2> u) : x(u.x), y(u.y), z(u.z) {}
-    P_3d operator*(const T a) const { return P_3d(x * a, y * a, z * a);  }
+    Float x, y, z;
+    P_3d(Float _x, Float _y, Float _z) : x(_x), y(_y), z(_z) {}
+    P_3d operator*(const Float a) const { return P_3d(x * a, y * a, z * a);  }
     P_3d operator+(const P_3d& o) { return P_3d(x + o.x, y + o.y, z + o.z); }
     P_3d operator-(const P_3d& o) { return P_3d(x - o.x, y - o.y, z - o.z); }
-    T abs() const { return sqrt(x * x + y * y + z * z); }
+    Float abs() const { return sqrt(x * x + y * y + z * z); }
     P_3d cross(P_3d o) const { return P_3d(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x); }
     tuple<int, int, int> to_int()  { return make_tuple(int(x), int(y), int(z)); };
 };
-template<class T> struct Cuboid
+ struct Cuboid
 {
-    T xm, xM, ym, yM, zm, zM;
-    Cuboid (P_3d<T> p1, P_3d<T> p2) :
+    Float xm, xM, ym, yM, zm, zM;
+    Cuboid (P_3d p1, P_3d p2) :
             xm(min(p1.x, p2.x)), xM(max(p1.x, p2.x)),
             ym(min(p1.y, p2.y)), yM(max(p1.y, p2.y)),
             zm(min(p1.z, p2.z)), zM(max(p1.z, p2.z)) { }
 };
-template<class T> struct Segment
+ struct Segment
 {
-    P_3d<T> p1, p2;
-    Segment(P_3d<T> _p1, P_3d<T> _p2) : p1(_p1), p2(_p2) {}
-    T len() { return (p1 - p2).abs(); }
-    bool Clip(Cuboid<T> View)
+    P_3d p1, p2;
+    Segment(P_3d _p1, P_3d _p2) : p1(_p1), p2(_p2) {}
+    Float len() { return (p1 - p2).abs(); }
+    bool Clip(Cuboid View)
     {
-        T umin = 0, umax = 1,
+        Float umin = 0, umax = 1,
                 x1 = p1.x, dx = p2.x - x1,
                 y1 = p1.y, dy = p2.y - y1,
                 z1 = p1.z, dz = p2.z - z1 ;
-#define CL(l) if (fabs(d##l) > EPS<T>) {\
-         T a =  (View.l##M - l##1) / d##l, b =  (View.l##m - l##1) / d##l;\
+#define CL(l) if (fabs(d##l) > EPS) {\
+         Float a =  (View.l##M - l##1) / d##l, b =  (View.l##m - l##1) / d##l;\
          if (a > b) swap(a, b); umin = max(umin, a); umax = min(umax, b); }
 
         CL(x); CL(y); CL(z);
 #undef CL
-        if (umin >= umax - EPS<T>) return false;
-        p1 = P_3d<T>(x1 + dx * umin, y1 + dy * umin, z1 + dz * umin);
-        p2 = P_3d<T>(x1 + dx * umax, y1 + dy * umax, z1 + dz * umax);
+        if (umin >= umax - EPS) return false;
+        p1 = P_3d(x1 + dx * umin, y1 + dy * umin, z1 + dz * umin);
+        p2 = P_3d(x1 + dx * umax, y1 + dy * umax, z1 + dz * umax);
         return true;
     }
-    P_3d<T> atx(T x) throw(int)
+    P_3d atx(Float x) throw(int)
     {
-        if (fabs(p2.x - p1.x) < EPS<T>)
+        if (fabs(p2.x - p1.x) < EPS)
             throw 233;
-        T inc = (x - p1.x) / (p2.x - p1.x);
-        return P_3d<T>(x, p1.y + (p2.y - p1.y) * inc, p1.z + (p2.z - p1.z) * inc);
+        Float inc = (x - p1.x) / (p2.x - p1.x);
+        return P_3d(x, p1.y + (p2.y - p1.y) * inc, p1.z + (p2.z - p1.z) * inc);
 
     }
 };
 const Float pixel_size = 1.0f / 8.0f;
-using p3df = P_3d<Float>;
-using sef = Segment<Float>;
-using cuf = Cuboid<Float>;
+using p3df = P_3d;
+using sef = Segment;
+using cuf = Cuboid;
 void FluidSimulation::init_Density_3d()
 {
-    double ang = -M_PI / 3;
+    double ang = -0;
     p3df vrp(30, 32, 0), vpn(-cos(ang), sin(ang), 0), uvp(0, 0, 1), vvp(vpn.cross(uvp)), prp(50, 32, 32);
     cuf jar(p3df(0, 0, 0), p3df(GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z));
     for (int i = 0; i < SHOW_SIZE_X; ++i)
@@ -91,7 +90,7 @@ void FluidSimulation::init_Density_3d()
                 while (true)
                 {
                     sef thu = ray;
-                    if (thu.len() < EPS<Float>) break;
+                    if (thu.len() < EPS) break;
                     p3df pPos = thu.p1 + (thu.p2 - thu.p1) * (0.05 / thu.len());
 
                     if (pPos.to_int() == thu.p2.to_int()) break;
