@@ -1,22 +1,18 @@
- FRESH POTS(TO BE CONTINUE...)
-£¨ÅÅÃû²»·ÖÏÈºó£©
+FRESH POTS(TO BE CONTINUE...) ï¼ˆæ’åä¸åˆ†å…ˆåï¼‰
 
-Â·ÏßÍ¼£ºextended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
+è·¯çº¿å›¾ï¼šextended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
 
-1. °ÑSemi-Lagrangian»»³ÉMacCormack
-2. Ö§³ÖË®Ô´ºÍÍâÁ¦
-3. ¸ãÇå³şhttp://cowboyprogramming.com/2008/04/01/practical-fluid-mechanics/ £¨Ò»¸öÍíÓÚGDC03µÄÏµÍ³£©¸ÉÁËÊ²Ã´£¬ÓĞÃ»ÓĞ¿ÉÄÜ¼ÓÈëÎÒÃÇµÄÏµÍ³
-	catch£ºËüÃ»ÓĞÇ¿ÖÆÉ¢¶ÈÎªÁã£¬¶øÊÇÓÃÌØÊâµÄadvection¼¼ÇÉ£¬ÒÔ¼°Ò»ÖÖ¸ù¾İÑ¹Ç¿ËãËÙ¶ÈµÄ·½·¨°ÑÉ¢¶È±äµÃÏñÁã¡£Õâ¸öÊÇ¡°Ö÷ÌåË¼Ïë¡±£¬ÊÇ¼ÙµÄÉç»áÖ÷ÒåÀíÏë£¬²»Óè¿¼ÂÇ
-4. ±È½Ï"Real-Time Eulerian Water Simulation Using a Restricted Tall Cell Grid"£¨¹²²úÖ÷ÒåÀíÏë£©±ÈÎÒÃÇ¶àÁËÊ²Ã´
-5. ÑĞ¾¿ÔõÃ´Ö§³Ö3DÇé¿ö£¬¸ãÇå³şhttps://github.com/rlguy/GridFluidSim3D £¨Éç»áÖ÷ÒåÀíÏë£©ËûÃÇ¸ÉÁËÊ²Ã´
-	catch£ºÕâºÍÈÎÎñ7ÏàÍ¬
-6. Ö§³ÖÊó±ê½»»¥£¬³¹µ×¸ã¶®v1.0µÄÂß¼­
-7. ·º¶Áfluid simulation for computer graphics(Robert Bridson)£¬¶ÔÃ¿Ò»¸ö×ÓÈÎÎñÕÒ³öÎÒÃÇÎÒÃÇ¿ÉÄÜµÄÓÅ»¯·½Ïò
-	catch£ºadvection£º¿ÉÒÔÔËÓÃRunge-Kutta·¨¸Ä½øsemi-laglarian·¨
-		p53,lin_solveµÄÀíÂÛÒÀ¾İ£¬ÕâÒ»¹ı³Ì¿ÉÒÔĞ´³ÉÒ»¸öÕæÕıµÄÏßĞÔ·½³Ì×é£¬ÓÃconjugate gradientËã·¨Çó½â
-8. ÓÃ¼ÙµÄ¹âÏß×·×Ù£¨¹Ì¶¨Ïà»úÊÓ½Ç£¬¾ßÌå·½·¨¼ûGPU Gem3£©Ö§³ÖÈıÎ¬äÖÈ¾
-9. Ö§³Öfree surfaceºÍÖØÁ¦
-10. ¸üĞÂadvectionËã·¨
+1. æŠŠSemi-Lagrangianæ¢æˆMacCormack
+2. æ”¯æŒæ°´æºå’Œå¤–åŠ›
+3. ææ¸…æ¥š[http://cowboyprogramming.com/2008/04/01/practical-fluid-mechanics/](http://cowboyprogramming.com/2008/04/01/practical-fluid-mechanics/)Â ï¼ˆä¸€ä¸ªæ™šäºGDC03çš„ç³»ç»Ÿï¼‰å¹²äº†ä»€ä¹ˆï¼Œæœ‰æ²¡æœ‰å¯èƒ½åŠ å…¥æˆ‘ä»¬çš„ç³»ç»Ÿ catchï¼šå®ƒæ²¡æœ‰å¼ºåˆ¶æ•£åº¦ä¸ºé›¶ï¼Œè€Œæ˜¯ç”¨ç‰¹æ®Šçš„advectionæŠ€å·§ï¼Œä»¥åŠä¸€ç§æ ¹æ®å‹å¼ºç®—é€Ÿåº¦çš„æ–¹æ³•æŠŠæ•£åº¦å˜å¾—åƒé›¶ã€‚è¿™ä¸ªæ˜¯â€œä¸»ä½“æ€æƒ³â€ï¼Œæ˜¯å‡çš„ç¤¾ä¼šä¸»ä¹‰ç†æƒ³ï¼Œä¸äºˆè€ƒè™‘
+4. æ¯”è¾ƒ"Real-Time Eulerian Water Simulation Using a Restricted Tall Cell Grid"ï¼ˆå…±äº§ä¸»ä¹‰ç†æƒ³ï¼‰æ¯”æˆ‘ä»¬å¤šäº†ä»€ä¹ˆ
+5. ç ”ç©¶æ€ä¹ˆæ”¯æŒ3Dæƒ…å†µï¼Œææ¸…æ¥š[https://github.com/rlguy/GridFluidSim3D](https://github.com/rlguy/GridFluidSim3D)Â ï¼ˆç¤¾ä¼šä¸»ä¹‰ç†æƒ³ï¼‰ä»–ä»¬å¹²äº†ä»€ä¹ˆ catchï¼šè¿™å’Œä»»åŠ¡7ç›¸åŒ
+6. æ”¯æŒé¼ æ ‡äº¤äº’ï¼Œå½»åº•ææ‡‚v1.0çš„é€»è¾‘
+7. æ³›è¯»fluid simulation for computer graphics(Robert Bridson)ï¼Œå¯¹æ¯ä¸€ä¸ªå­ä»»åŠ¡æ‰¾å‡ºæˆ‘ä»¬æˆ‘ä»¬å¯èƒ½çš„ä¼˜åŒ–æ–¹å‘ catchï¼š
+   * ~~advectionï¼šå¯ä»¥è¿ç”¨Runge-Kuttaæ³•æ”¹è¿›semi-laglarianæ³•~~
+   * p53,lin_solveçš„ç†è®ºä¾æ®ï¼Œè¿™ä¸€è¿‡ç¨‹å¯ä»¥å†™æˆä¸€ä¸ªçœŸæ­£çš„çº¿æ€§æ–¹ç¨‹ç»„ï¼Œç”¨conjugate gradientç®—æ³•æ±‚è§£
+8. ç”¨å‡çš„å…‰çº¿è¿½è¸ªï¼ˆå›ºå®šç›¸æœºè§†è§’ï¼Œå…·ä½“æ–¹æ³•è§GPU Gem3ï¼‰æ”¯æŒä¸‰ç»´æ¸²æŸ“
+9. æ”¯æŒfree surfaceå’Œé‡åŠ›
+10. æ›´æ–°advectionç®—æ³•
 
-ÓĞÈ¤µÄ²ÄÁÏ£º
-http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids
+æœ‰è¶£çš„ææ–™ï¼šÂ [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)

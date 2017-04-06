@@ -1,5 +1,8 @@
 #include "simulation_cubic.h"
 
+void Runge_Kutta(int i, int j, int k, Float delta, int iter,
+        Float vx[], Float vy[], Float vz[], Float &x, Float &y, Float &z);
+
 SimulationCubic::SimulationCubic(void){
     vx = (Float*) calloc(GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z, sizeof(Float));
     vy = (Float*) calloc(GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z, sizeof(Float));
@@ -222,10 +225,8 @@ void SimulationCubic::Advect(int axis, Float *density, Float *density0, Float *v
         for (int j = 0; j < GRID_SIZE_Y; j++) {
             for (int k = 0; k < GRID_SIZE_Z; k++) {
                 if (mask[ID(i, j, k)] == WATER) {
-                    Float x = i - TIME_DELTA*vx[ID(i, j, k)];
-                    //Float x = i;
-                    Float y = j - TIME_DELTA*vy[ID(i, j, k)];
-                    Float z = k - TIME_DELTA*vz[ID(i, j, k)];
+                    Float x, y, z;
+                    Runge_Kutta(i, j, k, TIME_DELTA, 2, vx, vy, vz, x, y, z);
                     //LOGM("%f %f %f\n", TIME_DELTA*vx[ID(i, j, k)], TIME_DELTA*vy[ID(i, j, k)], TIME_DELTA*vz[ID(i, j, k)]);
                     x = Clip(x, 0.5, GRID_SIZE_X + 0.5);
                     y = Clip(y, 0.5, GRID_SIZE_Y + 0.5);
@@ -281,4 +282,23 @@ void SimulationCubic::Step_Time(void){
         LOGM("\n");
     }LOGM("\n");*/
     //LOGM("density: %lf\n", density[0]);
+}
+
+void Runge_Kutta(int i, int j, int k, Float delta, int iter,
+                 Float vx[], Float vy[], Float vz[], Float &x, Float &y, Float &z) {
+    assert(iter >= 1);
+
+    delta /= iter;
+
+    int id = ID(i, j, k);
+    x = i - delta * vx[id];
+    y = j - delta * vy[id];
+    z = k - delta * vz[id];
+
+    for (int _ = 1; _ < iter; _++) {
+        Float nx = x - delta * Interpolation_3D(vx, x, y, z);
+        Float ny = y - delta * Interpolation_3D(vy, x, y, z);
+        Float nz = z - delta * Interpolation_3D(vz, x, y, z);
+        x = nx, y = ny, z = nz;
+    }
 }
