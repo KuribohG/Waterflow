@@ -1,4 +1,4 @@
-FRESH POTS(TO BE CONTINUE...) （排名不分先后）
+﻿FRESH POTS(TO BE CONTINUE...) （排名不分先后）
 
 路线图：extended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
 
@@ -14,5 +14,6 @@ FRESH POTS(TO BE CONTINUE...) （排名不分先后）
 8. 用假的光线追踪（固定相机视角，具体方法见GPU Gem3）支持三维渲染
 9. 支持free surface和重力
 10. 更新advection算法
+11. 阅读论文：Fast Grid-Free Surface Tracking，研究如何解决surface-tracking问题（着重寻找此领域的开山鼻祖paper）
 
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)
