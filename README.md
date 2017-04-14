@@ -14,6 +14,8 @@
 8. 用假的光线追踪（固定相机视角，具体方法见GPU Gem3）支持三维渲染
 9. 支持free surface和重力
 10. 更新advection算法
-11. 阅读论文：Fast Grid-Free Surface Tracking，研究如何解决surface-tracking问题（着重寻找此领域的开山鼻祖paper）
+11. 阅读论文：Fast Grid-Free Surface Tracking，研究如何解决surface-tracking问题（着重寻找此领域的开山鼻祖paper）
+	catch(wmd)：他们似乎其实是在做某种refine，可以暂时不予考虑
+12. 阅读论文：http://www.ewp.rpi.edu/hartford/~ernesto/F2012/CFD/Readings/Harlow-Welch-1965.pdf，搞懂marker particle方法如何work
 
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)
