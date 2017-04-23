@@ -27,18 +27,24 @@
     <ClCompile Include="drawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="surface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="simulation_cubic.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="fluid_simulation.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="drawer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="surface.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

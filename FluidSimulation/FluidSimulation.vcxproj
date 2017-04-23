@@ -143,12 +143,14 @@
     <ClCompile Include="fluid_simulation.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="simulation_cubic.cpp" />
+    <ClCompile Include="surface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drawer.h" />
     <ClInclude Include="fluid_simulation.h" />
-    <ClInclude Include="shared.h" />
+    <ClInclude Include="shared.hpp" />
     <ClInclude Include="simulation_cubic.h" />
+    <ClInclude Include="surface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

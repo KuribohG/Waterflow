@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "shared.hpp"
 #include "fluid_simulation.h"
 
 FluidSimulation fluidsim;
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);//double buffer
     glutInitWindowPosition(100, 100);
-    glutInitWindowSize(SHOW_SIZE_X*2, SHOW_SIZE_Y);
+    glutInitWindowSize(SHOW_SIZE_X*3, SHOW_SIZE_Y);
     int glut_window = glutCreateWindow("Fluid Simulation");
     glutDisplayFunc(&Display_Func);
     glutTimerFunc(1000/FPS, Step_Time, 1);

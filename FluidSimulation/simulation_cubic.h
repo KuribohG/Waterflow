@@ -1,8 +1,7 @@
 #pragma once
 
-#include "shared.h"
-
-enum GridMaterial { WATER, SOLID };
+#include "shared.hpp"
+#include "surface.h"
 
 class SimulationCubic {
 public:
@@ -15,13 +14,17 @@ public:
 	Float *vy0;
 	Float *vz0;
 	Float *s;
-	Float *density;
+	//Float *density;
 
 	int *mask;
+
+	vector<MarkerParticle> particles;
 
 	SimulationCubic(void);
 
 	~SimulationCubic();
+
+	void Apply_External_Forces(void);
 
 	void Linear_Solve(int axis, Float * x, Float * x0, Float a, Float wtsum, int iter);
 
