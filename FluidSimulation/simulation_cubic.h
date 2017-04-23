@@ -2,12 +2,16 @@
 
 #include "shared.hpp"
 #include "surface.h"
+#include "gridmath.h"
 
 class SimulationCubic {
 public:
 	Float viscosity=0.0;
 	Float diff=0.0;
-	Float *vx;
+	aryf vx, vx0, vy, vy0, vz, vz0;
+	aryf p, p0;
+	aryi mask;
+	/*Float *vx;
 	Float *vy;
 	Float *vz;
 	Float *vx0;
@@ -16,7 +20,7 @@ public:
 	Float *s;
 	//Float *density;
 
-	int *mask;
+	int *mask;*/
 
 	vector<MarkerParticle> particles;
 
@@ -26,17 +30,15 @@ public:
 
 	void Apply_External_Forces(void);
 
-	void Linear_Solve(int axis, Float * x, Float * x0, Float a, Float wtsum, int iter);
+	void Linear_Solve(int axis, aryf & x, aryf & x0, Float a, Float wtsum, int iter);
 
-	void Diffuse(int axis, Float * x, Float * x0, Float diff, Float dt, int iter);
+	void Calc_Divergence(aryf & vx, aryf & vy, aryf & vz, aryf & div);
 
-	void Calc_Divergence(Float * vx, Float * vy, Float * vz, Float * div);
+	void Project(aryf & vx, aryf & vy, aryf & vz, aryf & p, aryf & div);
 
-	void Project(Float * vx, Float * vy, Float * vz, Float * pressure, Float * dv);
+	void Runge_Kutta(int i, int j, int k, Float delta, int iter, aryf & vx, aryf & vy, aryf & vz, Float & x, Float & y, Float & z);
 
-	void Advect(int axis, Float * density, Float * density0, Float * vx, Float * vy, Float * vz);
-
-	void Runge_Kutta(int i, int j, int k, Float delta, int iter, Float vx[], Float vy[], Float vz[], Float & x, Float & y, Float & z);
+	void Advect(int axis, aryf & f, aryf & f0, aryf & vx, aryf & vy, aryf & vz);
 
 	void Step_Time();
 

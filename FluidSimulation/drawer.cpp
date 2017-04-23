@@ -3,14 +3,14 @@
 
 
 static void ScreenCoor_to_ClipCoor(Float &x, Float &y, SCREENID_T screenid) {
-    //x *= (SHOW_SIZE_X / GRID_SIZE_X);
-    //y *= (SHOW_SIZE_Y / GRID_SIZE_Y);
+    //x *= (SHOW_SIZE_X / GRIDX);
+    //y *= (SHOW_SIZE_Y / GRIDY);
     x = (x + screenid*SHOW_SIZE_X) * 2 / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0f;
     y = y * 2 / (SHOW_SIZE_Y) - 1.0f;
 }
 static void GridCoor_to_ClipCoor(Float &x, Float &y, SCREENID_T screenid) {
-    x *= (SHOW_SIZE_X / GRID_SIZE_Y);
-    y *= (SHOW_SIZE_Y / GRID_SIZE_Z);
+    x *= (SHOW_SIZE_X / GRIDY);
+    y *= (SHOW_SIZE_Y / GRIDZ);
     x = (x + screenid*SHOW_SIZE_X) * 2 / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0f;
     y = y * 2 / (SHOW_SIZE_Y)- 1.0f;
 }
@@ -31,7 +31,7 @@ void Draw_Particle_2d(vector<MarkerParticle> &particles, SCREENID_T screenid) {
 	glFlush();
 }
 
-void Draw_Density_3d(Float *density, SCREENID_T screen,
+/*void Draw_Density_3d(aryf &density, SCREENID_T screen,
                      const vector<pair<int, Float> > (*lightPath)[SHOW_SIZE_Y])
 {
     glBegin(GL_POINTS);
@@ -53,22 +53,22 @@ void Draw_Density_3d(Float *density, SCREENID_T screen,
         }
     glEnd();
     glFlush();
-}
+}*/
 
-void Draw_Mask_2d(int *mask, SCREENID_T screenid) {
+void Draw_Mask_2d(aryi &mask, SCREENID_T screenid) {
 	LOGM("draw density\n");
 	assert(screenid < 5);
 	glBegin(GL_POINTS);
 	for (int is = 0; is < SHOW_SIZE_X; is++) {
 		for (int js = 0; js < SHOW_SIZE_Y; js++) {
-			int i = is*GRID_SIZE_Y / SHOW_SIZE_X;
-			int j = js*GRID_SIZE_Z / SHOW_SIZE_Y;
+			int i = is*GRIDY / SHOW_SIZE_X;
+			int j = js*GRIDZ / SHOW_SIZE_Y;
 			//LOGM("%d %d\n", i, j);
 			//for (int k = 0; k < 3; k++) {
 			//assert(0 <= density[ID(2, i, j)] && density[ID(2, i, j)] <= 1.0);
 			Float x = is, y = js;
 			ScreenCoor_to_ClipCoor(x, y, screenid);
-			int d = mask[ID(2, i, j)];
+			int d = mask(2, i, j);
 			if (d == WATER) glColor3f(1, 1, 1);
 			else if (d == AIR) glColor3f(0, 0, 0);
 			else if (d == SOLID) glColor3f(0, 0, 1);
@@ -86,20 +86,21 @@ void Draw_Mask_2d(int *mask, SCREENID_T screenid) {
 	//glDrawPixels(SHOW_SIZE_X, SHOW_SIZE_Y, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 }
 
-void Draw_Density_2d(Float *density, SCREENID_T screenid) {
+void Draw_Density_2d(aryf &density, SCREENID_T screenid) {
     LOGM("draw density\n");
     assert(screenid < 5);
     glBegin(GL_POINTS);
     for (int is = 0; is < SHOW_SIZE_X; is++) {
         for (int js = 0; js < SHOW_SIZE_Y; js++) {
-            int i = is*GRID_SIZE_Y / SHOW_SIZE_X;
-            int j = js*GRID_SIZE_Z / SHOW_SIZE_Y;
+            int i = is*GRIDY / SHOW_SIZE_X;
+            int j = js*GRIDZ / SHOW_SIZE_Y;
             //LOGM("%d %d\n", i, j);
             //for (int k = 0; k < 3; k++) {
-            assert(0 <= density[ID(2, i, j)] && density[ID(2, i, j)] <= 1.0);
+            //assert(0 <= density(2, i, j) && density(2, i, j) <= 1.0);
             Float x = is, y = js;
             ScreenCoor_to_ClipCoor(x, y, screenid);
-			Float d = abs(density[ID(2, i, j)]);
+			Float d = abs(density(2, i, j));
+			//assert(0 <= d&&d <= 1.0);
             glColor3f(d, d, d);
             glVertex2f(x, y);
             //pixels[p++] = BYT(density[ID(2, i, j)] * 255);
@@ -113,12 +114,12 @@ void Draw_Density_2d(Float *density, SCREENID_T screenid) {
     //glDrawPixels(SHOW_SIZE_X, SHOW_SIZE_Y, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 }
 
-void Draw_Velocity_2d(int i, Float*, Float *vys, Float *vzs, SCREENID_T screenid) {
+void Draw_Velocity_2d(int i, aryf &vxs, aryf &vys,aryf &vzs, SCREENID_T screenid) {
     LOGM("draw velocity\n");
-    for (int j = 0; j < GRID_SIZE_Y; j ++) {
-        for (int k = 0; k < GRID_SIZE_Z; k ++) {
+    for (int j = 0; j < GRIDY; j ++) {
+        for (int k = 0; k < GRIDZ; k ++) {
             int j0 = j, k0 = k;
-			Float vy = vys[ID(i, j0, k0)] * TIME_DELTA , vz = vzs[ID(i, j0, k0)] * TIME_DELTA;
+			Float vy = vys(i, j0, k0) * TIME_DELTA , vz = vzs(i, j0, k0) * TIME_DELTA;
             //LOGM("%f %f\n", vy, vz);
 			Float y0 = j0 + 0.5, z0 = k0 + 0.5;
             Float y1 = y0 + vy, z1 = z0 + vz;

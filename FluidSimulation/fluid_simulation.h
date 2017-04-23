@@ -12,8 +12,8 @@ private:
 public:
 	FluidSimulation();
 	void init_Density_3d();
-	void Draw_Vel(int i);
-	void Draw_Pixels(void);
+	//void Draw_Vel(int i);
+	//void Draw_Pixels(void);
 	void Draw_On_Screen(void);
 	void Step_Time(void);
 };

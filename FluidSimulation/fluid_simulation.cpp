@@ -11,7 +11,7 @@ void FluidSimulation::Draw_On_Screen(void){
     Draw_Density_3d(cubic.density, RIGHT_SCREEN, lightPath);
 #else
 	//Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
-    Draw_Density_2d(cubic.s, THIRD_SCREEN);
+    Draw_Density_2d(cubic.p, THIRD_SCREEN);
 #endif
     Draw_Velocity_2d(2, cubic.vx, cubic.vy, cubic.vz, LEFT_SCREEN);
 	Draw_Particle_2d(cubic.particles, RIGHT_SCREEN);
@@ -78,9 +78,9 @@ using sef = Segment;
 using cuf = Cuboid;
 void FluidSimulation::init_Density_3d()
 {
-    double ang = -0;
+  /*double ang = -0;
     p3df vrp(30, 32, 0), vpn(-cos(ang), sin(ang), 0), uvp(0, 0, 1), vvp(vpn.cross(uvp)), prp(50, 32, 32);
-    cuf jar(p3df(0, 0, 0), p3df(GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z));
+    cuf jar(p3df(0, 0, 0), p3df(GRIDX, GRIDY, GRIDZ));
     for (int i = 0; i < SHOW_SIZE_X; ++i)
         for (int j = 0; j < SHOW_SIZE_Y; ++j)
             try
@@ -103,6 +103,6 @@ void FluidSimulation::init_Density_3d()
                     lightPath[i][j].push_back(make_pair(ID(x, y, z), thu.len()));
                     ray.p1 = thu.p2;
                 }
-            } catch(int err) { LOGM("err: %d\n", err); }
+            } catch(int err) { LOGM("err: %d\n", err); }*/
 }
 

@@ -1,27 +1,29 @@
 #include "surface.h"
 
 
-
-void Mark_Water_By(vector<MarkerParticle> &particles, int *mask) {
-	for (int i = 0; i < GRID_SIZE_X; i++) {
-		for (int j = 0; j < GRID_SIZE_Y; j++) {
-			for (int k = 0; k < GRID_SIZE_Z; k++) {
-				if (mask[ID(i, j, k)] != SOLID) mask[ID(i, j, k)] = AIR;
+void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				if (mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
 			}
 		}
 	}
 	for (MarkerParticle &p : particles) {
 		int x = round(p.x), y = round(p.y), z = round(p.z);
-		if (mask[ID(x, y, z)] != SOLID) mask[ID(x, y, z)] = WATER;
+		if (!mask.inside(x, y, z)) {
+			LOGM("when marking marker particle flying outside: %f %f %f\n", p.x, p.y, p.z);
+		}
+		else if (mask(x, y, z) != SOLID) mask(x, y, z) = WATER;
 	}
 }
 
-void Place_Particles(vector<MarkerParticle> &particles, int *mask) {
+void Place_Particles(vector<MarkerParticle> &particles, aryi &mask) {
 	particles.clear();
-	for (int i = 0; i < GRID_SIZE_X; i++) {
-		for (int j = 0; j < GRID_SIZE_Y; j++) {
-			for (int k = 0; k < GRID_SIZE_Z; k++) {
-				if (mask[ID(i, j, k)] == WATER) {
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				if (mask(i, j, k) == WATER) {
 					particles.push_back(MarkerParticle(i - 0.25, j - 0.25, k - 0.25));
 					particles.push_back(MarkerParticle(i - 0.25, j - 0.25, k + 0.25));
 					particles.push_back(MarkerParticle(i - 0.25, j + 0.25, k - 0.25));
@@ -42,11 +44,13 @@ void Place_Particles(vector<MarkerParticle> &particles, int *mask) {
 }
 
 //todo: Runge_Kutta here
-void Advect_Particles(vector<MarkerParticle> &particles, Float *vx, Float *vy, Float *vz, int *mask){
+void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryi &mask){
 	for (MarkerParticle &p : particles) {
 		int ix = round(p.x), iy = round(p.y), iz = round(p.z);
-		int k = ID(ix, iy, iz);
-		if (mask[k] != SOLID) {
+		if (!mask.inside(ix, iy, iz)) {
+			LOGM("when advecting marker particle flying outside: %f %f %f\n", p.x, p.y, p.z);
+		}
+		else if (mask(ix,iy,iz) != SOLID) {
 			p.x += Interpolation_In_Water_3D(vx, p.x, p.y, p.z, mask)*TIME_DELTA;
 			p.y += Interpolation_In_Water_3D(vy, p.x, p.y, p.z, mask)*TIME_DELTA;
 			p.z += Interpolation_In_Water_3D(vz, p.x, p.y, p.z, mask)*TIME_DELTA;
