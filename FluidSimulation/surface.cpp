@@ -1,5 +1,7 @@
 #include "surface.h"
 
+
+
 void Mark_Water_By(vector<MarkerParticle> &particles, int *mask) {
 	for (int i = 0; i < GRID_SIZE_X; i++) {
 		for (int j = 0; j < GRID_SIZE_Y; j++) {
@@ -32,6 +34,11 @@ void Place_Particles(vector<MarkerParticle> &particles, int *mask) {
 			}
 		}
 	}
+	for (MarkerParticle &p : particles) {
+		p.x += (randomF() - 0.5)*0.1;
+		p.y += (randomF() - 0.5)*0.1;
+		p.z += (randomF() - 0.5)*0.1;
+	}
 }
 
 //todo: Runge_Kutta here
@@ -40,9 +47,9 @@ void Advect_Particles(vector<MarkerParticle> &particles, Float *vx, Float *vy, F
 		int ix = round(p.x), iy = round(p.y), iz = round(p.z);
 		int k = ID(ix, iy, iz);
 		if (mask[k] != SOLID) {
-			p.x += Interpolation_3D(vx, p.x, p.y, p.z)*TIME_DELTA;
-			p.y += Interpolation_3D(vy, p.x, p.y, p.z)*TIME_DELTA;
-			p.z += Interpolation_3D(vz, p.x, p.y, p.z)*TIME_DELTA;
+			p.x += Interpolation_In_Water_3D(vx, p.x, p.y, p.z, mask)*TIME_DELTA;
+			p.y += Interpolation_In_Water_3D(vy, p.x, p.y, p.z, mask)*TIME_DELTA;
+			p.z += Interpolation_In_Water_3D(vz, p.x, p.y, p.z, mask)*TIME_DELTA;
 		}
 	}
 }

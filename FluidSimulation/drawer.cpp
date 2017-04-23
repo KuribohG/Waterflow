@@ -118,10 +118,10 @@ void Draw_Velocity_2d(int i, Float*, Float *vys, Float *vzs, SCREENID_T screenid
     for (int j = 0; j < GRID_SIZE_Y; j ++) {
         for (int k = 0; k < GRID_SIZE_Z; k ++) {
             int j0 = j, k0 = k;
-            Float vy = vys[ID(i, j0, k0)] / 10.0f, vz = vzs[ID(i, j0, k0)] / 10.0f;
+			Float vy = vys[ID(i, j0, k0)] * TIME_DELTA , vz = vzs[ID(i, j0, k0)] * TIME_DELTA;
             //LOGM("%f %f\n", vy, vz);
-            Float y0 = j0, z0 = k0;
-            Float y1 = j0 + vy, z1 = k0 + vz;
+			Float y0 = j0 + 0.5, z0 = k0 + 0.5;
+            Float y1 = y0 + vy, z1 = z0 + vz;
             //LOGM("%f %f %f %f\n", y0, z0, y1, z1);
             GridCoor_to_ClipCoor(y0, z0, screenid);
             GridCoor_to_ClipCoor(y1, z1, screenid);

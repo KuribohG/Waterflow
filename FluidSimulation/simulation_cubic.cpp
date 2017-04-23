@@ -1,7 +1,7 @@
 #include "simulation_cubic.h"
 
-void Runge_Kutta(int i, int j, int k, Float delta, int iter,
-        Float vx[], Float vy[], Float vz[], Float &x, Float &y, Float &z);
+//void Runge_Kutta(int i, int j, int k, Float delta, int iter,
+//       Float vx[], Float vy[], Float vz[], Float &x, Float &y, Float &z);
 
 SimulationCubic::SimulationCubic(void){
     vx = (Float*) calloc(GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z, sizeof(Float));
@@ -42,7 +42,7 @@ SimulationCubic::SimulationCubic(void){
                 vx[t] = 0;
                 //vy[t] = 0;
                 //vz[t] = 0;
-				if (j >= 30 && mask[t] != SOLID) mask[t] = AIR;
+				if ((k == GRID_SIZE_Z-2 || j >= 30) && mask[t] != SOLID) mask[t] = AIR;
                 //if (20 <= j &&j<= 30 && 10 <= k &&k<= 20) {
                    // vy[t] = 100;
                 //}
@@ -136,7 +136,9 @@ void SimulationCubic::Apply_External_Forces(void) {
 		for (int j = 0; j < GRID_SIZE_Y; j++) {
 			for (int k = 0; k < GRID_SIZE_Z; k++) {
 				int t = ID(i, j, k);
+				//vx[t] = 0;
 				if (mask[t] == WATER) vz[t] += -g*TIME_DELTA;
+				else if (mask[t] == AIR) vx[t] = vy[t] = vz[t] = 0;
 			}
 		}
 	}
@@ -239,7 +241,7 @@ void SimulationCubic::Advect(int axis, Float *density, Float *density0, Float *v
                     x = Clip(x, 0.5, GRID_SIZE_X + 0.5);
                     y = Clip(y, 0.5, GRID_SIZE_Y + 0.5);
                     z = Clip(z, 0.5, GRID_SIZE_Z + 0.5);
-                    density[ID(i, j, k)] = Interpolation_3D(density0, x, y, z);
+                    density[ID(i, j, k)] = Interpolation_In_Water_3D(density0, x, y, z,mask);
                 }
             }
         }
@@ -247,7 +249,7 @@ void SimulationCubic::Advect(int axis, Float *density, Float *density0, Float *v
     Bound_Solid(axis, density);
 }
 
-void Runge_Kutta(int i, int j, int k, Float delta, int iter,
+void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
 	Float vx[], Float vy[], Float vz[], Float &x, Float &y, Float &z) {
 	assert(iter >= 1);
 
@@ -259,9 +261,9 @@ void Runge_Kutta(int i, int j, int k, Float delta, int iter,
 	z = k - delta * vz[id];
 
 	for (int _ = 1; _ < iter; _++) {
-		Float nx = x - delta * Interpolation_3D(vx, x, y, z);
-		Float ny = y - delta * Interpolation_3D(vy, x, y, z);
-		Float nz = z - delta * Interpolation_3D(vz, x, y, z);
+		Float nx = x - delta * Interpolation_In_Water_3D(vx, x, y, z, mask);
+		Float ny = y - delta * Interpolation_In_Water_3D(vy, x, y, z, mask);
+		Float nz = z - delta * Interpolation_In_Water_3D(vz, x, y, z, mask);
 		x = nx, y = ny, z = nz;
 	}
 }
@@ -273,15 +275,18 @@ void SimulationCubic::Step_Time(void){
 	Apply_External_Forces();
 
     //Diffuse(0, vx0, vx, viscosity, TIME_DELTA, LINSOLVER_ITER);
-    Diffuse(1, vy0, vy, viscosity, TIME_DELTA, LINSOLVER_ITER);
-    Diffuse(2, vz0, vz, viscosity, TIME_DELTA, LINSOLVER_ITER);
+    //Diffuse(1, vy0, vy, viscosity, TIME_DELTA, LINSOLVER_ITER);
+    //Diffuse(2, vz0, vz, viscosity, TIME_DELTA, LINSOLVER_ITER);
+	swap(vx, vx0);
+	swap(vy, vy0);
+	swap(vz, vz0);
     //now vx0, vy0, vz0 are "blurred" velocities
     Project(vx0, vy0, vz0, vx, vy);
     //swap(vx, vx0);
     //swap(vy, vy0);
     //swap(vz, vz0);
     LOGM( "advect x:\n");
-    //Advect(0, vx, vx0, vx0, vy0, vz0);
+    Advect(0, vx, vx0, vx0, vy0, vz0);
     Advect(1, vy, vy0, vx0, vy0, vz0);
     Advect(2, vz, vz0, vx0, vy0, vz0);
     Project(vx, vy, vz, vx0, vy0);
@@ -294,14 +299,14 @@ void SimulationCubic::Step_Time(void){
     //Diffuse(-1, s, density, diff, TIME_DELTA, LINSOLVER_ITER);
 
     //now stored in s
-    Float sm = 0;
+    /*Float sm = 0;
     for (int j = 0; j < GRID_SIZE_Y; j++) {
         for (int k = 0;k<GRID_SIZE_Z; k++) {
             //LOGM("%f ", s[ID(2, j, k)]);
             sm += s[ID(2, j, k)];
         }
         //LOGM("\n");
-    }LOGM("%f \n",sm);
+    }LOGM("%f \n",sm);*/
     //Advect(-1, density, s, vx, vy, vz);
 	Advect_Particles(particles, vx, vy, vz, mask);
 	Mark_Water_By(particles, mask);

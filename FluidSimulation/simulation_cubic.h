@@ -34,6 +34,8 @@ public:
 
 	void Advect(int axis, Float * density, Float * density0, Float * vx, Float * vy, Float * vz);
 
+	void Runge_Kutta(int i, int j, int k, Float delta, int iter, Float vx[], Float vy[], Float vz[], Float & x, Float & y, Float & z);
+
 	void Step_Time();
 
 };
