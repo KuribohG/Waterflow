@@ -99,7 +99,7 @@ void Draw_Density_2d(Float *density, SCREENID_T screenid) {
             assert(0 <= density[ID(2, i, j)] && density[ID(2, i, j)] <= 1.0);
             Float x = is, y = js;
             ScreenCoor_to_ClipCoor(x, y, screenid);
-            Float d = density[ID(2, i, j)];
+			Float d = abs(density[ID(2, i, j)]);
             glColor3f(d, d, d);
             glVertex2f(x, y);
             //pixels[p++] = BYT(density[ID(2, i, j)] * 255);

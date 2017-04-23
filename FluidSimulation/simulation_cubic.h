@@ -30,6 +30,8 @@ public:
 
 	void Diffuse(int axis, Float * x, Float * x0, Float diff, Float dt, int iter);
 
+	void Calc_Divergence(Float * vx, Float * vy, Float * vz, Float * div);
+
 	void Project(Float * vx, Float * vy, Float * vz, Float * pressure, Float * dv);
 
 	void Advect(int axis, Float * density, Float * density0, Float * vx, Float * vy, Float * vz);

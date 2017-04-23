@@ -178,10 +178,30 @@ void SimulationCubic::Diffuse(int axis, Float *x, Float *x0, Float diff, Float d
     Linear_Solve(axis, x, x0, a, 6 * a + 1, iter);
 }
 
+void SimulationCubic::Calc_Divergence(Float *vx, Float *vy, Float *vz, Float *div) {
+	for (int i = 0; i < GRID_SIZE_X; i++) {
+		for (int j = 0; j < GRID_SIZE_Y; j++) {
+			for (int k = 0; k < GRID_SIZE_Z; k++) {
+				if (mask[ID(i, j, k)] == WATER) {
+					Float tmp = 0;
+					if (i + 1 < GRID_SIZE_X) tmp += vx[ID(i + 1, j, k)];
+					if (i - 1 >= 0) tmp -= vx[ID(i - 1, j, k)];
+					if (j + 1 < GRID_SIZE_Y) tmp += vy[ID(i, j + 1, k)];
+					if (j - 1 >= 0) tmp -= vy[ID(i, j - 1, k)];
+					if (k + 1 < GRID_SIZE_Z) tmp += vz[ID(i, j, k + 1)];
+					if (k - 1 >= 0) tmp -= vz[ID(i, j, k - 1)];
+					div[ID(i, j, k)] = -0.5*tmp;//it's divergence of velocity field
+					//s[ID(i, j, k)] = 0;
+				}
+			}
+		}
+	}
+}
+
 void SimulationCubic::Project(Float *vx, Float *vy, Float *vz, Float *s, Float *div) {
     /*based on Helmholtz decomposition, a vector field can be resolved into the sum of
     a mass-conserving field and a gradient field, and we hope the velocity field is mass-conserving*/
-    for (int i = 0; i < GRID_SIZE_X; i++) {
+    /*for (int i = 0; i < GRID_SIZE_X; i++) {
         for (int j = 0; j < GRID_SIZE_Y; j++) {
             for (int k = 0; k < GRID_SIZE_Z; k++) {
                 if (mask[ID(i, j, k)] == WATER) {
@@ -197,10 +217,13 @@ void SimulationCubic::Project(Float *vx, Float *vy, Float *vz, Float *s, Float *
                 }
             }
         }
-    }
-    Bound_Solid(-1, div);
+    }*/
+	Calc_Divergence(vx, vy, vz, div);
+	memset(s, 0, sizeof(s[0])*GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z);
+	Bound_Solid(-1, div);
     Linear_Solve(-1, s, div, 1, 6+1, LINSOLVER_ITER);
 	Bound_Surface(s, mask);
+	for (int i = 0; i < GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z; i++) s[i] *= 2;
     //basically, s is some "blurred" divergence
     //we substract the gradient of divergence from velocity field
     for (int i = 0; i < GRID_SIZE_X; i++) {
@@ -256,9 +279,9 @@ void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
 	delta /= iter;
 
 	int id = ID(i, j, k);
-	x = i - delta * vx[id];
-	y = j - delta * vy[id];
-	z = k - delta * vz[id];
+	x = i + 0.5 - delta * vx[id];
+	y = j + 0.5 - delta * vy[id];
+	z = k + 0.5 - delta * vz[id];
 
 	for (int _ = 1; _ < iter; _++) {
 		Float nx = x - delta * Interpolation_In_Water_3D(vx, x, y, z, mask);
@@ -281,7 +304,8 @@ void SimulationCubic::Step_Time(void){
 	swap(vy, vy0);
 	swap(vz, vz0);
     //now vx0, vy0, vz0 are "blurred" velocities
-    Project(vx0, vy0, vz0, vx, vy);
+    //Project(vx0, vy0, vz0, vx, vy);
+
     //swap(vx, vx0);
     //swap(vy, vy0);
     //swap(vz, vz0);
@@ -289,7 +313,10 @@ void SimulationCubic::Step_Time(void){
     Advect(0, vx, vx0, vx0, vy0, vz0);
     Advect(1, vy, vy0, vx0, vy0, vz0);
     Advect(2, vz, vz0, vx0, vy0, vz0);
+
+
     Project(vx, vy, vz, vx0, vy0);
+	//Calc_Divergence(vx, vy, vz, s);
 
 
     //diff = 1.0*GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z*200;
@@ -310,14 +337,15 @@ void SimulationCubic::Step_Time(void){
     //Advect(-1, density, s, vx, vy, vz);
 	Advect_Particles(particles, vx, vy, vz, mask);
 	Mark_Water_By(particles, mask);
-    //now stored in density
-    //memcpy(density, s, sizeof(Float)*GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z);
-    /*for (int j = 0; j < 10; j++) {
-        for (int k = 0; k < 10; k++) {
-            LOGM("%f ", density[ID(2, j, k)]);
-        }
-        LOGM("\n");
-    }LOGM("\n");*/
-    //LOGM("density: %lf\n", density[0]);
+
+
+	//Calc_Divergence(vx, vy, vz, s);
+	Calc_Divergence(vx, vy, vz, vx0);
+	memset(s, 0, sizeof(s[0])*GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z);
+	Bound_Solid(-1, vx0);
+	Linear_Solve(-1, s, vx0, 1, 6 + 1, LINSOLVER_ITER);
+	Bound_Surface(s, mask);
+	for (int i = 0; i < GRID_SIZE_X*GRID_SIZE_Y*GRID_SIZE_Z; i++) s[i] -= vx0[i];
 }
+
 

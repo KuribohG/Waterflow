@@ -24,15 +24,15 @@ enum GridMaterial { WATER, SOLID, AIR };
 
 constexpr Float  EPS = 1e-3f;
 
-const Float g = 98;
+const Float g = 9.8;
 
-const int FPS = 60;
+const int FPS = 10;
 
 const Float TIME_DELTA = 1.0 / (Float)FPS;
 
 const int TOTAL_SCREEN = 3;
 
-const int LINSOLVER_ITER = 20;
+const int LINSOLVER_ITER = 100;
 
 const int SHOW_SIZE_X = 512;
 const int SHOW_SIZE_Y = 512;
