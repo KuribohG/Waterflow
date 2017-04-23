@@ -39,13 +39,7 @@ bool Valid_Water(int x, int y, int z, aryi &mask) {
 }
 
 Float Interpolation_In_Water_3D(aryf &f, Float x, Float y, Float z, aryi &mask) {
-	/*int x0 = floor(x-0.5), x1 = x0 + 1;
-	int y0 = floor(y-0.5), y1 = y0 + 1;
-	int z0 = floor(z-0.5), z1 = z0 + 1;
-	Float s0 = x - x0 - 0.5, s1 = x1 - x + 0.5;
-	Float u0 = y - y0 - 0.5, u1 = y1 - y + 0.5;
-	Float v0 = z - z0 - 0.5, v1 = z1 - z + 0.5;
-	Float v = 0, sw = 0;*/
+	-+ // todo: somehow re-write all interpolation scenes to take 0.5 offset into consideration
 	//x -= 0.5, y -= 0.5, z -= 0.5;
 	int x0 = floor(x), x1 = x0 + 1;
 	int y0 = floor(y), y1 = y0 + 1;

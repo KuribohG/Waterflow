@@ -150,25 +150,6 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 }
 
 void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
-    /*based on Helmholtz decomposition, a vector field can be resolved into the sum of
-    a mass-conserving field and a gradient field, and we hope the velocity field is mass-conserving*/
-    /*for (int i = 0; i < GRIDX; i++) {
-        for (int j = 0; j < GRIDY; j++) {
-            for (int k = 0; k < GRIDZ; k++) {
-                if (mask[ID(i, j, k)] == WATER) {
-                    Float tmp = 0;
-                    if (i + 1 < GRIDX) tmp += vx[ID(i + 1, j, k)];
-                    if (i - 1 >= 0) tmp -= vx[ID(i - 1, j, k)];
-                    if (j + 1 < GRIDY) tmp += vy[ID(i, j + 1, k)];
-                    if (j - 1 >= 0) tmp -= vy[ID(i, j - 1, k)];
-                    if (k + 1 < GRIDZ) tmp += vz[ID(i, j, k + 1)];
-                    if (k - 1 >= 0) tmp -= vz[ID(i, j, k - 1)];
-                    div[ID(i, j, k)] = -0.5*tmp;//it's divergence of velocity field
-                    s[ID(i, j, k)] = 0;
-                }
-            }
-        }
-    }*/
 	Calc_Divergence(vx, vy, vz, div);
 	p.set(0);
 	//memset(s, 0, sizeof(s[0])*GRIDX*GRIDY*GRIDZ);
@@ -176,6 +157,9 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 	
 	//actually, p solved here is -deltaT*p, look at [Robert Bridson, p54]
 	Linear_Solve(-1, p, div, 1, 6 + 1, LINSOLVER_ITER);
+
+	-+ //todo: apply bound condition before, not after linear_solve
+	-+ //todo: now this routine's solid bound fails, try to fix it
 
 	Bound_Surface(p, mask);
 	for (int i = 0; i < GRIDX; i++) {
