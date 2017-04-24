@@ -2,6 +2,15 @@
 
 路线图：extended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
 
+get started:
+v1.0（盛满水的鱼缸里的染料）
+1. 论文：Real-Time Fluid Dynamics for Games，Stam
+2. 一个网页：https://mikeash.com/pyblog/fluid-simulation-for-dummies.html
+3. 网页里的代码：https://mikeash.com/pyblog/blog/images/fluid.c.file
+v2.0（空气和水）
+1. 书本：fluid simulation for computer graphics robert bridson
+2. 一个项目：https://github.com/rlguy/GridFluidSim3D
+
 1. 把Semi-Lagrangian换成MacCormack
 2. 支持水源和外力
 3. 搞清楚[http://cowboyprogramming.com/2008/04/01/practical-fluid-mechanics/](http://cowboyprogramming.com/2008/04/01/practical-fluid-mechanics/) （一个晚于GDC03的系统）干了什么，有没有可能加入我们的系统 catch：它没有强制散度为零，而是用特殊的advection技巧，以及一种根据压强算速度的方法把散度变得像零。这个是“主体思想”，是假的社会主义理想，不予考虑
