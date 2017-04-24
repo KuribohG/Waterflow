@@ -9,6 +9,7 @@ SimulationCubic::SimulationCubic(void){
 	vz.init(GRIDX, GRIDY, GRIDZ + 1); vz0.init(GRIDX, GRIDY, GRIDZ + 1);
 	p.init(GRIDX, GRIDY, GRIDZ); p0.init(GRIDX, GRIDY, GRIDZ);
 	mask.init(GRIDX, GRIDY, GRIDZ);
+	solver.init(GRIDX, GRIDY, GRIDZ);
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
             mask(i, j, 0) = mask(i, j, GRIDZ - 1) = SOLID;
@@ -34,7 +35,6 @@ SimulationCubic::SimulationCubic(void){
     }
 	LOGM("velocity set\n");
 	Place_Particles(particles, mask);
-	LOGM("marker particles set\n");
 }
 
 SimulationCubic::~SimulationCubic() {
@@ -85,10 +85,8 @@ void SimulationCubic::Apply_External_Forces(void) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
 				int t = mask(i, j, k);
-				if (t == WATER) {
-					vz(i, j, k) += -g*TIME_DELTA;
-					vz(i, j, k + 1) += -g*TIME_DELTA;
-				}
+				if (t == WATER) vz(i, j, k) += -g*TIME_DELTA;
+				else if(k>0&&mask(i,j,k-1)==WATER) vz(i, j, k) += -g*TIME_DELTA;
 				if (i < GRIDX&&t == AIR&&mask(i + 1, j, k) == AIR) vx(i + 1, j, k) = 0;
 				if (j < GRIDY&&t == AIR&&mask(i, j + 1, k) == AIR) vy(i, j + 1, k) = 0;
 				if (k < GRIDZ&&t == AIR&&mask(i, j, k + 1) == AIR) vz(i, j, k + 1) = 0;
@@ -98,7 +96,7 @@ void SimulationCubic::Apply_External_Forces(void) {
 }
 
 
-void SimulationCubic::Linear_Solve(int axis, aryf &x, aryf &x0, Float a, Float wtsum, int iter) {
+/*void SimulationCubic::Linear_Solve(int axis, aryf &x, aryf &x0, Float a, Float wtsum, int iter) {
     //this is so-called "Semi-Lagrangian" Advectoin
     //we shall change it to MacCormack Advection in further development
     //"hyperbolic equation": du/dt + a*du/dx = 0
@@ -115,14 +113,8 @@ void SimulationCubic::Linear_Solve(int axis, aryf &x, aryf &x0, Float a, Float w
             }
         }
     }
-    /*for (int j = 240; j < 255; j++) {
-        for (int k = 240; k < 255; k++) {
-            LOGM("%f ", x[ID(2, j, k)]);
-        }
-        LOGM("\n");
-    }LOGM("\n");*/
     Bound_Solid(axis, x);
-}
+}*/
 
 /*void SimulationCubic::Diffuse(int axis, Float *x, Float *x0, Float diff, Float dt, int iter) {//diffusion is blurring
     //solve x from x0
@@ -130,6 +122,8 @@ void SimulationCubic::Linear_Solve(int axis, aryf &x, aryf &x0, Float a, Float w
     LOGM("diffusion parameter: %d\n", iter);
     Linear_Solve(axis, x, x0, a, 6 * a + 1, iter);
 }*/
+
+
 
 void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 	for (int i = 0; i < GRIDX; i++) {
@@ -150,18 +144,21 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 }
 
 void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
-	Calc_Divergence(vx, vy, vz, div);
-	p.set(0);
+	LOGM("project\n");
+	solver.Solve_Pressure(vx, vy, vz, mask);
+	solver.Send_Back_To(p);
+	//Calc_Divergence(vx, vy, vz, div);
+	//p.set(0);
 	//memset(s, 0, sizeof(s[0])*GRIDX*GRIDY*GRIDZ);
 	//Bound_Solid(-1, div);
 	
 	//actually, p solved here is -deltaT*p, look at [Robert Bridson, p54]
-	Linear_Solve(-1, p, div, 1, 6 + 1, LINSOLVER_ITER);
+	//Linear_Solve(-1, p, div, 1, 6 + 1, LINSOLVER_ITER);
 
-	-+ //todo: apply bound condition before, not after linear_solve
-	-+ //todo: now this routine's solid bound fails, try to fix it
+	//-+ //todo: apply bound condition before, not after linear_solve
+	//-+ //todo: now this routine's solid bound fails, try to fix it
 
-	Bound_Surface(p, mask);
+	//Bound_Surface(p, mask);
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
@@ -195,9 +192,9 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
             }
         }
     }*/
-    Bound_Solid(0, vx);
-    Bound_Solid(1, vy);
-    Bound_Solid(2, vz);
+    //Bound_Solid(0, vx);
+    //Bound_Solid(1, vy);
+    //Bound_Solid(2, vz);
 }
 
 void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
@@ -212,14 +209,15 @@ void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
 	z = k + 0.5 - delta * vz(i, j, k);
 
 	for (int _ = 1; _ < iter; _++) {
-		Float nx = x - delta * Interpolation_In_Water_3D(vx, x, y, z, mask);
-		Float ny = y - delta * Interpolation_In_Water_3D(vy, x, y, z, mask);
-		Float nz = z - delta * Interpolation_In_Water_3D(vz, x, y, z, mask);
+		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask);
+		Float ny = y - delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask);
+		Float nz = z - delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask);
 		x = nx, y = ny, z = nz;
 	}
 }
 
-void SimulationCubic::Advect(int axis, aryf &f, aryf &f0, aryf &vx, aryf &vy, aryf &vz) {
+void SimulationCubic::Advect_Velocity(int axis, aryf &f, aryf &f0, aryf &vx, aryf &vy, aryf &vz) {
+	LOGM("advect along: %d\n", axis);
     Float x, y, s0, s1, t0, t1;
     int i0, i1, j0, j1;
     for (int i = 0; i < GRIDX; i++) {
@@ -232,7 +230,7 @@ void SimulationCubic::Advect(int axis, aryf &f, aryf &f0, aryf &vx, aryf &vy, ar
                     x = Clip(x, 0.5, GRIDX + 0.5);
                     y = Clip(y, 0.5, GRIDY + 0.5);
                     z = Clip(z, 0.5, GRIDZ + 0.5);
-                    f(i, j, k) = Interpolation_In_Water_3D(f0, x, y, z,mask);
+					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask);
                 }
             }
         }
@@ -255,11 +253,11 @@ void SimulationCubic::Step_Time(void){
     //Diffuse(1, vy0, vy, viscosity, TIME_DELTA, LINSOLVER_ITER);
     //Diffuse(2, vz0, vz, viscosity, TIME_DELTA, LINSOLVER_ITER);
 
-	printf("%p %p %f %f\n", vx.f, vx0.f, vx.f[0], vx0.f[0]);
+	//printf("%p %p %f %f\n", vx.f, vx0.f, vx.f[0], vx0.f[0]);
 	swap(vx, vx0);
 	swap(vy, vy0);
 	swap(vz, vz0);
-	printf("%p %p %f %f\n", vx.f, vx0.f, vx.f[0], vx0.f[0]);
+	//printf("%p %p %f %f\n", vx.f, vx0.f, vx.f[0], vx0.f[0]);
 
 
     //now vx0, vy0, vz0 are "blurred" velocities
@@ -268,10 +266,9 @@ void SimulationCubic::Step_Time(void){
     //swap(vx, vx0);
     //swap(vy, vy0);
     //swap(vz, vz0);
-    LOGM( "advect x:\n");
-    Advect(0, vx, vx0, vx0, vy0, vz0);
-    Advect(1, vy, vy0, vx0, vy0, vz0);
-    Advect(2, vz, vz0, vx0, vy0, vz0);
+    Advect_Velocity(0, vx, vx0, vx0, vy0, vz0);
+	Advect_Velocity(1, vy, vy0, vx0, vy0, vz0);
+	Advect_Velocity(2, vz, vz0, vx0, vy0, vz0);
 
 
 	Project(vx, vy, vz, p, p0);

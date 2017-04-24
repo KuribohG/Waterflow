@@ -3,6 +3,7 @@
 #include "shared.hpp"
 #include "surface.h"
 #include "gridmath.h"
+#include "pressuresolver.h"
 
 class SimulationCubic {
 public:
@@ -11,6 +12,7 @@ public:
 	aryf vx, vx0, vy, vy0, vz, vz0;
 	aryf p, p0;
 	aryi mask;
+	PressureSolver solver;
 	/*Float *vx;
 	Float *vy;
 	Float *vz;
@@ -38,7 +40,7 @@ public:
 
 	void Runge_Kutta(int i, int j, int k, Float delta, int iter, aryf & vx, aryf & vy, aryf & vz, Float & x, Float & y, Float & z);
 
-	void Advect(int axis, aryf & f, aryf & f0, aryf & vx, aryf & vy, aryf & vz);
+	void Advect_Velocity(int axis, aryf & f, aryf & f0, aryf & vx, aryf & vy, aryf & vz);
 
 	void Step_Time();
 

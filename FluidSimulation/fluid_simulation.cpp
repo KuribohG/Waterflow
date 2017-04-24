@@ -13,7 +13,7 @@ void FluidSimulation::Draw_On_Screen(void){
 	//Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
     Draw_Density_2d(cubic.p, THIRD_SCREEN);
 #endif
-    Draw_Velocity_2d(2, cubic.vx, cubic.vy, cubic.vz, LEFT_SCREEN);
+	Draw_Velocity_2d(2, cubic.vx, cubic.vy, cubic.vz, cubic.mask, LEFT_SCREEN);
 	Draw_Particle_2d(cubic.particles, RIGHT_SCREEN);
 }
 

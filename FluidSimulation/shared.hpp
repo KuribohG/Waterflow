@@ -15,7 +15,8 @@ typedef char BYT;
 typedef float Float;
 
 #ifdef NDEBUG
-#define LOGM(...) fprintf(stderr,  __VA_ARGS__)
+//#define LOGM(...) fprintf(stderr,  __VA_ARGS__)
+#define LOGM(...) void(0);
 #else
 #define LOGM(...)  fprintf(stderr,  __VA_ARGS__)
 #endif
@@ -23,19 +24,24 @@ typedef float Float;
 //#define ARYTPL template<int n,int m,int w> // without typename T
 //#define ARYTPLT template<typename T, int n, int m, int w> // with typename T
 //#define ARYDEF Array3D<T,n,m,w>
-
+enum AXES { _X, _Y, _Z };
 enum GridMaterial { WATER, SOLID, AIR };
+
+const double INF = 1e15;
 
 constexpr Float  EPS = 1e-3f;
 
+const Float DENSITY = 20;
+
 const Float g = 9.8;
 
-const int FPS = 10;
+const int FPS = 100;
 
 const Float TIME_DELTA = 1.0 / (Float)FPS;
 
 const int TOTAL_SCREEN = 3;
 
+const double TOLERANCE = 1e-6;
 const int LINSOLVER_ITER = 100;
 
 const int SHOW_SIZE_X = 512;

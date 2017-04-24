@@ -20,7 +20,7 @@ void Draw_Particle_2d(vector<MarkerParticle> &particles, SCREENID_T screenid) {
 	glBegin(GL_POINTS);
 	glColor3f(1.0, 1.0, 1.0);
 	for (MarkerParticle &p : particles) {
-		int ix = round(p.x);
+		int ix = floor(p.x);
 		Float y = p.y, z = p.z;
 		if (ix == 2) {
 			GridCoor_to_ClipCoor(y, z, screenid);
@@ -114,12 +114,13 @@ void Draw_Density_2d(aryf &density, SCREENID_T screenid) {
     //glDrawPixels(SHOW_SIZE_X, SHOW_SIZE_Y, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 }
 
-void Draw_Velocity_2d(int i, aryf &vxs, aryf &vys,aryf &vzs, SCREENID_T screenid) {
+void Draw_Velocity_2d(int i, const aryf &vxs, const aryf &vys,const aryf &vzs, const aryi &mask, SCREENID_T screenid) {
     LOGM("draw velocity\n");
     for (int j = 0; j < GRIDY; j ++) {
         for (int k = 0; k < GRIDZ; k ++) {
             int j0 = j, k0 = k;
-			Float vy = vys(i, j0, k0) * TIME_DELTA , vz = vzs(i, j0, k0) * TIME_DELTA;
+			Float vy = Interpolation_Water_Velocity(_Y, vys, i + 0.5, j0 + 0.5, k0 + 0.5, mask)*TIME_DELTA;
+			Float vz = Interpolation_Water_Velocity(_Z, vzs, i + 0.5, j0 + 0.5, k0 + 0.5, mask)*TIME_DELTA;
             //LOGM("%f %f\n", vy, vz);
 			Float y0 = j0 + 0.5, z0 = k0 + 0.5;
             Float y1 = y0 + vy, z1 = z0 + vz;
