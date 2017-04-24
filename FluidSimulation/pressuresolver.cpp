@@ -45,6 +45,7 @@ int PressureSolver::Get_Cell_Idx(int i, int j, int k){
 }
 
 void PressureSolver::Send_Back_To(aryf & pa) {
+	-+ // todo: consider solid pressure
 	pa.set(0);
 	for (int t = 0; t < pressure.size(); t++) {
 		int i = cells[t * 3 + 0], j = cells[t * 3 + 1], k = cells[t * 3 + 2];
