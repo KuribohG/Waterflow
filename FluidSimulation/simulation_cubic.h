@@ -30,6 +30,8 @@ public:
 
 	~SimulationCubic();
 
+	void Bound_Solid(void);
+
 	void Apply_External_Forces(void);
 
 	void Linear_Solve(int axis, aryf & x, aryf & x0, Float a, Float wtsum, int iter);

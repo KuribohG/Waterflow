@@ -12,7 +12,7 @@ SimulationCubic::SimulationCubic(void){
 	solver.init(GRIDX, GRIDY, GRIDZ);
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
-            mask(i, j, 0) = mask(i, j, GRIDZ - 1) = SOLID;
+			mask(i, j, 0) = SOLID; mask(i, j, GRIDZ - 1) = SOLID;
         }
     }
     for (int i = 0; i < GRIDX; i++) {
@@ -49,8 +49,8 @@ Float Clip(Float &x, Float _min, Float _max) {
     return x;
 }
 
-void Bound_Solid(int axis, aryf &x) {
-    for (int j = 0; j < x.m; j++) {
+void SimulationCubic::Bound_Solid(void) {
+    /*for (int j = 0; j < x.m; j++) {
         for (int k = 0; k < x.w; k++) {
             x(0, j, k) = (axis == 0) ? -x(1, j, k) : x(1, j, k);
             x(x.n - 1, j, k) = (axis == 0) ? -x(x.n - 2, j, k) : x(x.n - 2, j, k);
@@ -67,7 +67,18 @@ void Bound_Solid(int axis, aryf &x) {
             x(i, j, 0) = (axis == 2) ? -x(i, j, 1) : x(i, j, 1);
             x(i, j, x.w - 1) = (axis == 2) ? -x(i, j, x.w - 2) : x(i, j, x.w - 2);
         }
-    }
+    }*/
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				if (mask.is(i, j, k, SOLID)) {
+					vx(i, j, k) = vx(i + 1, j, k) = 0;
+					vy(i, j, k) = vy(i, j + 1, k) = 0;
+					vz(i, j, k) = vz(i, j, k + 1) = 0;
+				}
+			}
+		}
+	}
 }
 
 void Bound_Surface(aryf &pressure, aryi &mask) {
@@ -85,11 +96,15 @@ void SimulationCubic::Apply_External_Forces(void) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
 				int t = mask(i, j, k);
-				if (t == WATER) vz(i, j, k) += -g*TIME_DELTA;
-				else if(k>0&&mask(i,j,k-1)==WATER) vz(i, j, k) += -g*TIME_DELTA;
-				if (i < GRIDX&&t == AIR&&mask(i + 1, j, k) == AIR) vx(i + 1, j, k) = 0;
-				if (j < GRIDY&&t == AIR&&mask(i, j + 1, k) == AIR) vy(i, j + 1, k) = 0;
-				if (k < GRIDZ&&t == AIR&&mask(i, j, k + 1) == AIR) vz(i, j, k + 1) = 0;
+				if (t == WATER || mask.is(i + 1, j, k, WATER));
+				else vx(i, j, k) = 0;
+				if (t == WATER || mask.is(i, j + 1, k, WATER));
+				else vy(i, j, k) = 0;
+				if (t == WATER || mask.is(i, j, k + 1, WATER)) {
+					vz(i, j, k) += -g*TIME_DELTA;
+				}
+				else vz(i, j, k) = 0;
+				//if (i == 2 && (t == WATER || mask.is(i, j, k + 1, WATER))) LOGM("(%d %d)", j, k);
 			}
 		}
 	}
@@ -126,6 +141,7 @@ void SimulationCubic::Apply_External_Forces(void) {
 
 
 void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
+	div.set(0);
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
@@ -147,6 +163,7 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 	LOGM("project\n");
 	solver.Solve_Pressure(vx, vy, vz, mask);
 	solver.Send_Back_To(p);
+	//for (int i = 0; i < 1000; i++) LOGM("%f ", solver.pressure[i]);
 	//Calc_Divergence(vx, vy, vz, div);
 	//p.set(0);
 	//memset(s, 0, sizeof(s[0])*GRIDX*GRIDY*GRIDZ);
@@ -157,14 +174,24 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 
 	//-+ //todo: apply bound condition before, not after linear_solve
 	//-+ //todo: now this routine's solid bound fails, try to fix it
-
-	//Bound_Surface(p, mask);
+	double scale = TIME_DELTA / DENSITY;
+	Bound_Surface(p, mask);
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
-				if (i > 0) vx(i, j, k) += (p(i, j, k) - p(i - 1, j, k));
-				if (j > 0) vy(i, j, k) += (p(i, j, k) - p(i, j - 1, k));
-				if (k > 0) vz(i, j, k) += (p(i, j, k) - p(i, j, k - 1));
+				bool s0 = mask.is(i, j, k, SOLID);
+				bool si = mask.is(i - 1, j, k, SOLID);
+				bool sj = mask.is(i, j - 1, k, SOLID);
+				bool sk = mask.is(i, j, k - 1, SOLID);
+				if (i > 0 && !s0 && !mask.is(i - 1, j, k, SOLID)) vx(i, j, k) -= (p(i, j, k) - p(i - 1, j, k))*scale;
+				else vx(i, j, k) = 0;
+				if (j > 0 && !s0 && !mask.is(i, j - 1, k, SOLID)) vy(i, j, k) -= (p(i, j, k) - p(i, j - 1, k))*scale;
+				else vy(i, j, k) = 0;
+				if (k > 0 && !s0 && !mask.is(i, j, k - 1, SOLID)) vz(i, j, k) -= (p(i, j, k) - p(i, j, k - 1))*scale;
+				else vz(i, j, k) = 0;
+				//if (i > 0) vx(i, j, k) += (p(i, j, k) - p(i - 1, j, k));
+				//if (j > 0) vy(i, j, k) += (p(i, j, k) - p(i, j - 1, k));
+				//if (k > 0) vz(i, j, k) += (p(i, j, k) - p(i, j, k - 1));
 			}
 		}
 	}
@@ -235,7 +262,7 @@ void SimulationCubic::Advect_Velocity(int axis, aryf &f, aryf &f0, aryf &vx, ary
             }
         }
     }
-	Bound_Solid(axis, f);
+	//Bound_Solid(axis, f);
 }
 
 void swap(aryf &a, aryf &b) {
@@ -253,22 +280,18 @@ void SimulationCubic::Step_Time(void){
     //Diffuse(1, vy0, vy, viscosity, TIME_DELTA, LINSOLVER_ITER);
     //Diffuse(2, vz0, vz, viscosity, TIME_DELTA, LINSOLVER_ITER);
 
-	//printf("%p %p %f %f\n", vx.f, vx0.f, vx.f[0], vx0.f[0]);
-	swap(vx, vx0);
-	swap(vy, vy0);
-	swap(vz, vz0);
-	//printf("%p %p %f %f\n", vx.f, vx0.f, vx.f[0], vx0.f[0]);
-
 
     //now vx0, vy0, vz0 are "blurred" velocities
     //Project(vx0, vy0, vz0, vx, vy);
 
-    //swap(vx, vx0);
-    //swap(vy, vy0);
-    //swap(vz, vz0);
+    swap(vx, vx0);
+    swap(vy, vy0);
+    swap(vz, vz0);
     Advect_Velocity(0, vx, vx0, vx0, vy0, vz0);
 	Advect_Velocity(1, vy, vy0, vx0, vy0, vz0);
 	Advect_Velocity(2, vz, vz0, vx0, vy0, vz0);
+
+	Bound_Solid();
 
 
 	Project(vx, vy, vz, p, p0);

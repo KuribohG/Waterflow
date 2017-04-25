@@ -4,10 +4,12 @@
 FluidSimulation fluidsim;
 
 void Step_Time(int value) {
+	//LOGM("tab enter\n");
+	//getchar();
     LOGM("step time value: %d\n", value);
     fluidsim.Step_Time();
     glutPostRedisplay();
-    glutTimerFunc(1000/FPS, Step_Time, 1);
+	glutTimerFunc(1000/FPS, Step_Time, 1);
 }
 
 void Display_Func(void) {

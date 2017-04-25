@@ -122,6 +122,7 @@ void Draw_Velocity_2d(int i, const aryf &vxs, const aryf &vys,const aryf &vzs, c
 			Float vy = Interpolation_Water_Velocity(_Y, vys, i + 0.5, j0 + 0.5, k0 + 0.5, mask)*TIME_DELTA;
 			Float vz = Interpolation_Water_Velocity(_Z, vzs, i + 0.5, j0 + 0.5, k0 + 0.5, mask)*TIME_DELTA;
             //LOGM("%f %f\n", vy, vz);
+			vy *= 10, vz *= 10;
 			Float y0 = j0 + 0.5, z0 = k0 + 0.5;
             Float y1 = y0 + vy, z1 = z0 + vz;
             //LOGM("%f %f %f %f\n", y0, z0, y1, z1);
