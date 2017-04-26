@@ -7,16 +7,6 @@ T& Array3D<T>::operator[](int i){
 	return f[i];
 }*/
 
-template<typename T>
-inline int Array3D<T>::ID(int i, int j, int k)const{
-	return i*m*w + j*w + k;
-}
-
-template<typename T>
-inline bool Array3D<T>::inside(int i, int j, int k)const{
-	return 0 <= i&&i < n && 0 <= j&&j < m && 0 <= k&&k < w;
-}
-
 Float Neighbor_Sum6(aryf &x, int i, int j, int k) {
 	Float tmp = 0;
 	if (i - 1 >= 0) tmp += x(i - 1, j, k);

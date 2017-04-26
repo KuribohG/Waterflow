@@ -28,7 +28,9 @@ public:
 		memset(f, 0, sizeof(T)*n*m*w);
 		//printf("%p\n", f);
 	}
-	inline int ID(int i, int j, int k)const;
+	int ID(int i, int j, int k)const {
+		return i*m*w + j*w + k;
+	}
 	T get(int i, int j, int k)const {
 		return f[ID(i, j, k)];
 	}
@@ -38,7 +40,9 @@ public:
 		//assert(fabs(f[i*m*w + j*w + k]) < 1000);
 		return f[i*m*w + j*w + k];
 	}
-	inline bool inside(int i, int j, int k)const;
+	bool inside(int i, int j, int k)const {
+		return 0 <= i&&i < n && 0 <= j&&j < m && 0 <= k&&k < w;
+	}
 	void copy(Array3D<T> &b) {
 		assert(n == b.n);
 		assert(m == b.m);
