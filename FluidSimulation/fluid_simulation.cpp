@@ -3,6 +3,7 @@
 
 FluidSimulation::FluidSimulation()
 {
+    signed_dis.init(GRIDX, GRIDY, GRIDZ);
     init_Density_3d();
 }
 //#define D3
@@ -17,9 +18,34 @@ void FluidSimulation::Draw_On_Screen(void){
 	Draw_Particle_2d(cubic.particles, RIGHT_SCREEN);
 }
 
+Float Kernel_Func(Float s_square) {
+    Float x = 1 - s_square;
+    return x * x * x;
+}
+
+void FluidSimulation::Calculate_Signed_Distance() {
+    const Float h = 9.0;
+    const Float r = 1.0;
+    for (int i = 0; i < GRIDX; i++) {
+        for (int j = 0; j < GRIDY; j++) {
+            for (int k = 0; k < GRIDZ; k++) {
+                Float X = 0, Y = 0, Z = 0, d = 0;
+                Float x = i + 0.5, y = j + 0.5, z = k + 0.5;
+                for (MarkerParticle &p : cubic.particles) {
+                    Float dis_square = (p.x - x) * (p.x - x) + (p.y - y) * (p.y - y) + (p.z - z) * (p.z - z);
+                    Float weight = Kernel_Func(dis_square / h);
+                    d += weight, X += weight * p.x, Y += weight * p.y, Z += weight * p.z;
+                }
+                Float norm = sqrt((X - x) * (X - x) + (Y - y) * (Y - y) + (Z - z) * (Z - z));
+                signed_dis(i, j, k) = norm - r;
+            }
+        }
+    }
+}
+
 void FluidSimulation::Step_Time(void){
     cubic.Step_Time();
-
+    //Calculate_Signed_Distance();
 }
 
 struct P_3d

@@ -7,7 +7,8 @@
 class FluidSimulation {
 private:
 	SimulationCubic cubic;
-	vector<pair<int, Float> > lightPath[SHOW_SIZE_X][SHOW_SIZE_Y];
+	//vector<pair<int, Float> > lightPath[SHOW_SIZE_X][SHOW_SIZE_Y];
+	aryf signed_dis;
 
 public:
 	FluidSimulation();
@@ -16,4 +17,5 @@ public:
 	//void Draw_Pixels(void);
 	void Draw_On_Screen(void);
 	void Step_Time(void);
+	void Calculate_Signed_Distance(void);
 };
