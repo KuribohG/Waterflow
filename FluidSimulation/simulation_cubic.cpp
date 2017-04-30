@@ -30,9 +30,11 @@ SimulationCubic::SimulationCubic(void){
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
 				if ((k == GRIDZ - 2 || j >= 30) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
+				//if (!mask.is(i, j, k, SOLID)) mask(i, j, k) = AIR;
             }
         }
     }
+	//mask(2, 30, 30) = WATER;
 	LOGM("velocity set\n");
 	Place_Particles(particles, mask);
 }
@@ -101,6 +103,7 @@ void SimulationCubic::Apply_External_Forces(void) {
 				if (t == WATER || mask.is(i, j + 1, k, WATER));
 				else vy(i, j, k) = 0;
 				if (t == WATER || mask.is(i, j, k + 1, WATER)) {
+					//LOGM("add gravity: %d %d %d\n", i, j, k);
 					vz(i, j, k) += -g*TIME_DELTA;
 				}
 				else vz(i, j, k) = 0;
@@ -275,6 +278,7 @@ void SimulationCubic::Step_Time(void){
 
     //velocity-evolution
 	Apply_External_Forces();
+	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
 
     //Diffuse(0, vx0, vx, viscosity, TIME_DELTA, LINSOLVER_ITER);
     //Diffuse(1, vy0, vy, viscosity, TIME_DELTA, LINSOLVER_ITER);
@@ -296,6 +300,7 @@ void SimulationCubic::Step_Time(void){
 
 	Project(vx, vy, vz, p, p0);
 	//Calc_Divergence(vx, vy, vz, s);
+	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
 
 
     //diff = 1.0*GRIDX*GRIDY*GRIDZ*200;

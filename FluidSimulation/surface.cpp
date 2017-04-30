@@ -10,11 +10,14 @@ void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
 		}
 	}
 	for (MarkerParticle &p : particles) {
-		int x = floor(p.x), y = floor(p.y), z = round(p.z);
+		int x = floor(p.x), y = floor(p.y), z = floor(p.z);
 		if (!mask.inside(x, y, z)) {
 			LOGM("when marking marker particle flying outside: %f %f %f\n", p.x, p.y, p.z);
 		}
-		else if (mask(x, y, z) != SOLID) mask(x, y, z) = WATER;
+		else if (mask(x, y, z) != SOLID) {
+			//LOGM("%f %f %f %d %d %d\n", p.x, p.y, p.z, x, y, z);
+			mask(x, y, z) = WATER;
+		}
 	}
 }
 
@@ -55,6 +58,7 @@ void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, ary
 			Float pvx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
 			Float pvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
 			Float pvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
+			LOGM("advect particle: %f %f %f %f\n", p.x, p.y, p.z, pvz);
 			//assert(pvz <= 0);
 			p.x += pvx*TIME_DELTA;
 			p.y += pvy*TIME_DELTA;
