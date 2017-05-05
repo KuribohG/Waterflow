@@ -11,17 +11,14 @@ v2.0（空气和水）
 1. 书本：fluid simulation for computer graphics robert bridson
 2. 一个项目：https://github.com/rlguy/GridFluidSim3D
 
-2017.4.25
-现在状态：
-advect：Runge_Kutta
-Project：书上的解线性方程组
+2017.5.5
+现在状态：除了mesh和extrapolation之外，实现了gridfluidsim3D的全部主要要素。（飞沫等不在计划中，略去）
 
 现在todo：
-1. 支持出surface mesh
+1. 支持出surface mesh：出TSDF，TSDF->mesh，mesh->TSDF，TSDF场的advection
+2. 实现速度场的extrapolation：先实现一个粗糙的extrapolation，然后在mesh实现后，写根据mesh进行的extrapolation
+2. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
 
-现在问题：
-1. “贴壁”：贴着壁的速度总是0，这个问题是project之前的，换言之，是apply_external_forces（或者advect，但更可能是前者）出了问题
-2. “悬浮”：有一些marker particle悬浮在半空中，它们的速度为0，因此就一直那么悬在空中了
 
 
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)
