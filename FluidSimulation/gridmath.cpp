@@ -17,7 +17,32 @@ bool Valid_Water(int x, int y, int z, const aryi &mask) {
 	return mask.inside(x, y, z) && mask.get(x, y, z) == WATER;
 }
 
-Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Float z, const aryi &mask) {
+Float Extrapolation_Water_Velocity(const aryf &f, Float x, Float y, Float z, const aryi &mask) {
+	int x0 = floor(x), y0 = floor(y), z0 = floor(z);
+	int high = 7;//magic number!
+	Float mnsqr = INF, v;
+	for (int s = 0; s <= high; s++) {
+		for (int di = -s; di <= s; di++) {
+			int r = s - abs(di);
+			for (int dj = -r; dj <= r; dj++) {
+				for (int sgn = -1; sgn <= 1; sgn += 2) {
+					int dk = (r - abs(dj))*sgn;
+					if (mask.is(x0 + di, y0 + dj, z0 + dk, WATER)) {
+						high = s;
+						Float dissqr = (x0 + di - x)*(x0 + di - x) + (y0 + dj - y)*(y0 + dj - y) + (z0 + dk - z)*(z0 + dk - z);
+						if (dissqr < mnsqr) {
+							mnsqr = dissqr;
+							v = f.get(x0 + di, y0 + dj, z0 + dk);
+						}
+					}
+				}
+			}
+		}
+	}
+	return v;
+}
+
+Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Float z, const aryi &mask, bool extrapolation) {
 	if (axis == 0) y -= 0.5, z -= 0.5;
 	else if (axis == 1) x -= 0.5, z -= 0.5;
 	else if (axis == 2) x -= 0.5, y -= 0.5;
@@ -37,6 +62,9 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 	if (Valid_Water(x1, y1, z0, mask)) v += s0*u0*v1*f.get(x1, y1, z0), sw += s0*u0*v1;
 	if (Valid_Water(x1, y1, z1, mask)) v += s0*u0*v0*f.get(x1, y1, z1), sw += s0*u0*v0;
 	//if(abs()) printf("%d %f %f %f %f %f\n", axis, x, y, z, v, sw);
-	if (sw == 0) return 0;
+	if (sw == 0) {
+		if (!extrapolation) return 0;
+		else return Extrapolation_Water_Velocity(f, x, y, z, mask);
+	}
 	return v / sw;
 }

@@ -26,7 +26,12 @@ SimulationCubic::SimulationCubic(void){
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
-				if ((k == GRIDZ - 2 || j >= 30) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
+				if (mask.is(i, j, k, SOLID)) continue;
+				mask(i, j, k) = AIR;
+				if (20 <= j&&j <= 30 && 50 <= k&&k <= 60) mask(i, j, k) = WATER;
+				if (40 <= j&&j <= 50 && 20 <= k&&k <= 30) mask(i, j, k) = WATER;
+				mask(i, 50, 50) = WATER;
+				//if ((k == GRIDZ - 2 || j >= 40 || j <= 10 || k <= 30) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
 				//if (!mask.is(i, j, k, SOLID)) mask(i, j, k) = AIR;
             }
         }
@@ -159,9 +164,9 @@ void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
 	z = k + 0.5 - delta * vz(i, j, k);
 
 	for (int _ = 1; _ < iter; _++) {
-		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask);
-		Float ny = y - delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask);
-		Float nz = z - delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask);
+		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask, true);
+		Float ny = y - delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask, true);
+		Float nz = z - delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask, true);
 		x = nx, y = ny, z = nz;
 	}
 }
@@ -180,7 +185,7 @@ void SimulationCubic::Advect_Velocity(int axis, aryf &f, aryf &f0, aryf &vx, ary
                     x = Clip(x, 0.5, GRIDX + 0.5);
                     y = Clip(y, 0.5, GRIDY + 0.5);
                     z = Clip(z, 0.5, GRIDZ + 0.5);
-					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask);
+					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask, true);
                 }
             }
         }
@@ -222,5 +227,3 @@ void SimulationCubic::Step_Time(void){
 
 	Calc_Divergence(vx, vy, vz, p);
 }
-
-

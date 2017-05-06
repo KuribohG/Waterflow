@@ -55,9 +55,9 @@ void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, ary
 		}
 		else if (mask(ix,iy,iz) != SOLID) {
 			Float z0 = p.z;
-			Float pvx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
-			Float pvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
-			Float pvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
+			Float pvx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask, true);
+			Float pvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask, true);
+			Float pvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask, true);
 			LOGM("advect particle: %f %f %f %f\n", p.x, p.y, p.z, pvz);
 			//assert(pvz <= 0);
 			p.x += pvx*TIME_DELTA;

@@ -16,8 +16,9 @@ v2.0（空气和水）
 
 现在todo：
 1. 支持出surface mesh：出TSDF，TSDF->mesh，mesh->TSDF，TSDF场的advection
-2. 实现速度场的extrapolation：先实现一个粗糙的extrapolation，然后在mesh实现后，写根据mesh进行的extrapolation
+2. 实现速度场的extrapolation：在mesh实现后，写根据mesh进行的extrapolation
 2. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
+4. 研究清楚为什么在仅有advection情况下，大坨水的下落速度比小团水快得多
 
 
 
