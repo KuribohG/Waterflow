@@ -1,5 +1,5 @@
 #include "fluid_simulation.h"
-
+#include <cmath>
 
 FluidSimulation::FluidSimulation()
 {
@@ -19,9 +19,14 @@ void FluidSimulation::Draw_On_Screen(void){
 }
 
 Float Kernel_Func(Float s_square) {
+    if (s_square >= 1) {
+        return 0;
+    }
     Float x = 1 - s_square;
     return x * x * x;
 }
+
+vector<MarkerParticle *> v[GRIDX][GRIDY][GRIDZ];
 
 void FluidSimulation::Calculate_Signed_Distance() {
     const Float h = 9.0;
@@ -29,13 +34,37 @@ void FluidSimulation::Calculate_Signed_Distance() {
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
+                v[i][j][k].clear();
+            }
+        }
+    }
+    for (MarkerParticle &p : cubic.particles) {
+        int x = (int)std::floor(p.x);
+        int y = (int)std::floor(p.y);
+        int z = (int)std::floor(p.z);
+        v[x][y][z].emplace_back(&p);
+    }
+    for (int i = 0; i < GRIDX; i++) {
+        for (int j = 0; j < GRIDY; j++) {
+            for (int k = 0; k < GRIDZ; k++) {
                 Float X = 0, Y = 0, Z = 0, d = 0;
                 Float x = i + 0.5, y = j + 0.5, z = k + 0.5;
-                for (MarkerParticle &p : cubic.particles) {
-                    Float dis_square = (p.x - x) * (p.x - x) + (p.y - y) * (p.y - y) + (p.z - z) * (p.z - z);
-                    Float weight = Kernel_Func(dis_square / h);
-                    d += weight, X += weight * p.x, Y += weight * p.y, Z += weight * p.z;
+                for (int dx = -3; dx <= 3; dx++) {
+                    for (int dy = -3; dy <= 3; dy++) {
+                        for (int dz = -3; dz <= 3; dz++) {
+                            if (i + dx < 0 || i + dx >= GRIDX) continue;
+                            if (j + dy < 0 || j + dy >= GRIDY) continue;
+                            if (k + dz < 0 || k + dz >= GRIDZ) continue;
+                            for (MarkerParticle *ptr : v[i + dx][j + dy][k + dz]) {
+                                MarkerParticle &p = *ptr;
+                                Float dis_square = (p.x - x) * (p.x - x) + (p.y - y) * (p.y - y) + (p.z - z) * (p.z - z);
+                                Float weight = Kernel_Func(dis_square / h);
+                                d += weight, X += weight * p.x, Y += weight * p.y, Z += weight * p.z;
+                            }
+                        }
+                    }
                 }
+                X /= d, Y /= d, Z /= d;
                 Float norm = sqrt((X - x) * (X - x) + (Y - y) * (Y - y) + (Z - z) * (Z - z));
                 signed_dis(i, j, k) = norm - r;
             }
@@ -45,7 +74,7 @@ void FluidSimulation::Calculate_Signed_Distance() {
 
 void FluidSimulation::Step_Time(void){
     cubic.Step_Time();
-    //Calculate_Signed_Distance();
+    Calculate_Signed_Distance();
 }
 
 struct P_3d
