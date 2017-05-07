@@ -89,6 +89,6 @@ typedef Vec1D<double> vecd;
 Float Neighbor_Sum6(aryf &x, int i, int j, int k);
 bool Valid_Water(int x, int y, int z, aryi &mask);
 
-Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Float z, const aryi &mask);
+Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Float z, const aryi &mask, bool extrapolation = false);
 //Float Interpolation_In_Water_3D(aryf &f, Float x, Float y, Float z, aryi &mask);
 

@@ -1,8 +1,5 @@
 #include "simulation_cubic.h"
 
-//void Runge_Kutta(int i, int j, int k, Float delta, int iter,
-//       Float vx[], Float vy[], Float vz[], Float &x, Float &y, Float &z);
-
 SimulationCubic::SimulationCubic(void){
 	vx.init(GRIDX + 1, GRIDY, GRIDZ); vx0.init(GRIDX + 1, GRIDY, GRIDZ);
 	vy.init(GRIDX, GRIDY + 1, GRIDZ); vy0.init(GRIDX, GRIDY + 1, GRIDZ);
@@ -29,7 +26,12 @@ SimulationCubic::SimulationCubic(void){
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
-				if ((k == GRIDZ - 2 || j >= 30) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
+				if (mask.is(i, j, k, SOLID)) continue;
+				mask(i, j, k) = AIR;
+				if (20 <= j&&j <= 30 && 50 <= k&&k <= 60) mask(i, j, k) = WATER;
+				if (40 <= j&&j <= 50 && 20 <= k&&k <= 30) mask(i, j, k) = WATER;
+				mask(i, 50, 50) = WATER;
+				//if ((k == GRIDZ - 2 || j >= 40 || j <= 10 || k <= 30) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
 				//if (!mask.is(i, j, k, SOLID)) mask(i, j, k) = AIR;
             }
         }
@@ -52,24 +54,6 @@ Float Clip(Float &x, Float _min, Float _max) {
 }
 
 void SimulationCubic::Bound_Solid(void) {
-    /*for (int j = 0; j < x.m; j++) {
-        for (int k = 0; k < x.w; k++) {
-            x(0, j, k) = (axis == 0) ? -x(1, j, k) : x(1, j, k);
-            x(x.n - 1, j, k) = (axis == 0) ? -x(x.n - 2, j, k) : x(x.n - 2, j, k);
-        }
-    }
-    for (int i = 0; i < x.n; i++) {
-        for (int k = 0; k < x.w; k++) {
-            x(i, 0, k) = (axis == 1) ? -x(i, 1, k) : x(i, 1, k);
-            x(i, x.m - 1, k) = (axis == 1) ? -x(i, x.m - 2, k) : x(i, x.m - 2, k);
-        }
-    }
-    for (int i = 0; i < x.n; i++) {
-        for (int j = 0; j < x.m; j++) {
-            x(i, j, 0) = (axis == 2) ? -x(i, j, 1) : x(i, j, 1);
-            x(i, j, x.w - 1) = (axis == 2) ? -x(i, j, x.w - 2) : x(i, j, x.w - 2);
-        }
-    }*/
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
@@ -114,32 +98,9 @@ void SimulationCubic::Apply_External_Forces(void) {
 }
 
 
-/*void SimulationCubic::Linear_Solve(int axis, aryf &x, aryf &x0, Float a, Float wtsum, int iter) {
-    //this is so-called "Semi-Lagrangian" Advectoin
-    //we shall change it to MacCormack Advection in further development
-    //"hyperbolic equation": du/dt + a*du/dx = 0
-	x.copy(x0);
-    Float rcp = 1.0 / wtsum;
-    for (int t = 0; t < iter; t++) {
-        for (int i = 0; i < GRIDX; i++) {
-            for (int j = 0; j < GRIDY; j++) {
-                for (int k = 0; k < GRIDZ; k++) {
-                    if (mask(i, j, k) == WATER) {
-                        x(i, j, k) = (x0(i, j, k) + a*Neighbor_Sum6(x, i, j, k)) *rcp;
-                    } 
-                }
-            }
-        }
-    }
-    Bound_Solid(axis, x);
-}*/
 
-/*void SimulationCubic::Diffuse(int axis, Float *x, Float *x0, Float diff, Float dt, int iter) {//diffusion is blurring
-    //solve x from x0
-    Float a = dt*diff;
-    LOGM("diffusion parameter: %d\n", iter);
-    Linear_Solve(axis, x, x0, a, 6 * a + 1, iter);
-}*/
+
+
 
 
 
@@ -154,9 +115,6 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 						+ vy(i, j + 1, k) - vy(i, j, k)
 						+ vz(i, j, k + 1) - vz(i, j, k);
 				}
-				/*if (mask[ID(i, j, k)] == WATER) {
-					div[ID(i, j, k)] = -0.5*tmp;//it's divergence of velocity field
-				}*/
 			}
 		}
 	}
@@ -166,12 +124,7 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 	LOGM("project\n");
 	solver.Solve_Pressure(vx, vy, vz, mask);
 	solver.Send_Back_To(p);
-	//for (int i = 0; i < 1000; i++) LOGM("%f ", solver.pressure[i]);
-	//Calc_Divergence(vx, vy, vz, div);
-	//p.set(0);
-	//memset(s, 0, sizeof(s[0])*GRIDX*GRIDY*GRIDZ);
-	//Bound_Solid(-1, div);
-	
+
 	//actually, p solved here is -deltaT*p, look at [Robert Bridson, p54]
 	//Linear_Solve(-1, p, div, 1, 6 + 1, LINSOLVER_ITER);
 
@@ -192,39 +145,11 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 				else vy(i, j, k) = 0;
 				if (k > 0 && !s0 && !mask.is(i, j, k - 1, SOLID)) vz(i, j, k) -= (p(i, j, k) - p(i, j, k - 1))*scale;
 				else vz(i, j, k) = 0;
-				//if (i > 0) vx(i, j, k) += (p(i, j, k) - p(i - 1, j, k));
-				//if (j > 0) vy(i, j, k) += (p(i, j, k) - p(i, j - 1, k));
-				//if (k > 0) vz(i, j, k) += (p(i, j, k) - p(i, j, k - 1));
 			}
 		}
 	}
 
-	/*for (int i = 0; i < GRIDX*GRIDY*GRIDZ; i++) s[i] *= 2;
-    //basically, s is some "blurred" divergence
-    //we substract the gradient of divergence from velocity field
-    for (int i = 0; i < GRIDX; i++) {
-        for (int j = 0; j < GRIDY; j++) {
-            for (int k = 0; k < GRIDZ; k++) {
-                if (mask[ID(i, j, k)] == WATER) {
-                    Float tmp = 0;
-                    if (i + 1 < GRIDX) tmp += s[ID(i + 1, j, k)];
-                    if (i - 1 >= 0) tmp -= s[ID(i - 1, j, k)];
-                    vx[ID(i, j, k)] -= 0.5*tmp;
-                    tmp = 0;
-                    if (j + 1 < GRIDY) tmp += s[ID(i, j + 1, k)];
-                    if (j - 1 >= 0) tmp -= s[ID(i, j - 1, k)];
-                    vy[ID(i, j, k)] -= 0.5*tmp;
-                    tmp = 0;
-                    if (k + 1 < GRIDZ) tmp += s[ID(i, j, k + 1)];
-                    if (k - 1 >= 0) tmp -= s[ID(i, j, k - 1)];
-                    vz[ID(i, j, k)] -= 0.5*tmp;
-                }
-            }
-        }
-    }*/
-    //Bound_Solid(0, vx);
-    //Bound_Solid(1, vy);
-    //Bound_Solid(2, vz);
+
 }
 
 void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
@@ -239,9 +164,9 @@ void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
 	z = k + 0.5 - delta * vz(i, j, k);
 
 	for (int _ = 1; _ < iter; _++) {
-		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask);
-		Float ny = y - delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask);
-		Float nz = z - delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask);
+		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask, true);
+		Float ny = y - delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask, true);
+		Float nz = z - delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask, true);
 		x = nx, y = ny, z = nz;
 	}
 }
@@ -260,7 +185,7 @@ void SimulationCubic::Advect_Velocity(int axis, aryf &f, aryf &f0, aryf &vx, ary
                     x = Clip(x, 0.5, GRIDX + 0.5);
                     y = Clip(y, 0.5, GRIDY + 0.5);
                     z = Clip(z, 0.5, GRIDZ + 0.5);
-					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask);
+					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask, true);
                 }
             }
         }
@@ -280,13 +205,6 @@ void SimulationCubic::Step_Time(void){
 	Apply_External_Forces();
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
 
-    //Diffuse(0, vx0, vx, viscosity, TIME_DELTA, LINSOLVER_ITER);
-    //Diffuse(1, vy0, vy, viscosity, TIME_DELTA, LINSOLVER_ITER);
-    //Diffuse(2, vz0, vz, viscosity, TIME_DELTA, LINSOLVER_ITER);
-
-
-    //now vx0, vy0, vz0 are "blurred" velocities
-    //Project(vx0, vy0, vz0, vx, vy);
 
     swap(vx, vx0);
     swap(vy, vy0);
@@ -303,23 +221,9 @@ void SimulationCubic::Step_Time(void){
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
 
 
-    //diff = 1.0*GRIDX*GRIDY*GRIDZ*200;
-    //diff = 1e6;
-
-    //density evolution
-    //Diffuse(-1, s, density, diff, TIME_DELTA, LINSOLVER_ITER);
-
 	Advect_Particles(particles, vx, vy, vz, mask);
 	Mark_Water_By(particles, mask);
 
 
 	Calc_Divergence(vx, vy, vz, p);
-	/*Calc_Divergence(vx, vy, vz, vx0);
-	memset(s, 0, sizeof(s[0])*GRIDX*GRIDY*GRIDZ);
-	Bound_Solid(-1, vx0);
-	Linear_Solve(-1, s, vx0, 1, 6 + 1, LINSOLVER_ITER);
-	Bound_Surface(s, mask);
-	for (int i = 0; i < GRIDX*GRIDY*GRIDZ; i++) s[i] -= vx0[i];*/
 }
-
-

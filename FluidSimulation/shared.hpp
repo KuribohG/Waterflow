@@ -35,7 +35,7 @@ const Float DENSITY = 20;
 
 const Float g = 9.8;
 
-const int FPS = 100;
+const int FPS = 20;
 
 const Float TIME_DELTA = 1.0 / (Float)FPS;
 
