@@ -4,3 +4,4 @@ FluidSimulation/x64/*
 Debug/*
 cmake-build-debug/*
 .idea/*
+FluidSimulation/objs/*

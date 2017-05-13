@@ -14,7 +14,7 @@ void FluidSimulation::Draw_On_Screen(void){
 	Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
     //Draw_Density_2d(cubic.p, THIRD_SCREEN);
 #endif
-	Draw_Velocity_2d(2, cubic.vx, cubic.vy, cubic.vz, cubic.mask, LEFT_SCREEN);
+	Draw_Velocity_2d(cubic.vx, cubic.vy, cubic.vz, cubic.mask, LEFT_SCREEN);
 	Draw_Particle_2d(cubic.particles, RIGHT_SCREEN);
 }
 
@@ -75,6 +75,14 @@ void FluidSimulation::Calculate_Signed_Distance() {
 void FluidSimulation::Step_Time(void){
     cubic.Step_Time();
     Calculate_Signed_Distance();
+	framenum++;
+	if (framenum % 10 == 0) {
+		char name[50];
+		sprintf(name, "objs/meshs.%04d.obj", framenum);
+		meshcubes.Reconstruct(signed_dis, 0.0);
+		meshcubes.Dump_Obj(name);
+		//getchar();
+	}
 }
 
 struct P_3d

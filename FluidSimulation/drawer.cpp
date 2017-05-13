@@ -20,7 +20,7 @@ void Draw_Particle_2d(vector<MarkerParticle> &particles, SCREENID_T screenid) {
 	for (MarkerParticle &p : particles) {
 		int ix = floor(p.x);
 		Float y = p.y, z = p.z;
-		if (ix == 2) {
+		if (ix == GRIDX / 2) {
 			GridCoor_to_ClipCoor(y, z, screenid);
 			glVertex2f(y, z);
 		}
@@ -39,7 +39,7 @@ void Draw_Mask_2d(aryi &mask, SCREENID_T screenid) {
 			int j = js*GRIDZ / SHOW_SIZE_Y;
 			Float x = is, y = js;
 			ScreenCoor_to_ClipCoor(x, y, screenid);
-			int d = mask(2, i, j);
+			int d = mask(GRIDX / 2, i, j);
 			if (d == WATER) glColor3f(1, 1, 1);
 			else if (d == AIR) glColor3f(0, 0, 0);
 			else if (d == SOLID) glColor3f(0, 0, 1);
@@ -60,7 +60,7 @@ void Draw_Density_2d(aryf &density, SCREENID_T screenid) {
             int j = js*GRIDZ / SHOW_SIZE_Y;
             Float x = is, y = js;
             ScreenCoor_to_ClipCoor(x, y, screenid);
-			Float d = abs(density(2, i, j));
+			Float d = abs(density(GRIDX / 2, i, j));
             glColor3f(d, d, d);
             glVertex2f(x, y);
         }
@@ -69,14 +69,16 @@ void Draw_Density_2d(aryf &density, SCREENID_T screenid) {
     glFlush();
 }
 
-void Draw_Velocity_2d(int i, const aryf &vxs, const aryf &vys,const aryf &vzs, const aryi &mask, SCREENID_T screenid) {
+void Draw_Velocity_2d(const aryf &vxs, const aryf &vys,const aryf &vzs, const aryi &mask, SCREENID_T screenid) {
     LOGM("draw velocity\n");
+	int i = GRIDX / 2;
     for (int j = 0; j < GRIDY; j ++) {
         for (int k = 0; k < GRIDZ; k ++) {
             int j0 = j, k0 = k;
 			Float vy = Interpolation_Water_Velocity(_Y, vys, i + 0.5, j0 + 0.5, k0 + 0.5, mask, false)*TIME_DELTA;
 			Float vz = Interpolation_Water_Velocity(_Z, vzs, i + 0.5, j0 + 0.5, k0 + 0.5, mask, false)*TIME_DELTA;
 			vy *= 1, vz *= 1;
+			//LOGM("get velocity: %f %f %f %f\n", j0 + 0.5, k0 + 0.5, vy, vz);
 			Float y0 = j0 + 0.5, z0 = k0 + 0.5;
             Float y1 = y0 + vy, z1 = z0 + vz;
             GridCoor_to_ClipCoor(y0, z0, screenid);

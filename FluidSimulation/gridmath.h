@@ -24,7 +24,7 @@ public:
 		m = _m;
 		w = _w;
 		f = (T*)malloc(n*m*w * sizeof(T));
-		printf("%d %d %d %p\n", n, m, w, f);
+		//printf("%d %d %d %p\n", n, m, w, f);
 		memset(f, 0, sizeof(T)*n*m*w);
 		//printf("%p\n", f);
 	}

@@ -1,5 +1,22 @@
 #include "simulation_cubic.h"
 
+void Print_Velocity(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask) {
+	Float vz0 = INF;
+	for (int i = 2; i <= 2; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				if (mask.is(i, j, k, WATER)) {
+					Float v1 = Interpolation_Water_Velocity(_Y, vy, i + 0.5, j + 0.5, k + 0.5, mask, false);
+					Float v2 = Interpolation_Water_Velocity(_Z, vz, i + 0.5, j + 0.5, k + 0.5, mask, false);
+					//LOGM("velocity: %f %f %f %f %f\n", i + 0.5, j + 0.5, k + 0.5, v1, v2);
+					//if (vz0 > 100) vz0 = v2;
+					//assert(vz0 == v2);
+				}
+			}
+		}
+	}
+}
+
 SimulationCubic::SimulationCubic(void){
 	vx.init(GRIDX + 1, GRIDY, GRIDZ); vx0.init(GRIDX + 1, GRIDY, GRIDZ);
 	vy.init(GRIDX, GRIDY + 1, GRIDZ); vy0.init(GRIDX, GRIDY + 1, GRIDZ);
@@ -28,10 +45,12 @@ SimulationCubic::SimulationCubic(void){
             for (int k = 0; k < GRIDZ; k++) {
 				if (mask.is(i, j, k, SOLID)) continue;
 				mask(i, j, k) = AIR;
-				if (20 <= j&&j <= 30 && 50 <= k&&k <= 60) mask(i, j, k) = WATER;
-				if (40 <= j&&j <= 50 && 20 <= k&&k <= 30) mask(i, j, k) = WATER;
-				mask(i, 50, 50) = WATER;
-				//if ((k == GRIDZ - 2 || j >= 40 || j <= 10 || k <= 30) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
+				if (20 <= i&&i <= 50 && 20 <= j&&j <= 50 && !mask.is(i, j, k, SOLID)) mask(i, j, k) = WATER;
+				//if (j == 30 && 40 <= k&&k <= 50) mask(i, j, k) = WATER;
+				//if (20 <= j&&j <= 30 && 50 <= k&&k <= 60) mask(i, j, k) = WATER;
+				//if (40 <= j&&j <= 50 && 20 <= k&&k <= 30) mask(i, j, k) = WATER;
+				//mask(i, 50, 50) = WATER;
+				//if ((k == GRIDZ - 2 || j >= 40 || j <= 10) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
 				//if (!mask.is(i, j, k, SOLID)) mask(i, j, k) = AIR;
             }
         }
@@ -153,15 +172,15 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 }
 
 void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
-	aryf &vx, aryf &vy, aryf &vz, Float &x, Float &y, Float &z) {
+	const aryf &vx, const aryf &vy, const aryf &vz, Float &x, Float &y, Float &z) {
 	assert(iter >= 1);
 
 	delta /= iter;
 
 	//int id = ID(i, j, k);
-	x = i + 0.5 - delta * vx(i, j, k);
-	y = j + 0.5 - delta * vy(i, j, k);
-	z = k + 0.5 - delta * vz(i, j, k);
+	x = i + 0.5 - delta * vx.get(i, j, k);
+	y = j + 0.5 - delta * vy.get(i, j, k);
+	z = k + 0.5 - delta * vz.get(i, j, k);
 
 	for (int _ = 1; _ < iter; _++) {
 		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask, true);
@@ -171,7 +190,7 @@ void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
 	}
 }
 
-void SimulationCubic::Advect_Velocity(int axis, aryf &f, aryf &f0, aryf &vx, aryf &vy, aryf &vz) {
+void SimulationCubic::Advect_Velocity(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz) {
 	LOGM("advect along: %d\n", axis);
     Float x, y, s0, s1, t0, t1;
     int i0, i1, j0, j1;
@@ -204,14 +223,14 @@ void SimulationCubic::Step_Time(void){
     //velocity-evolution
 	Apply_External_Forces();
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
+	//Print_Velocity(vx, vy, vz, mask);
 
-
-    swap(vx, vx0);
-    swap(vy, vy0);
-    swap(vz, vz0);
-    Advect_Velocity(0, vx, vx0, vx0, vy0, vz0);
-	Advect_Velocity(1, vy, vy0, vx0, vy0, vz0);
-	Advect_Velocity(2, vz, vz0, vx0, vy0, vz0);
+ //   swap(vx, vx0);
+ //   swap(vy, vy0);
+ //   swap(vz, vz0);
+ //   Advect_Velocity(0, vx, vx0, vx0, vy0, vz0);
+	//Advect_Velocity(1, vy, vy0, vx0, vy0, vz0);
+	//Advect_Velocity(2, vz, vz0, vx0, vy0, vz0);
 
 	Bound_Solid();
 

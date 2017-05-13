@@ -305,7 +305,7 @@ void PressureSolver::Solver_LA_System(vector<MatCell> &A, vector<double> &b, vec
 		Add_Scaled_Vector(residual, auxillary, -alpha);
 
 		if (Maximum_Abs(residual) < tol) {
-			LOGM("CG Iterations: ", iterationNumber, 1);
+			printf("CG Iterations: %d\n", iterationNumber);
 			return;
 		}
 
@@ -317,10 +317,10 @@ void PressureSolver::Solver_LA_System(vector<MatCell> &A, vector<double> &b, vec
 
 		iterationNumber++;
 
-		if (iterationNumber % 10 == 0) {
+		/*if (iterationNumber % 10 == 0) {
 			cerr << "\tIteration #: " << iterationNumber <<
 				"\tEstimated Error: " << Maximum_Abs(residual) << std::endl;
-		}
+		}*/
 	}
 }
 

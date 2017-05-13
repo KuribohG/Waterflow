@@ -29,6 +29,7 @@ enum GridMaterial { WATER, SOLID, AIR };
 
 const double INF = 1e15;
 
+const Float TSDF_EPS = 1e-6f;
 constexpr Float  EPS = 1e-3f;
 
 const Float DENSITY = 20;
@@ -47,7 +48,7 @@ const int LINSOLVER_ITER = 100;
 const int SHOW_SIZE_X = 512;
 const int SHOW_SIZE_Y = 512;
 
-const int GRIDX = 10;
+const int GRIDX = 64;
 const int GRIDY = 64;
 const int GRIDZ = 64;
 //#define assert(x) if (!(x)) { asm("int $3"); }

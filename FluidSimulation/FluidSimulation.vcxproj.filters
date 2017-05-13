@@ -36,6 +36,9 @@
     <ClCompile Include="pressuresolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="marchingcubes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="simulation_cubic.h">
@@ -57,6 +60,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="pressuresolver.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="marchingcubes.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

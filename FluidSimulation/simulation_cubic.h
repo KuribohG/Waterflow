@@ -34,15 +34,15 @@ public:
 
 	void Apply_External_Forces(void);
 
-	void Linear_Solve(int axis, aryf & x, aryf & x0, Float a, Float wtsum, int iter);
+	//void Linear_Solve(int axis, aryf & x, aryf & x0, Float a, Float wtsum, int iter);
 
 	void Calc_Divergence(aryf & vx, aryf & vy, aryf & vz, aryf & div);
 
 	void Project(aryf & vx, aryf & vy, aryf & vz, aryf & p, aryf & div);
 
-	void Runge_Kutta(int i, int j, int k, Float delta, int iter, aryf & vx, aryf & vy, aryf & vz, Float & x, Float & y, Float & z);
+	void Runge_Kutta(int i, int j, int k, Float delta, int iter, const aryf & vx, const aryf & vy, const aryf & vz, Float & x, Float & y, Float & z);
 
-	void Advect_Velocity(int axis, aryf & f, aryf & f0, aryf & vx, aryf & vy, aryf & vz);
+	void Advect_Velocity(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz);
 
 	void Step_Time();
 

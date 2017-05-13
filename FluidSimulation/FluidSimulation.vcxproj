@@ -143,6 +143,7 @@
     <ClCompile Include="fluid_simulation.cpp" />
     <ClCompile Include="gridmath.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="marchingcubes.cpp" />
     <ClCompile Include="pressuresolver.cpp" />
     <ClCompile Include="simulation_cubic.cpp" />
     <ClCompile Include="surface.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="drawer.h" />
     <ClInclude Include="fluid_simulation.h" />
     <ClInclude Include="gridmath.h" />
+    <ClInclude Include="marchingcubes.h" />
     <ClInclude Include="pressuresolver.h" />
     <ClInclude Include="shared.hpp" />
     <ClInclude Include="simulation_cubic.h" />
