@@ -51,7 +51,7 @@ void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, ary
 		int ix = floor(p.x), iy = floor(p.y), iz = floor(p.z);
 		if (!mask.inside(ix, iy, iz)) {
 			//assert(false);
-			LOGM("when advecting marker particle flying outside: %f %f %f\n", p.x, p.y, p.z);
+			printf("when advecting marker particle flying outside: %f %f %f\n", p.x, p.y, p.z);
 		}
 		else if (mask(ix,iy,iz) != SOLID) {
 			Float z0 = p.z;
@@ -60,9 +60,17 @@ void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, ary
 			Float pvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask, false);
 			//LOGM("advect particle: %f %f %f %f\n", p.x, p.y, p.z, pvz);
 			//assert(pvz <= 0);
-			p.x += pvx*TIME_DELTA;
-			p.y += pvy*TIME_DELTA;
-			p.z += pvz*TIME_DELTA;
+			Float x1 = p.x + pvx*TIME_DELTA;
+			Float y1 = p.y + pvy*TIME_DELTA;
+			Float z1 = p.z + pvz*TIME_DELTA;
+			if (mask.is(floor(x1), floor(y1), floor(z1), WATER)) {
+				p.x = x1;
+				p.y = y1;
+				p.z = z1;
+			}
+			//p.x += pvx*TIME_DELTA;
+			//p.y += pvy*TIME_DELTA;
+			//p.z += pvz*TIME_DELTA;
 		}
 	}
 }

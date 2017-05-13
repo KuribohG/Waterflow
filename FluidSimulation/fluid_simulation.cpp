@@ -42,6 +42,9 @@ void FluidSimulation::Calculate_Signed_Distance() {
         int x = (int)std::floor(p.x);
         int y = (int)std::floor(p.y);
         int z = (int)std::floor(p.z);
+		if (x < 0 || x >= GRIDX) continue;
+		if (y < 0 || y >= GRIDY) continue;
+		if (z < 0 || z >= GRIDZ) continue;
         v[x][y][z].emplace_back(&p);
     }
     for (int i = 0; i < GRIDX; i++) {
@@ -70,6 +73,17 @@ void FluidSimulation::Calculate_Signed_Distance() {
             }
         }
     }
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				Float w = signed_dis.get(i, j, k);
+				if (!_finite(w) || _isnan(w)) {
+					signed_dis(i, j, k) = 1;
+				}
+				//else if (fabs(w) < TSDF_EPS) signed_dis(i, j, k) = 0;
+			}
+		}
+	}
 }
 
 void FluidSimulation::Step_Time(void){
@@ -81,7 +95,7 @@ void FluidSimulation::Step_Time(void){
 		sprintf(name, "objs/meshs.%04d.obj", framenum);
 		meshcubes.Reconstruct(signed_dis, 0.0);
 		meshcubes.Dump_Obj(name);
-		//getchar();
+		getchar();
 	}
 }
 

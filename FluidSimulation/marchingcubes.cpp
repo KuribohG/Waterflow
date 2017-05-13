@@ -321,7 +321,9 @@ void MarchingCubes::List_Verts(const aryf & f, Float isoval) {
 		for (int j = 0; j < f.m; j++) {
 			for (int k = 0; k < f.w; k++) {
 				Float w1 = f.get(i, j, k);
-				if (w1 != w1) continue;
+				if (!_finite(w1)) {
+					w1 = 1;
+				}
 				int sgn1 = (w1 < isoval);
 				for (int d = 0; d < 3; d++) {
 					int i1 = i, j1 = j, k1 = k;
@@ -330,7 +332,9 @@ void MarchingCubes::List_Verts(const aryf & f, Float isoval) {
 					else if (d == 2) k1++;
 					if (!f.inside(i1, j1, k1)) continue;
 					Float w2 = f.get(i1, j1, k1);
-					if (w2 != w2) continue;
+					if (!_finite(w2)) {
+						w2 = 1;
+					}
 					int sgn2 = (w2 < isoval);
 					if (sgn1 != sgn2) {
 						Float x0 = LinerInterpolate(i, i1, w1, w2, isoval);
@@ -354,12 +358,15 @@ void MarchingCubes::List_Faces(const aryf &f, Float isoval) {
 	for (int i = 0; i + 1 < f.n; i++) {
 		for (int j = 0; j + 1 < f.m; j++) {
 			for (int k = 0; k + 1 < f.w; k++) {
+				//if (k < 59 || k>60) continue;
 				int mask = 0;
 				int i1, j1, k1;
 				for (int d = 0; d < 8; d++) {
 					GetVertexAddr(i, j, k, d, i1, j1, k1);
 					Float w = f.get(i1, j1, k1);
-					if (w != w) break;
+					if (!_finite(w)) {
+						w = 1;
+					}
 					if (w < isoval) mask |= (1 << d);
 				}
 				int *tri = triTable[mask];
@@ -381,7 +388,9 @@ void MarchingCubes::List_Faces(const aryf &f, Float isoval) {
 }
 
 void MarchingCubes::Reconstruct(const aryf & f, Float isoval){
-	//for (int j = 0; j < 60; j++) printf("%f ", f.get(2, j, 30));
+	/*for (int k = 60; k >= 59; k--) {
+		for (int i = 0; i < 10; i++) printf("%.5f ", f.get(i, GRIDY / 2, k)); printf("\n");
+	}*/
 	verts.clear(); faces.clear();
 	List_Verts(f, isoval);
 	List_Faces(f, isoval);

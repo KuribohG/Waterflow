@@ -45,7 +45,7 @@ SimulationCubic::SimulationCubic(void){
             for (int k = 0; k < GRIDZ; k++) {
 				if (mask.is(i, j, k, SOLID)) continue;
 				mask(i, j, k) = AIR;
-				if (20 <= i&&i <= 50 && 20 <= j&&j <= 50 && !mask.is(i, j, k, SOLID)) mask(i, j, k) = WATER;
+				if (2 <= i&&i <= 8 && 20 <= j&&j <= 50 && !mask.is(i, j, k, SOLID)) mask(i, j, k) = WATER;
 				//if (j == 30 && 40 <= k&&k <= 50) mask(i, j, k) = WATER;
 				//if (20 <= j&&j <= 30 && 50 <= k&&k <= 60) mask(i, j, k) = WATER;
 				//if (40 <= j&&j <= 50 && 20 <= k&&k <= 30) mask(i, j, k) = WATER;
