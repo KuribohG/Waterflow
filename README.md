@@ -17,8 +17,10 @@ v2.0（空气和水）
 现在todo：
 1. 支持出surface mesh：mesh->TSDF，TSDF场的advection
 2. 实现速度场的extrapolation：理论上应该对所有空气格子都extrapolate出速度。在mesh实现后，写根据mesh进行的extrapolation
-2. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
+3. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
 4. 由于没有extrapolation，导致空气的速度为0，尽管在下一帧有一些marker particle进入，那么它们的速度就不科学了。
+5. 搞懂blender怎么渲染实心玻璃材质。
+6. 解决固体TSDF不同号的问题，这导致了mesh上的破洞。
 
 
 
