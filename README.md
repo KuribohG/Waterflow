@@ -15,10 +15,12 @@ v2.0（空气和水）
 现在状态：除了mesh和extrapolation之外，实现了gridfluidsim3D的全部主要要素。（飞沫等不在计划中，略去）
 
 现在todo：
-1. 支持出surface mesh：出TSDF，TSDF->mesh，mesh->TSDF，TSDF场的advection
-2. 实现速度场的extrapolation：在mesh实现后，写根据mesh进行的extrapolation
-2. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
-4. 研究清楚为什么在仅有advection情况下，大坨水的下落速度比小团水快得多
+1. 支持出surface mesh：mesh->TSDF，TSDF场的advection
+2. 实现速度场的extrapolation：理论上应该对所有空气格子都extrapolate出速度。在mesh实现后，写根据mesh进行的extrapolation
+3. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
+4. 由于没有extrapolation，导致空气的速度为0，尽管在下一帧有一些marker particle进入，那么它们的速度就不科学了。
+5. 搞懂blender怎么渲染实心玻璃材质。
+6. 解决固体TSDF不同号的问题，这导致了mesh上的破洞。
 
 
 
