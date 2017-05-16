@@ -53,6 +53,15 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 	Float u0 = y - y0, u1 = y1 - y;
 	Float v0 = z - z0, v1 = z1 - z;
 	Float v = 0, sw = 0;
+	v += s1*u1*v1*f.get(x0, y0, z0), sw += s1*u1*v1;
+	v += s1*u1*v0*f.get(x0, y0, z1), sw += s1*u1*v0;
+	v += s1*u0*v1*f.get(x0, y1, z0), sw += s1*u0*v1;
+	v += s1*u0*v0*f.get(x0, y1, z1), sw += s1*u0*v0;
+	v += s0*u1*v1*f.get(x1, y0, z0), sw += s0*u1*v1;
+	v += s0*u1*v0*f.get(x1, y0, z1), sw += s0*u1*v0;
+	v += s0*u0*v1*f.get(x1, y1, z0), sw += s0*u0*v1;
+	v += s0*u0*v0*f.get(x1, y1, z1), sw += s0*u0*v0;
+	/*
 	if (Valid_Water(x0, y0, z0, mask)) v += s1*u1*v1*f.get(x0, y0, z0), sw += s1*u1*v1;
 	if (Valid_Water(x0, y0, z1, mask)) v += s1*u1*v0*f.get(x0, y0, z1), sw += s1*u1*v0;
 	if (Valid_Water(x0, y1, z0, mask)) v += s1*u0*v1*f.get(x0, y1, z0), sw += s1*u0*v1;
@@ -66,5 +75,6 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 		if (!extrapolation) return 0;
 		else return Extrapolation_Water_Velocity(f, x, y, z, mask);
 	}
+	*/
 	return v / sw;
 }

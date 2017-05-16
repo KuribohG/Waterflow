@@ -102,14 +102,14 @@ void SimulationCubic::Apply_External_Forces(void) {
 			for (int k = 0; k < GRIDZ; k++) {
 				int t = mask(i, j, k);
 				if (t == WATER || mask.is(i + 1, j, k, WATER));
-				else vx(i, j, k) = 0;
+				//else vx(i, j, k) = 0;
 				if (t == WATER || mask.is(i, j + 1, k, WATER));
-				else vy(i, j, k) = 0;
+				//else vy(i, j, k) = 0;
 				if (t == WATER || mask.is(i, j, k + 1, WATER)) {
 					//LOGM("add gravity: %d %d %d\n", i, j, k);
 					vz(i, j, k) += -g*TIME_DELTA;
 				}
-				else vz(i, j, k) = 0;
+				//else vz(i, j, k) = 0;
 				//if (i == 2 && (t == WATER || mask.is(i, j, k + 1, WATER))) LOGM("(%d %d)", j, k);
 			}
 		}
@@ -183,9 +183,9 @@ void SimulationCubic::Runge_Kutta(int i, int j, int k, Float delta, int iter,
 	z = k + 0.5 - delta * vz.get(i, j, k);
 
 	for (int _ = 1; _ < iter; _++) {
-		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask, true);
-		Float ny = y - delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask, true);
-		Float nz = z - delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask, true);
+		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask);
+		Float ny = y - delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask);
+		Float nz = z - delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask);
 		x = nx, y = ny, z = nz;
 	}
 }
@@ -204,7 +204,7 @@ void SimulationCubic::Advect_Velocity(int axis, aryf &f, const aryf &f0, const a
                     x = Clip(x, 0.5, GRIDX + 0.5);
                     y = Clip(y, 0.5, GRIDY + 0.5);
                     z = Clip(z, 0.5, GRIDZ + 0.5);
-					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask, true);
+					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask);
                 }
             }
         }
@@ -225,14 +225,14 @@ void SimulationCubic::Step_Time(void){
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
 	//Print_Velocity(vx, vy, vz, mask);
 
- //   swap(vx, vx0);
- //   swap(vy, vy0);
- //   swap(vz, vz0);
- //   Advect_Velocity(0, vx, vx0, vx0, vy0, vz0);
-	//Advect_Velocity(1, vy, vy0, vx0, vy0, vz0);
-	//Advect_Velocity(2, vz, vz0, vx0, vy0, vz0);
+    swap(vx, vx0);
+    swap(vy, vy0);
+    swap(vz, vz0);
+    Advect_Velocity(0, vx, vx0, vx0, vy0, vz0);
+	Advect_Velocity(1, vy, vy0, vx0, vy0, vz0);
+	Advect_Velocity(2, vz, vz0, vx0, vy0, vz0);
 
-	Bound_Solid();
+	//Bound_Solid();
 
 
 	Project(vx, vy, vz, p, p0);
@@ -244,5 +244,5 @@ void SimulationCubic::Step_Time(void){
 	Mark_Water_By(particles, mask);
 
 
-	Calc_Divergence(vx, vy, vz, p);
+	//Calc_Divergence(vx, vy, vz, p);
 }

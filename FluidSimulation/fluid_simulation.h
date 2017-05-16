@@ -21,4 +21,6 @@ public:
 	void Draw_On_Screen(void);
 	void Step_Time(void);
 	void Calculate_Signed_Distance(void);
+	void Calculate_Nearest_Particle(void);
+	void Get_Full_Velocity(void);
 };
