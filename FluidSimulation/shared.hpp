@@ -16,8 +16,8 @@ typedef char BYT;
 typedef float Float;
 
 #ifdef NDEBUG
-//#define LOGM(...) fprintf(stderr,  __VA_ARGS__)
-#define LOGM(...) void(0);
+#define LOGM(...) fprintf(stderr,  __VA_ARGS__)
+//#define LOGM(...) void(0);
 #else
 #define LOGM(...)  fprintf(stderr,  __VA_ARGS__)
 #endif

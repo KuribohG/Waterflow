@@ -58,12 +58,12 @@ void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, ary
 			Float pvx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask, false);
 			Float pvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask, false);
 			Float pvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask, false);
-			//LOGM("advect particle: %f %f %f %f\n", p.x, p.y, p.z, pvz);
+			//if (ix == GRIDX / 2) LOGM("advect particle: %f %f %f %f\n", p.x, p.y, p.z, pvz);
 			//assert(pvz <= 0);
 			Float x1 = p.x + pvx*TIME_DELTA;
 			Float y1 = p.y + pvy*TIME_DELTA;
 			Float z1 = p.z + pvz*TIME_DELTA;
-			if (mask.is(floor(x1), floor(y1), floor(z1), WATER)) {
+			if (mask.is(floor(x1), floor(y1), floor(z1), WATER) || mask.is(floor(x1), floor(y1), floor(z1), AIR)) {
 				p.x = x1;
 				p.y = y1;
 				p.z = z1;

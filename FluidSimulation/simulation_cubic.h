@@ -6,6 +6,9 @@
 #include "pressuresolver.h"
 
 class SimulationCubic {
+private:
+	aryf temp_dis;
+	void Extrapolate(aryf & f);
 public:
 	Float viscosity=0.0;
 	Float diff=0.0;

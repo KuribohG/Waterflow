@@ -94,9 +94,11 @@ void FluidSimulation::Step_Time(void){
 		char name[50];
 		sprintf(name, "objs/meshs.%04d.obj", framenum);
 		meshcubes.Reconstruct(signed_dis, 0.0);
-		meshcubes.Dump_Obj(name);
-		getchar();
+		//meshcubes.Dump_Obj(name);
+		//getchar();
 	}
+	if (framenum >= 5) { printf("input: \n"); getchar(); }
+	//LOGM("continue\n");
 }
 
 struct P_3d
