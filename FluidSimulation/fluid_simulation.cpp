@@ -87,6 +87,10 @@ void FluidSimulation::Calculate_Signed_Distance() {
 				if (!finite(w) || isnan(w)) {
 					signed_dis(i, j, k) = 1;
 				}
+                // hack on signed_dis, to make mesh close
+                if (cubic.mask(i, j, k) == SOLID && signed_dis(i, j, k) < 1e-5) {
+                    signed_dis(i, j, k) = 0.0001;
+                }
 				//else if (fabs(w) < TSDF_EPS) signed_dis(i, j, k) = 0;
 			}
 		}
@@ -160,6 +164,15 @@ void FluidSimulation::Calculate_Nearest_Particle() {
             }
         }
     }
+    for (int i = 0; i < GRIDX; i++) {
+        for (int j = 0; j < GRIDY; j++) {
+            for (int k = 0; k < GRIDZ; k++) {
+                if (nearest[i][j][k]) {
+                    signed_dis(i, j, k) = dis[i][j][k];
+                }
+            }
+        }
+    }
 }
 
 void FluidSimulation::Get_Full_Velocity() {
@@ -195,15 +208,12 @@ void FluidSimulation::Step_Time(void){
     Calculate_Nearest_Particle();
     Get_Full_Velocity();
 	framenum++;
-    /*
 	if (framenum % 10 == 0) {
 		char name[50];
 		sprintf(name, "objs/meshs.%04d.obj", framenum);
 		meshcubes.Reconstruct(signed_dis, 0.0);
 		meshcubes.Dump_Obj(name);
-		getchar();
 	}
-    */
 }
 
 struct P_3d
