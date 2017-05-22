@@ -22,6 +22,10 @@ typedef float Float;
 #define LOGM(...)  fprintf(stderr,  __VA_ARGS__)
 #endif
 
+#ifdef WIN32
+#define finite _finite
+#endif
+
 //#define ARYTPL template<int n,int m,int w> // without typename T
 //#define ARYTPLT template<typename T, int n, int m, int w> // with typename T
 //#define ARYDEF Array3D<T,n,m,w>

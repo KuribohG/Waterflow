@@ -321,7 +321,7 @@ void MarchingCubes::List_Verts(const aryf & f, Float isoval) {
 		for (int j = 0; j < f.m; j++) {
 			for (int k = 0; k < f.w; k++) {
 				Float w1 = f.get(i, j, k);
-				if (!_finite(w1)) {
+				if (!finite(w1)) {
 					w1 = 1;
 				}
 				int sgn1 = (w1 < isoval);
@@ -332,7 +332,7 @@ void MarchingCubes::List_Verts(const aryf & f, Float isoval) {
 					else if (d == 2) k1++;
 					if (!f.inside(i1, j1, k1)) continue;
 					Float w2 = f.get(i1, j1, k1);
-					if (!_finite(w2)) {
+					if (!finite(w2)) {
 						w2 = 1;
 					}
 					int sgn2 = (w2 < isoval);
@@ -364,7 +364,7 @@ void MarchingCubes::List_Faces(const aryf &f, Float isoval) {
 				for (int d = 0; d < 8; d++) {
 					GetVertexAddr(i, j, k, d, i1, j1, k1);
 					Float w = f.get(i1, j1, k1);
-					if (!_finite(w)) {
+					if (!finite(w)) {
 						w = 1;
 					}
 					if (w < isoval) mask |= (1 << d);

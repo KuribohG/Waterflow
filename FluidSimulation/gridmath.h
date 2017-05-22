@@ -92,3 +92,4 @@ bool Valid_Water(int x, int y, int z, aryi &mask);
 Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Float z, const aryi &mask, bool extrapolation = false);
 //Float Interpolation_In_Water_3D(aryf &f, Float x, Float y, Float z, aryi &mask);
 
+void Print_Velocity(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask);

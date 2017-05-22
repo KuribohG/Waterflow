@@ -78,7 +78,7 @@ void Draw_Velocity_2d(const aryf &vxs, const aryf &vys,const aryf &vzs, const ar
 			Float vy = Interpolation_Water_Velocity(_Y, vys, i + 0.5, j0 + 0.5, k0 + 0.5, mask, false)*TIME_DELTA;
 			Float vz = Interpolation_Water_Velocity(_Z, vzs, i + 0.5, j0 + 0.5, k0 + 0.5, mask, false)*TIME_DELTA;
 			vy *= 1, vz *= 1;
-			//if(vz!=0) printf("get velocity: %f %f %f %f\n", j0 + 0.5, k0 + 0.5, vy, vz);
+			//if(j==29) printf("get velocity: %f %f %f %f\n", j0 + 0.5, k0 + 0.5, vy, vzs.get(i,j0,k0));
 			Float y0 = j0 + 0.5, z0 = k0 + 0.5;
             Float y1 = y0 + vy, z1 = z0 + vz;
             GridCoor_to_ClipCoor(y0, z0, screenid);
@@ -95,5 +95,25 @@ void Draw_Velocity_2d(const aryf &vxs, const aryf &vys,const aryf &vzs, const ar
         }
     }
     glFlush();
+}
+
+void Draw_Nearest(int i, MarkerParticle * nearest[GRIDX][GRIDY][GRIDZ]){
+	for (int j = 0; j < GRIDY; j++) {
+		for (int k = 0; k < GRIDZ; k++) {
+			if (!nearest[i][j][k]) continue;
+			MarkerParticle p = *nearest[i][j][k];
+			//cout << p.x << " " << p.y << endl;
+			Float y0 = j, z0 = k;
+			Float y1 = p.y, z1 = p.z;
+			GridCoor_to_ClipCoor(y0, z0, THIRD_SCREEN);
+			GridCoor_to_ClipCoor(y1, z1, THIRD_SCREEN);
+			glColor3f(1.0, 1.0, 1.0);
+			glBegin(GL_LINES);
+			glVertex2f(y0, z0);
+			glVertex2f(y1, z1);
+			glEnd();
+		}
+	}
+	glFlush();
 }
 
