@@ -408,3 +408,25 @@ void MarchingCubes::Dump_Obj(const char * filename){
 	fclose(fout);
 	cerr << "obj dumpped to: " << filename << endl;
 }
+
+void MarchingCubes::Dump_GOC(const char * gocname, const char *pngname, int outputW, int outputH) {
+	FILE *fout = fopen(gocname, "w");
+	fprintf(fout, "size %d %d\n", outputW, outputH);//set render size
+	fprintf(fout, "output %s\n", pngname);//set output file name
+	fprintf(fout, "camera %d %d %d %d %d %d %d %d %d %d\n", (int)(GRIDX*1.5), GRIDY / 2, (int)(GRIDZ*0.8), GRIDX / 2, GRIDY / 2, GRIDZ / 2, 0, 0, 1, 45);//set camera parameter
+	fprintf(fout, "point %d %d %d 1 1 1\n", GRIDX * 2, GRIDY / 2, GRIDZ / 2);
+	fprintf(fout, "ambient 0 0 0\n");
+	fprintf(fout, "specular 0 0 0\n");
+	fprintf(fout, "shininess 1\n");
+	fprintf(fout, "emission 0.1 0.1 0.1\n");
+	fprintf(fout, "diffuse 0.8 0.8 0.8\n");
+	fprintf(fout, "maxverts %d\n", verts.size() / 3);
+	for (unsigned int i = 0; i < verts.size(); i += 3) {
+		fprintf(fout, "vertex %f %f %f\n", verts[i], verts[i + 1], verts[i + 2]);
+	}
+	for (unsigned int i = 0; i < faces.size(); i += 3) {
+		fprintf(fout, "tri %d %d %d\n", faces[i + 2] - 1, faces[i + 1] - 1, faces[i] - 1);
+	}
+	fclose(fout);
+	cerr << "goc dumpped to: " << gocname << endl;
+}

@@ -218,9 +218,14 @@ void FluidSimulation::Step_Time(void){
 		sprintf(name, "objs/meshs.%04d.obj", framenum);
 		meshcubes.Reconstruct(signed_dis, 0.0);
 		printf("dump to: %s\n", name);
+		char pngname[100];
+		sprintf(pngname, "%04d.png", framenum);
+		
 		meshcubes.Dump_Obj(name);
+		//meshcubes.Dump_GOC(name, pngname, 1200, 900);
 		//getchar();
 	}
+	if (framenum >= 100) exit(0);
 	//if (framenum >= 5) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
     

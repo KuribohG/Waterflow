@@ -15,5 +15,6 @@ public:
 	void List_Faces(const aryf & f, Float isoval);
 	void Reconstruct(const aryf &f, Float isoval);
 	void Dump_Obj(const char *filename);
+	void Dump_GOC(const char * gocname, const char *pngname, int outputW, int outputH);//GOC: scene file format used in wmd's renderer
 };
 
