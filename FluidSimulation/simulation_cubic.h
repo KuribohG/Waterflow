@@ -8,7 +8,6 @@
 class SimulationCubic {
 private:
 	aryf temp_dis;
-	void Extrapolate(aryf & f);
 public:
 	Float viscosity=0.0;
 	Float diff=0.0;
@@ -32,6 +31,8 @@ public:
 	SimulationCubic(void);
 
 	~SimulationCubic();
+
+	void Read_Scene_File(const char *filename);
 
 	void Bound_Solid(void);
 

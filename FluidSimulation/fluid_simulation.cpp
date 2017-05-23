@@ -225,7 +225,7 @@ void FluidSimulation::Step_Time(void){
 		//meshcubes.Dump_GOC(name, pngname, 1200, 900);
 		//getchar();
 	}
-	if (framenum >= 100) exit(0);
+	if (framenum >= 1000) exit(0);
 	//if (framenum >= 5) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
     

@@ -1,4 +1,6 @@
 #include "simulation_cubic.h"
+#include<fstream>
+#include<sstream>
 
 /*void SimulationCubic::Extrapolate(aryf &f){
 	for(int i=0;i<)
@@ -35,7 +37,7 @@ SimulationCubic::SimulationCubic(void){
 				mask(i, j, k) = AIR;
 				//if (2 <= i&&i <= 8 && 20 <= j&&j <= 50 && !mask.is(i, j, k, SOLID)) mask(i, j, k) = WATER;
 				//if (j == 30 && 40 <= k&&k <= 50) mask(i, j, k) = WATER;
-				if (5 <= j&&j <= 40 && 0 <= k&&k <= 60) mask(i, j, k) = WATER;
+				//if (5 <= j&&j <= 40 && 0 <= k&&k <= 60) mask(i, j, k) = WATER;
 				//if (29 <= j&&j <= 29 && 45 <= k&&k <= 50) mask(i, j, k) = WATER;
 				//mask(i, 50, 50) = WATER;
 				//if ((k == GRIDZ - 2 || j >= 40 || j <= 10) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
@@ -43,6 +45,11 @@ SimulationCubic::SimulationCubic(void){
             }
         }
     }
+	string filename;
+	cout << "please enter scene file name: ";
+	//cin >> filename;
+	filename = "scenes/frog.box";
+	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
 	LOGM("velocity set\n");
 	Place_Particles(particles, mask);
@@ -53,6 +60,33 @@ SimulationCubic::~SimulationCubic() {
 	vx.clear(), vx0.clear(), vy.clear(), vy0.clear(), vz.clear(), vz0.clear();
 	p.clear(), p0.clear();
 	mask.clear();
+}
+
+void SimulationCubic::Read_Scene_File(const char * filename){
+	cerr << "read scene file: " << filename << endl;
+	ifstream fin;
+	fin.open(filename);
+	string buff, cmd;
+	while (getline(fin, buff)) {
+		stringstream sin(buff);
+		sin >> cmd;
+		//cout << buff << endl;
+		if (buff[0] == '#');
+		else if (cmd == "box") {
+			int x0, x1, y0, y1, z0, z1;
+			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
+			for (int i = x0; i <= x1; i++) {
+				for (int j = y0; j <= y1; j++) {
+					for (int k = z0; k <= z1; k++) {
+						if (mask.is(i, j, k, AIR)) {
+							mask(i, j, k) = WATER;
+						}
+					}
+				}
+			}
+		}
+	}
+	fin.close();
 }
 
 Float Clip(Float &x, Float _min, Float _max) {
