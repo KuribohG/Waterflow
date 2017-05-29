@@ -102,7 +102,7 @@ Float Square_Dis(Float x, Float y, Float z, Float xx, Float yy, Float zz) {
 }
 
 void FluidSimulation::Calculate_Signed_Distance() {
-    const Float h = 9.0;
+    const Float h = 4.0;
     const Float r = 1.0;
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
@@ -125,10 +125,10 @@ void FluidSimulation::Calculate_Signed_Distance() {
             for (int k = 0; k < GRIDZ; k++) {
                 Float X = 0, Y = 0, Z = 0, d = 0;
                 Float x = i + 0.5, y = j + 0.5, z = k + 0.5;
-                for (int dx = -3; dx <= 3; dx++) {
-                    for (int dy = -3; dy <= 3; dy++) {
-                        for (int dz = -3; dz <= 3; dz++) {
-                            if (std::abs(dx) + std::abs(dy) + std::abs(dz) >= 6) continue;
+                for (int dx = -2; dx <= 2; dx++) {
+                    for (int dy = -2; dy <= 2; dy++) {
+                        for (int dz = -2; dz <= 2; dz++) {
+                            if (std::abs(dx) + std::abs(dy) + std::abs(dz) >= 5) continue;
                             if (i + dx < 0 || i + dx >= GRIDX) continue;
                             if (j + dy < 0 || j + dy >= GRIDY) continue;
                             if (k + dz < 0 || k + dz >= GRIDZ) continue;
