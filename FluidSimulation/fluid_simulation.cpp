@@ -77,7 +77,7 @@ void FluidSimulation::Pour_Source(void) {
 			for (int j = s.y0; j <= s.y1; j++) {
 				for (int k = s.z0; k <= s.z1; k++) {
 					Float t = random();
-					if (t >= s.gen_rate) {
+					if (t <= s.gen_rate) {
 						cubic.Mark_Single_Water(i, j, k);
 						Add_Single_Particle(cubic.particles, cubic.mask, i, j, k);
 					}
