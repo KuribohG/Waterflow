@@ -128,6 +128,7 @@ void FluidSimulation::Calculate_Signed_Distance() {
                 for (int dx = -3; dx <= 3; dx++) {
                     for (int dy = -3; dy <= 3; dy++) {
                         for (int dz = -3; dz <= 3; dz++) {
+                            if (std::abs(dx) + std::abs(dy) + std::abs(dz) >= 6) continue;
                             if (i + dx < 0 || i + dx >= GRIDX) continue;
                             if (j + dy < 0 || j + dy >= GRIDY) continue;
                             if (k + dz < 0 || k + dz >= GRIDZ) continue;
