@@ -66,37 +66,50 @@ void Add_Particles(vector<MarkerParticle> &particles, aryi &mask, int x0, int x1
 	LOGM("add water source particles\n");
 }
 
+Float clip(Float x, Float min, Float max) {
+	x = std::max(min, x);
+	x = std::min(max, x);
+	return x;
+}
+
+void RK3(MarkerParticle &p, aryf &vx, aryf &vy, aryf &vz, aryi &mask, int step = 3) {
+	const Float step_size[3] = {0.0, 1.0 / 2, 3.0 / 4};
+	const Float weight[3] = {2.0 / 9, 3.0 / 9, 4.0 / 9};
+	Float time_delta = TIME_DELTA / step;
+	for (int t = 0; t < step; t++) {
+		Float pvx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
+		Float pvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
+		Float pvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
+		Float delta_x = 0, delta_y = 0, delta_z = 0;
+		for (int s = 0; s < 3; s++) {
+			Float px = p.x + step_size[s] * pvx * time_delta;
+			Float py = p.y + step_size[s] * pvy * time_delta;
+			Float pz = p.z + step_size[s] * pvz * time_delta;
+			Float pvx1 = Interpolation_Water_Velocity(_X, vx, px, py, pz, mask);
+			Float pvy1 = Interpolation_Water_Velocity(_Y, vy, px, py, pz, mask);
+			Float pvz1 = Interpolation_Water_Velocity(_Z, vz, px, py, pz, mask);
+			delta_x += pvx1 * time_delta * weight[s];
+			delta_y += pvy1 * time_delta * weight[s];
+			delta_z += pvz1 * time_delta * weight[s];
+		}
+		p.x += delta_x, p.y += delta_y, p.z += delta_z;
+		//XXX: find the nearest grid which is not solid
+		p.x = clip(p.x, 1 + EPS, GRIDX - 1 - EPS);
+		p.y = clip(p.y, 1 + EPS, GRIDY - 1 - EPS);
+		p.z = clip(p.z, 1 + EPS, GRIDZ - 1 - EPS);
+	}
+}
+
 //todo: Runge_Kutta here
 void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryi &mask){
 	for (MarkerParticle &p : particles) {
 		int ix = floor(p.x), iy = floor(p.y), iz = floor(p.z);
 		if (!mask.inside(ix, iy, iz)) {
-			//assert(false);
+			assert(false);
 			printf("when advecting marker particle flying outside: %f %f %f\n", p.x, p.y, p.z);
 		}
-		else {
-			Float z0 = p.z;
-			Float pvx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask, false);
-			Float pvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask, false);
-			Float pvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask, false);
-			//if (ix == GRIDX / 2) LOGM("advect particle: %f %f %f %f\n", p.x, p.y, p.z, pvz);
-			//assert(pvz <= 0);
-			Float x1 = p.x + pvx*TIME_DELTA;
-			Float y1 = p.y + pvy*TIME_DELTA;
-			Float z1 = p.z + pvz*TIME_DELTA;
-			if (mask.inside(floor(x1), floor(y1), floor(z1))) {
-				p.x = x1;
-				p.y = y1;
-				p.z = z1;
-			}
-			/*if (mask.is(floor(x1), floor(y1), floor(z1), WATER) || mask.is(floor(x1), floor(y1), floor(z1), AIR)) {
-				p.x = x1;
-				p.y = y1;
-				p.z = z1;
-			}*/
-			//p.x += pvx*TIME_DELTA;
-			//p.y += pvy*TIME_DELTA;
-			//p.z += pvz*TIME_DELTA;
+		else if (mask(ix,iy,iz) != SOLID) {
+			RK3(p, vx, vy, vz, mask);
 		}
 	}
 }

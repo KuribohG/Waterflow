@@ -10,7 +10,7 @@
 #include <cstdlib>
 using namespace std;
 
-Float random(void) {
+Float Random(void) {
 	return rand() / (RAND_MAX - 1.0);
 }
 
@@ -76,7 +76,7 @@ void FluidSimulation::Pour_Source(void) {
 		for (int i = s.x0; i <= s.x1; i++) {
 			for (int j = s.y0; j <= s.y1; j++) {
 				for (int k = s.z0; k <= s.z1; k++) {
-					Float t = random();
+					Float t = Random();
 					if (t <= s.gen_rate) {
 						cubic.Mark_Single_Water(i, j, k);
 						Add_Single_Particle(cubic.particles, cubic.mask, i, j, k);

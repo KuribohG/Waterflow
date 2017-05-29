@@ -258,6 +258,35 @@ void SimulationCubic::Advect_Velocity(int axis, aryf &f, const aryf &f0, const a
 	//Bound_Solid(axis, f);
 }
 
+void SimulationCubic::Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz) {
+	for (int i = 0; i < f.n; i++) {
+		for (int j = 0; j < f.m; j++) {
+			for (int k = 0; k < f.w; k++) {
+				f(i, j, k) = f0.get(i, j, k);
+				bool flag = false;
+				if (axis == _X) {
+					if (mask.is(i, j, k, WATER) || mask.is(i - 1, j, k, WATER)) flag = true;
+				}
+				else if (axis == _Y) {
+					if (mask.is(i, j, k, WATER) || mask.is(i, j - 1, k, WATER)) flag = true;
+				}
+				else if (axis == _Z) {
+					if (mask.is(i, j, k, WATER) || mask.is(i, j, k - 1, WATER)) flag = true;
+				}
+				flag = false;
+				if (flag) {
+					Float x, y, z;
+					Runge_Kutta(axis, i, j, k, TIME_DELTA, 2, vx, vy, vz, x, y, z);
+					x = Clip(x, 0.5, GRIDX + 0.5);
+					y = Clip(y, 0.5, GRIDY + 0.5);
+					z = Clip(z, 0.5, GRIDZ + 0.5);
+					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask);
+				}
+			}
+		}
+	}
+}
+
 void swap(aryf &a, aryf &b) {
 	aryf c;
 	c = a; a = b; b = c;

@@ -52,6 +52,8 @@ public:
 
 	void Advect_Velocity(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz);
 
+	void Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz);
+
 	void Step_Time();
 
 };
