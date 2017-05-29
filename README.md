@@ -4,7 +4,7 @@ box x0 x1 y0 y1 z0 z1 #在初始时候增加一个装满水的长方体，坐标
 source x0 x1 y0 y1 z0 z1 rate vx vy vz #增加一个水源，同上，其中每个格子，每一秒平均生成rate次水。vx vy vz是它吐出水的初始速度（暂且不支持）。
 
 现在todo（星号为不重要）：
-1. 渲染（wukan）。可选方案：blender API，自写光线追踪，借用wkw组photon mapping。
+1. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
 2. 全面切换到PIC advection方法，不再采用grid advection。
 3. 修extrapolation的bug：x,y,z=0时不计算。
 4. （或许在PIC上线之后）设法支持水源的初始速度。
