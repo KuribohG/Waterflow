@@ -289,7 +289,7 @@ void FluidSimulation::Step_Time(void){
 	int t3 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
 	//printf("after extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
     
-	if (framenum % 5 == 0) {
+	if (framenum % 1 == 0) {
 
 		char name[50];
 		sprintf(name, "objs/meshs.%04d.obj", framenum);
