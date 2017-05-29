@@ -38,6 +38,8 @@ public:
 
 	void Apply_External_Forces(void);
 
+	void Cancel_Air_Velocity(void);
+
 	//void Linear_Solve(int axis, aryf & x, aryf & x0, Float a, Float wtsum, int iter);
 
 	void Calc_Divergence(aryf & vx, aryf & vy, aryf & vz, aryf & div);

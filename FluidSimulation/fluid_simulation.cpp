@@ -9,12 +9,13 @@ FluidSimulation::FluidSimulation()
 }
 //#define D3
 void FluidSimulation::Draw_On_Screen(void){
+	printf("draw on screen: \n");
 #ifdef D3
     Draw_Density_3d(cubic.density, RIGHT_SCREEN, lightPath);
 #else
 	//Draw_Nearest(GRIDX / 2, nearest);
-	Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
-    //Draw_Density_2d(cubic.p, THIRD_SCREEN);
+	//Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
+    Draw_Density_2d(cubic.p, THIRD_SCREEN);
 #endif
 	Draw_Velocity_2d(cubic.vx, cubic.vy, cubic.vz, cubic.mask, LEFT_SCREEN);
 	Draw_Particle_2d(cubic.particles, RIGHT_SCREEN);
@@ -175,6 +176,7 @@ void FluidSimulation::Calculate_Nearest_Particle() {
 }
 
 void FluidSimulation::Get_Full_Velocity() {
+	printf("extrapolating: \n");
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
@@ -225,6 +227,7 @@ void FluidSimulation::Step_Time(void){
 		//meshcubes.Dump_GOC(name, pngname, 1200, 900);
 		//getchar();
 	}
+	//getchar();
 	if (framenum >= 1000) exit(0);
 	//if (framenum >= 5) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");

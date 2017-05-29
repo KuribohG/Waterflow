@@ -25,7 +25,8 @@ public:
 	void Add_Scaled_Vectors(vector<double>& v1, double s1, vector<double>& v2, double s2, vector<double>& result);
 	int Get_Cell_Idx(int i, int j, int k);
 	void Build_Water_Index(const aryi &mask);
-	void Calc_Neg_Divergence(const aryf &vx, const aryf &vy, const aryf &vz);
+	void Calc_Neg_Divergence(const aryf & vx, const aryf & vy, const aryf & vz, const aryi & mask);
+	//void Calc_Neg_Divergence(const aryf &vx, const aryf &vy, const aryf &vz);
 	void Calc_Matrix_Coeffs(vector<MatCell>& A, const aryi & mask);
 	void Calc_Preconditioner(vector<MatCell>& A, vector<double>& precon);
 	void Apply_Preconditioner(vector<MatCell>& A, vector<double>& precon, vector<double>& residual, vector<double>& vect);

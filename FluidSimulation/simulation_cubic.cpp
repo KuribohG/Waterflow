@@ -2,9 +2,6 @@
 #include<fstream>
 #include<sstream>
 
-/*void SimulationCubic::Extrapolate(aryf &f){
-	for(int i=0;i<)
-}*/
 
 SimulationCubic::SimulationCubic(void){
 	temp_dis.init(GRIDX + 1, GRIDY + 1, GRIDZ + 1);
@@ -35,20 +32,13 @@ SimulationCubic::SimulationCubic(void){
             for (int k = 0; k < GRIDZ; k++) {
 				if (mask.is(i, j, k, SOLID)) continue;
 				mask(i, j, k) = AIR;
-				//if (2 <= i&&i <= 8 && 20 <= j&&j <= 50 && !mask.is(i, j, k, SOLID)) mask(i, j, k) = WATER;
-				//if (j == 30 && 40 <= k&&k <= 50) mask(i, j, k) = WATER;
-				//if (5 <= j&&j <= 40 && 0 <= k&&k <= 60) mask(i, j, k) = WATER;
-				//if (29 <= j&&j <= 29 && 45 <= k&&k <= 50) mask(i, j, k) = WATER;
-				//mask(i, 50, 50) = WATER;
-				//if ((k == GRIDZ - 2 || j >= 40 || j <= 10) && mask(i, j, k) != SOLID) mask(i, j, k) = AIR;
-				//if (!mask.is(i, j, k, SOLID)) mask(i, j, k) = AIR;
             }
         }
     }
 	string filename;
 	cout << "please enter scene file name: ";
 	//cin >> filename;
-	filename = "scenes/frog.box";
+	filename = "scenes/test.box";
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
 	LOGM("velocity set\n");
@@ -120,27 +110,37 @@ void Bound_Surface(aryf &pressure, aryi &mask) {
 }
 
 void SimulationCubic::Apply_External_Forces(void) {
+	printf("apply external forces\n");
 	for (int i = 0; i <= GRIDX; i++) {
 		for (int j = 0; j <= GRIDY; j++) {
 			for (int k = 0; k <= GRIDZ; k++) {
-				//int t = mask(i, j, k);
-				//if (t == WATER || mask.is(i + 1, j, k, WATER));
-				//else vx(i, j, k) = 0;
-				//if (t == WATER || mask.is(i, j + 1, k, WATER));
-				//else vy(i, j, k) = 0;
 				if (mask.is(i, j, k, WATER) || mask.is(i, j, k - 1, WATER)) {
-					//if (i == GRIDX / 2) LOGM("add gravity: %d %d %d %f ", i, j, k, vz(i, j, k));
 					vz(i, j, k) += -g*TIME_DELTA;
+					//if (i == GRIDX / 2) LOGM("add gravity: %d %d %d %f += %f\n ", i, j, k, vz(i, j, k), -g*TIME_DELTA);
 					//if (i == GRIDX / 2) LOGM("%f\n", vz.get(i, j, k));
 				}
-				//else vz(i, j, k) = 0;
-				//if (i == 2 && (t == WATER || mask.is(i, j, k + 1, WATER))) LOGM("(%d %d)", j, k);
 			}
 		}
 	}
 }
 
-
+void SimulationCubic::Cancel_Air_Velocity(void) {
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				if (mask(i, j, k) != WATER && i - 1 >= 0 && mask(i - 1, j, k) != WATER) {
+					vx(i, j, k) = 0;
+				}
+				if (mask(i, j, k) != WATER && j - 1 >= 0 && mask(i, j - 1, k) != WATER) {
+					vy(i, j, k) = 0;
+				}
+				if (mask(i, j, k) != WATER && k - 1 >= 0 && mask(i, j, k - 1) != WATER) {
+					vz(i, j, k) = 0;
+				}
+			}
+		}
+	}
+}
 
 void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 	div.set(0);
@@ -160,6 +160,7 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 
 void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 	LOGM("project\n");
+	Cancel_Air_Velocity();
 	solver.Solve_Pressure(vx, vy, vz, mask);
 	solver.Send_Back_To(p);
 
@@ -190,6 +191,10 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 
 }
 
+void Bound_Add(Float &x, Float a, Float bound_low, Float bound_high) {
+	if (bound_low <= x + a&&x + a <= bound_high) x += a;
+}
+
 void SimulationCubic::Runge_Kutta(int axis, int i, int j, int k, Float delta, int iter,
 	const aryf &vx, const aryf &vy, const aryf &vz, Float &x, Float &y, Float &z) {
 	assert(iter >= 1);
@@ -200,18 +205,24 @@ void SimulationCubic::Runge_Kutta(int axis, int i, int j, int k, Float delta, in
 	else if (axis == _Y) x += 0.5, z += 0.5;
 	else if (axis == _Z) x += 0.5, y += 0.5;
 	//int id = ID(i, j, k);
-	x -= vx.get(i, j, k);
+	Bound_Add(x, -vx.get(i, j, k), 0, GRIDX);
+	Bound_Add(y, -vy.get(i, j, k), 0, GRIDY);
+	Bound_Add(z, -vz.get(i, j, k), 0, GRIDZ);
+	/*x -= vx.get(i, j, k);
 	y -= vy.get(i, j, k);
-	z -= vz.get(i, j, k);
+	z -= vz.get(i, j, k);*/
 	/*x = i + 0.5 - delta * vx.get(i, j, k);
 	y = j + 0.5 - delta * vy.get(i, j, k);
 	z = k + 0.5 - delta * vz.get(i, j, k);*/
-
+	//NOTE: x,y,z should be bounded here
 	for (int _ = 1; _ < iter; _++) {
-		Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask);
+		Bound_Add(x, -delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask), 0, GRIDX);
+		Bound_Add(y, -delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask), 0, GRIDY);
+		Bound_Add(z, -delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask), 0, GRIDZ);
+		/*Float nx = x - delta*Interpolation_Water_Velocity(_X, vx, x, y, z, mask);
 		Float ny = y - delta*Interpolation_Water_Velocity(_Y, vy, x, y, z, mask);
 		Float nz = z - delta*Interpolation_Water_Velocity(_Z, vz, x, y, z, mask);
-		x = nx, y = ny, z = nz;
+		x = nx, y = ny, z = nz;*/
 	}
 }
 
@@ -231,7 +242,7 @@ void SimulationCubic::Advect_Velocity(int axis, aryf &f, const aryf &f0, const a
 				else if (axis == _Z) {
 					if (mask.is(i, j, k, WATER) || mask.is(i, j, k - 1, WATER)) flag = true;
 				}
-				flag = false;
+				//flag = false;
 				if (flag) {
 					Float x, y, z;
 					Runge_Kutta(axis, i, j, k, TIME_DELTA, 2, vx, vy, vz, x, y, z);
@@ -277,14 +288,14 @@ void SimulationCubic::Step_Time(void){
     //velocity-evolution
 	Apply_External_Forces();
 	//printf("before advection: \n"); Print_Velocity(vx, vy, vz, mask);
-	if (tot++) {
+	/*if (tot++) {
 		swap(vx, vx0);
 		swap(vy, vy0);
 		swap(vz, vz0);
 		Advect_Velocity(0, vx, vx0, vx0, vy0, vz0);
 		Advect_Velocity(1, vy, vy0, vx0, vy0, vz0);
 		Advect_Velocity(2, vz, vz0, vx0, vy0, vz0);
-	}
+	}*/
 
 	//printf("after advection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Bound_Solid();
@@ -293,10 +304,11 @@ void SimulationCubic::Step_Time(void){
 	Mark_Water_By(particles, mask);
 
 	Project(vx, vy, vz, p, p0);
+	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Calc_Divergence(vx, vy, vz, s);
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
 
 
 
-	//Calc_Divergence(vx, vy, vz, p);
+	Calc_Divergence(vx, vy, vz, p);
 }

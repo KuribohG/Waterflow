@@ -16,10 +16,11 @@ v2.0（空气和水）
 
 现在todo：
 1. 渲染。可选方案：blender API，自写raytracing，wkw组photon mapping。
-2. 支持出surface mesh：mesh->TSDF，TSDF场的advection
-3. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
-4. 搞懂blender怎么渲染实心玻璃材质。
-5. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
+2. 调研第10章，研究hybrid方法
+3. 支持出surface mesh：mesh->TSDF，TSDF场的advection
+4. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
+5. 搞懂blender怎么渲染实心玻璃材质。
+6. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
 
 
 
