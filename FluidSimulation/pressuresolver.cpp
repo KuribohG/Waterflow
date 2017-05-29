@@ -331,6 +331,7 @@ void PressureSolver::Solver_LA_System(vector<MatCell> &A, vector<double> &b, vec
 }
 
 void PressureSolver::Solve_Pressure(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask) {
+	int t0 = clock();
 	Build_Water_Index(mask);
 	pressure = vector<double>(cells.size() / 3);
 	div = vector<double>(pressure.size());
@@ -341,4 +342,5 @@ void PressureSolver::Solve_Pressure(const aryf &vx, const aryf &vy, const aryf &
 	Calc_Matrix_Coeffs(A, mask);
 	Calc_Preconditioner(A, precon);
 	Solver_LA_System(A, div, precon, pressure);
+	printf("pressure solve done, time cost: %.2fs\n", (clock() - t0 + 0.0) / CLOCKS_PER_SEC);
 }
