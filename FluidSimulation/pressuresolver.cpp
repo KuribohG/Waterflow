@@ -74,7 +74,7 @@ void PressureSolver::Build_Water_Index(const aryi & mask){
 	}
 }
 
-void PressureSolver::Calc_Neg_Divergence(const aryf & vx, const aryf & vy, const aryf & vz){
+void PressureSolver::Calc_Neg_Divergence(const aryf & vx, const aryf & vy, const aryf & vz, const aryi &mask){
 	for (int t = 0; t < div.size(); t++) {
 		int i = cells[t * 3 + 0], j = cells[t * 3 + 1], k = cells[t * 3 + 2];
 		div[t]=-(
@@ -82,6 +82,12 @@ void PressureSolver::Calc_Neg_Divergence(const aryf & vx, const aryf & vy, const
 			+ vy.get(i, j + 1, k) - vy.get(i, j, k)
 			+ vz.get(i, j, k + 1) - vz.get(i, j, k)
 		);
+		if (mask.is(i - 1, j, k, SOLID)) div[t] -= vx.get(i, j, k);
+		if (mask.is(i + 1, j, k, SOLID)) div[t] += vx.get(i + 1, j, k);
+		if (mask.is(i, j - 1, k, SOLID)) div[t] -= vy.get(i, j, k);
+		if (mask.is(i, j + 1, k, SOLID)) div[t] += vy.get(i, j + 1, k);
+		if (mask.is(i, j, k - 1, SOLID)) div[t] -= vz.get(i, j, k);
+		if (mask.is(i, j, k + 1, SOLID)) div[t] += vz.get(i, j, k + 1);
 	}
 }
 
@@ -328,7 +334,7 @@ void PressureSolver::Solve_Pressure(const aryf &vx, const aryf &vy, const aryf &
 	Build_Water_Index(mask);
 	pressure = vector<double>(cells.size() / 3);
 	div = vector<double>(pressure.size());
-	Calc_Neg_Divergence(vx, vy, vz);
+	Calc_Neg_Divergence(vx, vy, vz, mask);
 	if (Maximum_Abs(div) < TOLERANCE) return; //with pressure=0
 	vector<MatCell> A(pressure.size());
 	vector<double> precon(pressure.size());

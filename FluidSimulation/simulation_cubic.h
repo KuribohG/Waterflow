@@ -32,11 +32,15 @@ public:
 
 	~SimulationCubic();
 
-	void Read_Scene_File(const char *filename);
+	void Mark_Single_Water(int i, int j, int k);
+
+	void Mark_Water(int x0, int x1, int y0, int y1, int z0, int z1);
 
 	void Bound_Solid(void);
 
 	void Apply_External_Forces(void);
+
+	void Cancel_Air_Velocity(void);
 
 	//void Linear_Solve(int axis, aryf & x, aryf & x0, Float a, Float wtsum, int iter);
 

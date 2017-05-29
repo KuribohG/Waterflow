@@ -87,7 +87,8 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 	}
 	*/
 	//if (fabs(sw) < 1e-10) printf("++++++++++++++++++++++++++++++%f %f %f\n", x, y, z);
-	//assert(fabs(sw) > 1e-10);
-	assert(sw != 0);
+	if (fabs(sw) <= 1e-10) throw("ind");
+	assert(fabs(sw) > 1e-10);
+	//assert(sw != 0);
 	return v / sw;
 }

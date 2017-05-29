@@ -16,6 +16,7 @@ void Display_Func(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     fluidsim.Draw_On_Screen();
     glutSwapBuffers();
+	static int frame = 0; if (frame >= 15) { printf("frame :%d input: \n", frame++); getchar(); }
 }
 int main(int argc, char *argv[])
 {

@@ -21,28 +21,49 @@ void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
 	}
 }
 
-void Place_Particles(vector<MarkerParticle> &particles, aryi &mask) {
+void Add_Particles_Single_Cell(vector<MarkerParticle> &particles, int i, int j, int k) {
 	const Float dxs[8] = { 0.25,0.25,0.25,0.25,0.75,0.75,0.75,0.75 };
 	const Float dys[8] = { 0.25,0.25,0.75,0.75,0.25,0.25,0.75,0.75 };
 	const Float dzs[8] = { 0.25,0.75,0.25,0.75,0.25,0.75,0.25,0.75 };
+	for (int d = 0; d < 8; d++) {
+		particles.push_back(MarkerParticle(i + dxs[d], j + dys[d], k + dzs[d]));
+	}
+	/*p.x += (randomF() - 0.5)*0.1;
+	p.y += (randomF() - 0.5)*0.1;
+	p.z += (randomF() - 0.5)*0.1;*/
+}
+
+void Init_Particles(vector<MarkerParticle> &particles, aryi &mask) {//should only be called once for initialization
 	particles.clear();
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
 				if (mask(i, j, k) == WATER) {
-					for (int d = 0; d < 8; d++) {
-						particles.push_back(MarkerParticle(i + dxs[d], j + dys[d], k + dzs[d]));
-					}
+					Add_Particles_Single_Cell(particles, i, j, k);
 				}
 			}
 		}
 	}
-	for (MarkerParticle &p : particles) {
-		//p.x += (randomF() - 0.5)*0.1;
-		//p.y += (randomF() - 0.5)*0.1;
-		//p.z += (randomF() - 0.5)*0.1;
+	LOGM("initial marker particles set\n");
+}
+
+void Add_Single_Particle(vector<MarkerParticle> &particles, aryi &mask, int i, int j, int k) {
+	if (mask.is(i, j, k, WATER)) {
+		Add_Particles_Single_Cell(particles, i, j, k);
 	}
-	LOGM("marker particles set\n");
+}
+
+void Add_Particles(vector<MarkerParticle> &particles, aryi &mask, int x0, int x1, int y0, int y1, int z0, int z1) {
+	for (int i = x0; i <= x1; i++) {
+		for (int j = y0; j <= y1; j++) {
+			for (int k = z0; k <= z1; k++) {
+				if (mask.is(i, j, k, WATER)) {
+					Add_Particles_Single_Cell(particles, i, j, k);
+				}
+			}
+		}
+	}
+	LOGM("add water source particles\n");
 }
 
 Float clip(Float x, Float min, Float max) {
@@ -72,9 +93,10 @@ void RK3(MarkerParticle &p, aryf &vx, aryf &vy, aryf &vz, aryi &mask, int step =
 			delta_z += pvz1 * time_delta * weight[s];
 		}
 		p.x += delta_x, p.y += delta_y, p.z += delta_z;
-		p.x = clip(p.x, 0, GRIDX);
-		p.y = clip(p.y, 0, GRIDY);
-		p.z = clip(p.z, 0, GRIDZ);
+		//XXX: find the nearest grid which is not solid
+		p.x = clip(p.x, 1 + EPS, GRIDX - 1 - EPS);
+		p.y = clip(p.y, 1 + EPS, GRIDY - 1 - EPS);
+		p.z = clip(p.z, 1 + EPS, GRIDZ - 1 - EPS);
 	}
 }
 
