@@ -309,10 +309,10 @@ void SimulationCubic::Step_Time(void){
 
 	//printf("after advection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Bound_Solid();
-
+	int t0 = clock();
 	Advect_Particles(particles, vx, vy, vz, mask);
 	Mark_Water_By(particles, mask);
-
+	int t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
 	Project(vx, vy, vz, p, p0);
 	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Calc_Divergence(vx, vy, vz, s);

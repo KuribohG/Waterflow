@@ -273,16 +273,24 @@ void FluidSimulation::Get_Full_Velocity() {
 }
 
 void FluidSimulation::Step_Time(void){
+	printf("==========================================================================================\n");
+	static int T0 = clock();
+	int tstep = clock();
+	framenum++;
+	printf("start to step frame %d\n", framenum);
 	Pour_Source();
     cubic.Step_Time();
+	int t0 = clock();
     Calculate_Signed_Distance();
+	int t1 = clock(); printf("calc signed distance time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
     Calculate_Nearest_Particle();
+	int t2 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
 	//printf("before extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
     Get_Full_Velocity();
+	int t3 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
 	//printf("after extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
-	framenum++;
     
-	if (framenum % 5 == 0) {
+	if (framenum % 1 == 0) {
 
 		char name[50];
 		sprintf(name, "objs/meshs.%04d.obj", framenum);
@@ -296,10 +304,12 @@ void FluidSimulation::Step_Time(void){
 		//getchar();
 	}
 	//getchar();
-	if (framenum >= 1000) exit(0);
+	if (framenum >= 200) exit(0);
 	//if (framenum >= 5) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
-    
+	int t4 = clock();
+	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0)/CLOCKS_PER_SEC, (t4 - T0 + 0.0) / CLOCKS_PER_SEC);
+	printf("==========================================================================================\n");
 }
 
 struct P_3d

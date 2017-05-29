@@ -72,29 +72,29 @@ void Draw_Density_2d(aryf &density, SCREENID_T screenid) {
 void Draw_Velocity_2d(const aryf &vxs, const aryf &vys,const aryf &vzs, const aryi &mask, SCREENID_T screenid) {
     LOGM("draw velocity\n");
 	int i = GRIDX / 2;
-    for (int j = 0; j < GRIDY; j ++) {
-        for (int k = 0; k < GRIDZ; k ++) {
-            int j0 = j, k0 = k;
+	for (int j = 0; j < GRIDY; j += GRIDY / 64) {
+		for (int k = 0; k < GRIDZ; k += GRIDZ / 64) {
+			int j0 = j, k0 = k;
 			Float vy = Interpolation_Water_Velocity(_Y, vys, i + 0.5, j0 + 0.5, k0 + 0.5, mask, false)*TIME_DELTA;
 			Float vz = Interpolation_Water_Velocity(_Z, vzs, i + 0.5, j0 + 0.5, k0 + 0.5, mask, false)*TIME_DELTA;
 			vy *= 1, vz *= 1;
 			//if (j == 29 && vz != 0) printf("get velocity: %f %f %f %f\n", j0 + 0.5, k0 + 0.5, vy, vz);
 			Float y0 = j0 + 0.5, z0 = k0 + 0.5;
-            Float y1 = y0 + vy, z1 = z0 + vz;
+			Float y1 = y0 + vy, z1 = z0 + vz;
 			//printf("%f %f %f %f\n", y0, z0, y1, z1);
-            GridCoor_to_ClipCoor(y0, z0, screenid);
-            GridCoor_to_ClipCoor(y1, z1, screenid);
-            glColor3f(1.0, 1.0, 1.0);
-            glBegin(GL_LINES);
-            glVertex2f(y0, z0);
-            glVertex2f(y1, z1);
-            glEnd();
-            glColor3f(0, 1, 0);
-            glBegin(GL_POINTS);
-            glVertex2f(y0, z0);
-            glEnd();
-        }
-    }
+			GridCoor_to_ClipCoor(y0, z0, screenid);
+			GridCoor_to_ClipCoor(y1, z1, screenid);
+			glColor3f(1.0, 1.0, 1.0);
+			glBegin(GL_LINES);
+			glVertex2f(y0, z0);
+			glVertex2f(y1, z1);
+			glEnd();
+			glColor3f(0, 1, 0);
+			glBegin(GL_POINTS);
+			glVertex2f(y0, z0);
+			glEnd();
+		}
+	}
     glFlush();
 }
 
