@@ -21,29 +21,49 @@ void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
 	}
 }
 
-void Place_Particles(vector<MarkerParticle> &particles, aryi &mask) {
+void Add_Particles_Single_Cell(vector<MarkerParticle> &particles, int i, int j, int k) {
 	const Float dxs[8] = { 0.25,0.25,0.25,0.25,0.75,0.75,0.75,0.75 };
 	const Float dys[8] = { 0.25,0.25,0.75,0.75,0.25,0.25,0.75,0.75 };
 	const Float dzs[8] = { 0.25,0.75,0.25,0.75,0.25,0.75,0.25,0.75 };
+	for (int d = 0; d < 8; d++) {
+		particles.push_back(MarkerParticle(i + dxs[d], j + dys[d], k + dzs[d]));
+	}
+	/*p.x += (randomF() - 0.5)*0.1;
+	p.y += (randomF() - 0.5)*0.1;
+	p.z += (randomF() - 0.5)*0.1;*/
+}
+
+void Init_Particles(vector<MarkerParticle> &particles, aryi &mask) {//should only be called once for initialization
 	particles.clear();
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
 				if (mask(i, j, k) == WATER) {
-					//particles.push_back(MarkerParticle(i + 0.5, j + 0.5, k + 0.5));
-					for (int d = 0; d < 8; d++) {
-						particles.push_back(MarkerParticle(i + dxs[d], j + dys[d], k + dzs[d]));
-					}
+					Add_Particles_Single_Cell(particles, i, j, k);
 				}
 			}
 		}
 	}
-	for (MarkerParticle &p : particles) {
-		//p.x += (randomF() - 0.5)*0.1;
-		//p.y += (randomF() - 0.5)*0.1;
-		//p.z += (randomF() - 0.5)*0.1;
+	LOGM("initial marker particles set\n");
+}
+
+void Add_Single_Particle(vector<MarkerParticle> &particles, aryi &mask, int i, int j, int k) {
+	if (mask.is(i, j, k, WATER)) {
+		Add_Particles_Single_Cell(particles, i, j, k);
 	}
-	LOGM("marker particles set\n");
+}
+
+void Add_Particles(vector<MarkerParticle> &particles, aryi &mask, int x0, int x1, int y0, int y1, int z0, int z1) {
+	for (int i = x0; i <= x1; i++) {
+		for (int j = y0; j <= y1; j++) {
+			for (int k = z0; k <= z1; k++) {
+				if (mask.is(i, j, k, WATER)) {
+					Add_Particles_Single_Cell(particles, i, j, k);
+				}
+			}
+		}
+	}
+	LOGM("add water source particles\n");
 }
 
 //todo: Runge_Kutta here

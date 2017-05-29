@@ -35,14 +35,6 @@ SimulationCubic::SimulationCubic(void){
             }
         }
     }
-	string filename;
-	cout << "please enter scene file name: ";
-	//cin >> filename;
-	filename = "scenes/test.box";
-	Read_Scene_File(filename.c_str());
-	//mask(2, 30, 30) = WATER;
-	LOGM("velocity set\n");
-	Place_Particles(particles, mask);
 }
 
 SimulationCubic::~SimulationCubic() {
@@ -52,31 +44,20 @@ SimulationCubic::~SimulationCubic() {
 	mask.clear();
 }
 
-void SimulationCubic::Read_Scene_File(const char * filename){
-	cerr << "read scene file: " << filename << endl;
-	ifstream fin;
-	fin.open(filename);
-	string buff, cmd;
-	while (getline(fin, buff)) {
-		stringstream sin(buff);
-		sin >> cmd;
-		//cout << buff << endl;
-		if (buff[0] == '#');
-		else if (cmd == "box") {
-			int x0, x1, y0, y1, z0, z1;
-			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
-			for (int i = x0; i <= x1; i++) {
-				for (int j = y0; j <= y1; j++) {
-					for (int k = z0; k <= z1; k++) {
-						if (mask.is(i, j, k, AIR)) {
-							mask(i, j, k) = WATER;
-						}
-					}
-				}
+void SimulationCubic::Mark_Single_Water(int i, int j, int k) {
+	if (mask.is(i, j, k, AIR)) {
+		mask(i, j, k) = WATER;
+	}
+}
+
+void SimulationCubic::Mark_Water(int x0, int x1, int y0, int y1, int z0, int z1) {
+	for (int i = x0; i <= x1; i++) {
+		for (int j = y0; j <= y1; j++) {
+			for (int k = z0; k <= z1; k++) {
+				Mark_Single_Water(i, j, k);
 			}
 		}
 	}
-	fin.close();
 }
 
 Float Clip(Float &x, Float _min, Float _max) {

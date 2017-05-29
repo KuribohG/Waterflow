@@ -1,9 +1,34 @@
 #include "fluid_simulation.h"
 #include <cmath>
 #include <queue>
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <cstring>
+#include <sstream>
+#include <string>
+#include <cstdlib>
+using namespace std;
 
-FluidSimulation::FluidSimulation()
+Float random(void) {
+	return rand() / (RAND_MAX - 1.0);
+}
+
+WaterSource::WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, Float _gen_rate, Float _init_vx, Float _init_vy, Float _init_vz) :
+	x0(_x0), x1(_x1), y0(_y0), y1(_y1), z0(_z0), z1(_z1), gen_rate(_gen_rate / FPS), init_vx(_init_vx), init_vy(_init_vy), init_vz(_init_vz)
 {
+}
+
+FluidSimulation::FluidSimulation():cubic(){
+	string filename;
+	cout << "please enter scene file name: ";
+	//cin >> filename;
+	filename = "scenes/test.box";
+	cout << filename << endl;
+	Read_Scene_File(filename.c_str());
+	//mask(2, 30, 30) = WATER;
+	LOGM("velocity set\n");
+	Init_Particles(cubic.particles, cubic.mask);
     signed_dis.init(GRIDX, GRIDY, GRIDZ);
     init_Density_3d();
 }
@@ -14,11 +39,52 @@ void FluidSimulation::Draw_On_Screen(void){
     Draw_Density_3d(cubic.density, RIGHT_SCREEN, lightPath);
 #else
 	//Draw_Nearest(GRIDX / 2, nearest);
-	//Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
-    Draw_Density_2d(cubic.p, THIRD_SCREEN);
+	Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
+    //Draw_Density_2d(cubic.p, THIRD_SCREEN);
 #endif
 	Draw_Velocity_2d(cubic.vx, cubic.vy, cubic.vz, cubic.mask, LEFT_SCREEN);
 	Draw_Particle_2d(cubic.particles, RIGHT_SCREEN);
+}
+
+void FluidSimulation::Read_Scene_File(const char * filename) {
+	cerr << "read scene file: " << filename << endl;
+	ifstream fin;
+	fin.open(filename);
+	string buff, cmd;
+	while (getline(fin, buff)) {
+		stringstream sin(buff);
+		sin >> cmd;
+		//cout << buff << endl;
+		if (buff[0] == '#');
+		else if (cmd == "box") {
+			int x0, x1, y0, y1, z0, z1;
+			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
+			cubic.Mark_Water(x0, x1, y0, y1, z0, z1);
+		}
+		else if (cmd == "source") {
+			int x0, x1, y0, y1, z0, z1;
+			Float rate, vx, vy, vz;
+			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> rate >> vx >> vy >> vz;
+			sources.emplace_back(x0, x1, y0, y1, z0, z1, rate, vx, vy, vz);
+		}
+	}
+	fin.close();
+}
+
+void FluidSimulation::Pour_Source(void) {
+	for (WaterSource &s : sources) {
+		for (int i = s.x0; i <= s.x1; i++) {
+			for (int j = s.y0; j <= s.y1; j++) {
+				for (int k = s.z0; k <= s.z1; k++) {
+					Float t = random();
+					if (t >= s.gen_rate) {
+						cubic.Mark_Single_Water(i, j, k);
+						Add_Single_Particle(cubic.particles, cubic.mask, i, j, k);
+					}
+				}
+			}
+		}
+	}
 }
 
 Float Kernel_Func(Float s_square) {
@@ -206,6 +272,7 @@ void FluidSimulation::Get_Full_Velocity() {
 }
 
 void FluidSimulation::Step_Time(void){
+	Pour_Source();
     cubic.Step_Time();
     Calculate_Signed_Distance();
     Calculate_Nearest_Particle();
