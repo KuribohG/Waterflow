@@ -22,7 +22,6 @@ private:
 	//vector<pair<int, Float> > lightPath[SHOW_SIZE_X][SHOW_SIZE_Y];
 	aryf signed_dis;
 	MarchingCubes meshcubes;
-	vector<MarkerParticle *> v[GRIDX][GRIDY][GRIDZ];
 	Float dis[GRIDX][GRIDY][GRIDZ];
 	MarkerParticle *nearest[GRIDX][GRIDY][GRIDZ];
 public:

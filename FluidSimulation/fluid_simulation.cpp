@@ -23,7 +23,7 @@ FluidSimulation::FluidSimulation():cubic(){
 	string filename;
 	cout << "please enter scene file name: ";
 	//cin >> filename;
-	filename = "scenes/test.box";
+	filename = "scenes/frog.box";
 	cout << filename << endl;
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
@@ -107,7 +107,7 @@ void FluidSimulation::Calculate_Signed_Distance() {
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
-                v[i][j][k].clear();
+                cubic.v[i][j][k].clear();
             }
         }
     }
@@ -118,7 +118,7 @@ void FluidSimulation::Calculate_Signed_Distance() {
 		if (x < 0 || x >= GRIDX) continue;
 		if (y < 0 || y >= GRIDY) continue;
 		if (z < 0 || z >= GRIDZ) continue;
-        v[x][y][z].emplace_back(&p);
+        cubic.v[x][y][z].emplace_back(&p);
     }
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
@@ -132,7 +132,7 @@ void FluidSimulation::Calculate_Signed_Distance() {
                             if (i + dx < 0 || i + dx >= GRIDX) continue;
                             if (j + dy < 0 || j + dy >= GRIDY) continue;
                             if (k + dz < 0 || k + dz >= GRIDZ) continue;
-                            for (MarkerParticle *ptr : v[i + dx][j + dy][k + dz]) {
+                            for (MarkerParticle *ptr : cubic.v[i + dx][j + dy][k + dz]) {
                                 MarkerParticle &p = *ptr;
                                 Float dis_square = Square_Dis(p.x, p.y, p.z, x, y, z);
                                 Float weight = Kernel_Func(dis_square / h);
@@ -193,7 +193,7 @@ void FluidSimulation::Calculate_Nearest_Particle() {
                             if (i + dx < 0 || i + dx >= GRIDX) continue;
                             if (j + dy < 0 || j + dy >= GRIDY) continue;
                             if (k + dz < 0 || k + dz >= GRIDZ) continue;
-                            vector<MarkerParticle *> &particles = v[i + dx][j + dy][k + dz];
+                            vector<MarkerParticle *> &particles = cubic.v[i + dx][j + dy][k + dz];
                             Float X = i + 0.5, Y = j + 0.5, Z = k + 0.5;
                             for (MarkerParticle *particle : particles) {
                                 Float d = Square_Dis(particle->x, particle->y, particle->z, X, Y, Z);
@@ -262,7 +262,6 @@ void FluidSimulation::Get_Full_Velocity() {
 				if (cubic.mask(i, j, k) != WATER && k - 1 >= 0 && cubic.mask(i, j, k - 1) != WATER) {
 					Float x = nearest[i][j][k]->x, y = nearest[i][j][k]->y, z = nearest[i][j][k]->z;
 					Float xx = nearest[i][j][k - 1]->x, yy = nearest[i][j][k - 1]->y, zz = nearest[i][j][k - 1]->z;
-					//if(i==GRIDX/2&&j==2) printf("%f %f %f %f\n", x, y, z, Interpolation_Water_Velocity(_Z, cubic.vz, x, y, z, cubic.mask));
 					cubic.vz(i, j, k) = (Interpolation_Water_Velocity(_Z, cubic.vz, x, y, z, cubic.mask)
 						+ Interpolation_Water_Velocity(_Z, cubic.vz, xx, yy, zz, cubic.mask)) / 2;
 				}
@@ -304,7 +303,7 @@ void FluidSimulation::Step_Time(void){
 		//getchar();
 	}
 	//getchar();
-	if (framenum >= 200) exit(0);
+	//if (framenum >= 200) exit(0);
 	//if (framenum >= 5) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
 	int t4 = clock();

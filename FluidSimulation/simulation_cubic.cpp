@@ -92,8 +92,8 @@ void Bound_Surface(aryf &pressure, aryi &mask) {
 
 void SimulationCubic::Apply_External_Forces(void) {
 	printf("apply external forces\n");
-	for (int i = 0; i <= GRIDX; i++) {
-		for (int j = 0; j <= GRIDY; j++) {
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k <= GRIDZ; k++) {
 				if (mask.is(i, j, k, WATER) || mask.is(i, j, k - 1, WATER)) {
 					vz(i, j, k) += -g*TIME_DELTA;
@@ -258,29 +258,117 @@ void SimulationCubic::Advect_Velocity(int axis, aryf &f, const aryf &f0, const a
 	//Bound_Solid(axis, f);
 }
 
+Float Kernel(Float dx, Float dy, Float dz) {
+	Float res = 1;
+	if (dx >= 0 && dx <= 1) {
+		res *= 1 - dx;
+	} else if (dx >= -1 && dx <= 0) {
+		res *= 1 + dx;
+	} else return 0;
+	if (dy >= 0 && dy <= 1) {
+		res *= 1 - dy;
+	} else if (dy >= -1 && dy <= 0) {
+		res *= 1 + dy;
+	} else return 0;
+	if (dz >= 0 && dz <= 1) {
+		res *= 1 - dz;
+	} else if (dz >= -1 && dz <= 0) {
+		res *= 1 + dz;
+	} else return 0;
+	return res;
+}
+
+void SimulationCubic::Advect_PIC_Preprocess() {
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				v[i][j][k].clear();
+			}
+		}
+	}
+	for (MarkerParticle &p : particles) {
+		int x = (int)std::floor(p.x);
+		int y = (int)std::floor(p.y);
+		int z = (int)std::floor(p.z);
+		if (x < 0 || x >= GRIDX) continue;
+		if (y < 0 || y >= GRIDY) continue;
+		if (z < 0 || z >= GRIDZ) continue;
+		v[x][y][z].emplace_back(&p);
+	}
+}
+
 void SimulationCubic::Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz) {
-	for (int i = 0; i < f.n; i++) {
-		for (int j = 0; j < f.m; j++) {
-			for (int k = 0; k < f.w; k++) {
-				f(i, j, k) = f0.get(i, j, k);
-				bool flag = false;
-				if (axis == _X) {
-					if (mask.is(i, j, k, WATER) || mask.is(i - 1, j, k, WATER)) flag = true;
+	if (axis == _X) {
+		for (int i = 0; i <= GRIDX; i++) {
+			for (int j = 0; j < GRIDY; j++) {
+				for (int k = 0; k < GRIDZ; k++) {
+					Float u = 0, d = 0;
+					for (int dx = -1; dx <= 0; dx++) {
+						for (int dy = -1; dy <= 1; dy++) {
+							for (int dz = -1; dz <= 1; dz++) {
+								if (i + dx < 0 || i + dx >= GRIDX) continue;
+								if (j + dy < 0 || j + dy >= GRIDY) continue;
+								if (k + dz < 0 || k + dz >= GRIDZ) continue;
+								for (MarkerParticle *ptr : v[i + dx][j + dy][k + dz]) {
+									MarkerParticle &p = *ptr;
+									Float ker = Kernel(i - p.x, j + 0.5 - p.y, k + 0.5 - p.z);
+									d += ker, u += ker * p.vx;
+								}
+							}
+						}
+					}
+					if (fabs(d) < EPS) f(i, j, k) = 0;
+					else f(i, j, k) = u / d;
 				}
-				else if (axis == _Y) {
-					if (mask.is(i, j, k, WATER) || mask.is(i, j - 1, k, WATER)) flag = true;
+			}
+		}
+	}
+	if (axis == _Y) {
+		for (int i = 0; i < GRIDX; i++) {
+			for (int j = 0; j <= GRIDY; j++) {
+				for (int k = 0; k < GRIDZ; k++) {
+					Float u = 0, d = 0;
+					for (int dx = -1; dx <= 1; dx++) {
+						for (int dy = -1; dy <= 0; dy++) {
+							for (int dz = -1; dz <= 1; dz++) {
+								if (i + dx < 0 || i + dx >= GRIDX) continue;
+								if (j + dy < 0 || j + dy >= GRIDY) continue;
+								if (k + dz < 0 || k + dz >= GRIDZ) continue;
+								for (MarkerParticle *ptr : v[i + dx][j + dy][k + dz]) {
+									MarkerParticle &p = *ptr;
+									Float ker = Kernel(i + 0.5 - p.x, j - p.y, k + 0.5 - p.z);
+									d += ker, u += ker * p.vy;
+								}
+							}
+						}
+					}
+					if (fabs(d) < EPS) f(i, j, k) = 0;
+					else f(i, j, k) = u / d;
 				}
-				else if (axis == _Z) {
-					if (mask.is(i, j, k, WATER) || mask.is(i, j, k - 1, WATER)) flag = true;
-				}
-				flag = false;
-				if (flag) {
-					Float x, y, z;
-					Runge_Kutta(axis, i, j, k, TIME_DELTA, 2, vx, vy, vz, x, y, z);
-					x = Clip(x, 0.5, GRIDX + 0.5);
-					y = Clip(y, 0.5, GRIDY + 0.5);
-					z = Clip(z, 0.5, GRIDZ + 0.5);
-					f(i, j, k) = Interpolation_Water_Velocity(axis, f0, x, y, z, mask);
+			}
+		}
+	}
+	if (axis == _Z) {
+		for (int i = 0; i < GRIDX; i++) {
+			for (int j = 0; j < GRIDY; j++) {
+				for (int k = 0; k <= GRIDZ; k++) {
+					Float u = 0, d = 0;
+					for (int dx = -1; dx <= 1; dx++) {
+						for (int dy = -1; dy <= 1; dy++) {
+							for (int dz = -1; dz <= 0; dz++) {
+								if (i + dx < 0 || i + dx >= GRIDX) continue;
+								if (j + dy < 0 || j + dy >= GRIDY) continue;
+								if (k + dz < 0 || k + dz >= GRIDZ) continue;
+								for (MarkerParticle *ptr : v[i + dx][j + dy][k + dz]) {
+									MarkerParticle &p = *ptr;
+									Float ker = Kernel(i + 0.5 - p.x, j + 0.5 - p.y, k - p.z);
+									d += ker, u += ker * p.vz;
+								}
+							}
+						}
+					}
+					if (fabs(d) < EPS) f(i, j, k) = 0;
+					else f(i, j, k) = u / d;
 				}
 			}
 		}
@@ -310,7 +398,17 @@ void SimulationCubic::Step_Time(void){
 	//printf("after advection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Bound_Solid();
 	int t0 = clock();
+	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	Advect_Particles(particles, vx, vy, vz, mask);
+
+	Advect_PIC_Preprocess();
+    swap(vx, vx0);
+	swap(vy, vy0);
+	swap(vz, vz0);
+	Advect_PIC(0, vx, vx0, vx0, vy0, vz0);
+	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
+	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
+
 	Mark_Water_By(particles, mask);
 	int t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
 	Project(vx, vy, vz, p, p0);

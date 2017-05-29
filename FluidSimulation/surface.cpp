@@ -66,6 +66,14 @@ void Add_Particles(vector<MarkerParticle> &particles, aryi &mask, int x0, int x1
 	LOGM("add water source particles\n");
 }
 
+void Get_Particles_Velocity(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryi &mask) {
+	for (MarkerParticle &p : particles) {
+		p.vx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
+		p.vy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
+		p.vz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
+	}
+}
+
 Float clip(Float x, Float min, Float max) {
 	x = std::max(min, x);
 	x = std::min(max, x);
