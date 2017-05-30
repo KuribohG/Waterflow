@@ -23,7 +23,7 @@ FluidSimulation::FluidSimulation():cubic(){
 	string filename;
 	cout << "please enter scene file name: ";
 	//cin >> filename;
-	filename = "scenes/test.box";
+	filename = "scenes/frog.box";
 	cout << filename << endl;
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
@@ -157,6 +157,8 @@ void FluidSimulation::Calculate_Signed_Distance() {
                 // hack on signed_dis, to make mesh close
                 if (cubic.mask(i, j, k) == SOLID && signed_dis(i, j, k) < 1e-5) {
                     signed_dis(i, j, k) = 0.0001;
+                } else if (cubic.mask(i, j, k) == WATER && signed_dis(i, j, k) > -1e-5) {
+                    signed_dis(i, j, k) = -10;
                 }
 				//else if (fabs(w) < TSDF_EPS) signed_dis(i, j, k) = 0;
 			}
