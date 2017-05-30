@@ -95,11 +95,7 @@ void SimulationCubic::Apply_External_Forces(void) {
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k <= GRIDZ; k++) {
-				if (mask.is(i, j, k, WATER) || mask.is(i, j, k - 1, WATER)) {
-					vz(i, j, k) += -g*TIME_DELTA;
-					//if (i == GRIDX / 2) LOGM("add gravity: %d %d %d %f += %f\n ", i, j, k, vz(i, j, k), -g*TIME_DELTA);
-					//if (i == GRIDX / 2) LOGM("%f\n", vz.get(i, j, k));
-				}
+				vz(i, j, k) += -g*TIME_DELTA;
 			}
 		}
 	}
@@ -133,6 +129,12 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 						+vx(i + 1, j, k) - vx(i, j, k)
 						+ vy(i, j + 1, k) - vy(i, j, k)
 						+ vz(i, j, k + 1) - vz(i, j, k);
+					if (mask.is(i - 1, j, k, SOLID)) div(i, j, k) -= vx.get(i, j, k);
+					if (mask.is(i + 1, j, k, SOLID)) div(i, j, k) += vx.get(i + 1, j, k);
+					if (mask.is(i, j - 1, k, SOLID)) div(i, j, k) -= vy.get(i, j, k);
+					if (mask.is(i, j + 1, k, SOLID)) div(i, j, k) += vy.get(i, j + 1, k);
+					if (mask.is(i, j, k - 1, SOLID)) div(i, j, k) -= vz.get(i, j, k);
+					if (mask.is(i, j, k + 1, SOLID)) div(i, j, k) += vz.get(i, j, k + 1);
 				}
 			}
 		}
@@ -142,6 +144,7 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 	LOGM("project\n");
 	Cancel_Air_Velocity();
+	//Print_Velocity(vx, vy, vz, mask);
 	solver.Solve_Pressure(vx, vy, vz, mask);
 	solver.Send_Back_To(p);
 
@@ -156,9 +159,6 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
 				bool s0 = mask.is(i, j, k, SOLID);
-				bool si = mask.is(i - 1, j, k, SOLID);
-				bool sj = mask.is(i, j - 1, k, SOLID);
-				bool sk = mask.is(i, j, k - 1, SOLID);
 				if (i > 0 && !s0 && !mask.is(i - 1, j, k, SOLID)) vx(i, j, k) -= (p(i, j, k) - p(i - 1, j, k))*scale;
 				else vx(i, j, k) = 0;
 				if (j > 0 && !s0 && !mask.is(i, j - 1, k, SOLID)) vy(i, j, k) -= (p(i, j, k) - p(i, j - 1, k))*scale;
@@ -385,6 +385,10 @@ void SimulationCubic::Step_Time(void){
 	static int tot = 0;
     //velocity-evolution
 	Apply_External_Forces();
+	//puts("111111111");
+	//for (MarkerParticle &p : particles) {
+	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
+	//}
 	//printf("before advection: \n"); Print_Velocity(vx, vy, vz, mask);
 	/*if (tot++) {
 		swap(vx, vx0);
@@ -399,19 +403,29 @@ void SimulationCubic::Step_Time(void){
 	//Bound_Solid();
 	int t0 = clock();
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
+	//puts("1.51.51.51.51.5");
+	//for (MarkerParticle &p : particles) {
+	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
+	//}
 	Advect_Particles(particles, vx, vy, vz, mask);
 
 	Advect_PIC_Preprocess();
+	//puts("222222");
+	//for (MarkerParticle &p : particles) {
+	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
+	//}
     swap(vx, vx0);
 	swap(vy, vy0);
 	swap(vz, vz0);
 	Advect_PIC(0, vx, vx0, vx0, vy0, vz0);
 	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
 	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
+	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 
 	Mark_Water_By(particles, mask);
 	int t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
 	Project(vx, vy, vz, p, p0);
+	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Calc_Divergence(vx, vy, vz, s);
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));

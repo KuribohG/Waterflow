@@ -5,7 +5,7 @@ void Print_Velocity(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &
 	for (int i = GRIDX / 2; i <= GRIDX / 2; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
-				if (j == 29) printf("%d %d %f\n", j, k, vz.get(i, j, k));
+				if (j == GRIDY - 2) printf("%d %d %f\n", j, k, vz.get(i, j, k));
 			}
 		}
 	}
