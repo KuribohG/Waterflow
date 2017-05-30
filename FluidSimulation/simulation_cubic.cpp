@@ -95,11 +95,7 @@ void SimulationCubic::Apply_External_Forces(void) {
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k <= GRIDZ; k++) {
-				if (mask.is(i, j, k, WATER) || mask.is(i, j, k - 1, WATER)) {
-					vz(i, j, k) += -g*TIME_DELTA;
-					//if (i == GRIDX / 2) LOGM("add gravity: %d %d %d %f += %f\n ", i, j, k, vz(i, j, k), -g*TIME_DELTA);
-					//if (i == GRIDX / 2) LOGM("%f\n", vz.get(i, j, k));
-				}
+				vz(i, j, k) += -g*TIME_DELTA;
 			}
 		}
 	}
@@ -385,6 +381,10 @@ void SimulationCubic::Step_Time(void){
 	static int tot = 0;
     //velocity-evolution
 	Apply_External_Forces();
+	puts("111111111");
+	for (MarkerParticle &p : particles) {
+		printf("%f %f %f\n", p.vx, p.vy, p.vz);
+	}
 	//printf("before advection: \n"); Print_Velocity(vx, vy, vz, mask);
 	/*if (tot++) {
 		swap(vx, vx0);
@@ -399,19 +399,37 @@ void SimulationCubic::Step_Time(void){
 	//Bound_Solid();
 	int t0 = clock();
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
+	puts("1.51.51.51.51.5");
+	for (MarkerParticle &p : particles) {
+		printf("%f %f %f\n", p.vx, p.vy, p.vz);
+	}
 	Advect_Particles(particles, vx, vy, vz, mask);
 
 	Advect_PIC_Preprocess();
+	puts("222222");
+	for (MarkerParticle &p : particles) {
+		printf("%f %f %f\n", p.vx, p.vy, p.vz);
+	}
     swap(vx, vx0);
 	swap(vy, vy0);
 	swap(vz, vz0);
 	Advect_PIC(0, vx, vx0, vx0, vy0, vz0);
 	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
 	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
+	puts("33333333333");
+	Get_Particles_Velocity(particles, vx, vy, vz, mask);
+	for (MarkerParticle &p : particles) {
+		printf("%f %f %f\n", p.vx, p.vy, p.vz);
+	}
 
 	Mark_Water_By(particles, mask);
 	int t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
 	Project(vx, vy, vz, p, p0);
+	puts("444444444444");
+	Get_Particles_Velocity(particles, vx, vy, vz, mask);
+	for (MarkerParticle &p : particles) {
+		printf("%f %f %f\n", p.vx, p.vy, p.vz);
+	}
 	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Calc_Divergence(vx, vy, vz, s);
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));

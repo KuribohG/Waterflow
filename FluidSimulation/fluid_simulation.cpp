@@ -23,7 +23,7 @@ FluidSimulation::FluidSimulation():cubic(){
 	string filename;
 	cout << "please enter scene file name: ";
 	//cin >> filename;
-	filename = "scenes/frog.box";
+	filename = "scenes/test.box";
 	cout << filename << endl;
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
@@ -39,8 +39,8 @@ void FluidSimulation::Draw_On_Screen(void){
     Draw_Density_3d(cubic.density, RIGHT_SCREEN, lightPath);
 #else
 	//Draw_Nearest(GRIDX / 2, nearest);
-	Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
-    //Draw_Density_2d(cubic.p, THIRD_SCREEN);
+	//Draw_Mask_2d(cubic.mask, THIRD_SCREEN);
+    Draw_Density_2d(cubic.p, THIRD_SCREEN);
 #endif
 	Draw_Velocity_2d(cubic.vx, cubic.vy, cubic.vz, cubic.mask, LEFT_SCREEN);
 	Draw_Particle_2d(cubic.particles, RIGHT_SCREEN);
@@ -303,7 +303,7 @@ void FluidSimulation::Step_Time(void){
 		//getchar();
 	}
 	//getchar();
-	//if (framenum >= 200) exit(0);
+	//if (framenum >= 1) exit(0);
 	//if (framenum >= 5) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
 	int t4 = clock();
