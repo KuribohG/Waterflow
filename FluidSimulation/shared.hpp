@@ -54,9 +54,9 @@ const int LINSOLVER_ITER = 100;
 const int SHOW_SIZE_X = 512;
 const int SHOW_SIZE_Y = 512;
 
-const int GRIDX = 10;
-const int GRIDY = 64;
-const int GRIDZ = 64;
+const int GRIDX = 256;
+const int GRIDY = 256;
+const int GRIDZ = 256;
 //#define assert(x) if (!(x)) { asm("int $3"); }
 /*inline int ID(int x, int y, int z) {
     assert(0 <= x&&x < GRIDX);

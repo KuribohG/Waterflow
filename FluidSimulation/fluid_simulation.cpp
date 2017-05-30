@@ -23,7 +23,7 @@ FluidSimulation::FluidSimulation():cubic(){
 	string filename;
 	cout << "please enter scene file name: ";
 	//cin >> filename;
-	filename = "scenes/frog.box";
+	filename = "scenes/test.box";
 	cout << filename << endl;
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
@@ -303,7 +303,7 @@ void FluidSimulation::Step_Time(void){
 		//getchar();
 	}
 	//getchar();
-	//if (framenum >= 200) exit(0);
+	if (framenum >= 200) exit(0);
 	//if (framenum >= 5) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
 	int t4 = clock();
