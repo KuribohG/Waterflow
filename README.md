@@ -30,4 +30,7 @@ v2.0（空气和水）
 2017.5.29
 状态：实现了MAC方法的全要素（除飞沫等），但MAC advection出现问题，准备切换到PIC advection。
 
+2017.5.30
+实现了MAC+PIC方法。修正了projection和advection的bug，修正了模型内部气泡问题。接下来首要事项是demo艺术。
+
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)
