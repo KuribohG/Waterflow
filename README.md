@@ -4,7 +4,7 @@ box x0 x1 y0 y1 z0 z1 #在初始时候增加一个装满水的长方体，坐标
 source x0 x1 y0 y1 z0 z1 rate vx vy vz #增加一个水源，同上，其中每个格子，每一秒平均生成rate次水。vx vy vz是它吐出水的初始速度（暂且不支持）。
 
 现在todo（星号为不重要）：
-1. 解决advection的自更新问题。
+1. 解决advection的自更新问题。修正PIC advection被固体速度影响的问题。
 2. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
 3. 全面切换到PIC advection方法，不再采用grid advection。
 4. 修extrapolation的bug：x,y,z=0时不计算。修“空中飞点”问题。
@@ -35,6 +35,6 @@ v2.0（空气和水）
 实现了MAC+PIC方法。修正了projection和advection的bug，修正了模型内部气泡问题。接下来首要事项是demo艺术。
 
 2017.5.31
-定位一个bug：advection自更新导致的速度耗散，在projection后产生了pressure爆炸。
+发现bug：advection自更新导致的速度耗散，在projection后产生了pressure爆炸。此外，把固体内部面的速度改成0会影响PIC advection。
 
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)

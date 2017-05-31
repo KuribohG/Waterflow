@@ -120,6 +120,7 @@ void SimulationCubic::Cancel_Air_Velocity(void) {
 }
 
 void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
+	printf("calc divergence:\n");
 	div.set(0);
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
@@ -144,12 +145,13 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 
 void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 	LOGM("project\n");
-	Cancel_Air_Velocity();
+	//Cancel_Air_Velocity();
 	//Print_Velocity(vx, vy, vz, mask);
+	//Calc_Divergence(vx, vy, vz, p0);
 	solver.Solve_Pressure(vx, vy, vz, mask);
 	solver.Send_Back_To(p);
-	Print_Density(p);
-
+	//printf("pressure density:\n");Print_Density(p);
+	//return;
 	//actually, p solved here is -deltaT*p, look at [Robert Bridson, p54]
 	//Linear_Solve(-1, p, div, 1, 6 + 1, LINSOLVER_ITER);
 
@@ -161,12 +163,29 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
 				bool s0 = mask.is(i, j, k, SOLID);
-				if (i > 0 && !s0 && !mask.is(i - 1, j, k, SOLID)) vx(i, j, k) -= (p(i, j, k) - p(i - 1, j, k))*scale;
-				else vx(i, j, k) = 0;
+				if (i > 0 && !s0 && !mask.is(i - 1, j, k, SOLID)) {
+					vx(i, j, k) -= (p(i, j, k) - p(i - 1, j, k))*scale;
+				}
+				else {
+					//if (vx.get(i, j, k) != 0) printf("X solid boundary: %d %d %d %f\n", i, j, k, vx.get(i, j, k));
+					vx(i, j, k) = 0;
+				}
 				if (j > 0 && !s0 && !mask.is(i, j - 1, k, SOLID)) vy(i, j, k) -= (p(i, j, k) - p(i, j - 1, k))*scale;
-				else vy(i, j, k) = 0;
-				if (k > 0 && !s0 && !mask.is(i, j, k - 1, SOLID)) vz(i, j, k) -= (p(i, j, k) - p(i, j, k - 1))*scale;
-				else vz(i, j, k) = 0;
+				else {
+					//if (vy.get(i, j, k) != 0) printf("Y solid boundary: %d %d %d %f\n", i, j, k, vy.get(i, j, k));
+					vy(i, j, k) = 0;
+				}
+				if (k > 0 && !s0 && !mask.is(i, j, k - 1, SOLID)) {
+					vz(i, j, k) -= (p(i, j, k) - p(i, j, k - 1))*scale;
+					if (p(i, j, k) - p(i, j, k - 1) != 0) {
+						//printf("update vz: %d %d %d %f\n", i, j, k, (p(i, j, k) - p(i, j, k - 1))*scale);
+					}
+				}
+				else {
+					//printf("%d %d %d,s0: %d, k-1: %d\n", i, j, k, s0, mask.is(i, j, k - 1, SOLID));
+					//if (vz.get(i, j, k) != 0) printf("Z solid boundary: %d %d %d %f\n", i, j, k, vz.get(i, j, k));
+					vz(i, j, k) = 0;
+				}
 			}
 		}
 	}
@@ -408,18 +427,22 @@ void SimulationCubic::Step_Time(void){
 	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
 	//}
 	Advect_Particles(particles, vx, vy, vz, mask);
-
 	Advect_PIC_Preprocess();
 	//puts("222222");
 	//for (MarkerParticle &p : particles) {
 	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
 	//}
+	printf("before PIC 1 1 60 and 1 1 61: %f %f\n", vz.get(1, 1, 60), vz.get(1, 1, 61));
+
     swap(vx, vx0);
 	swap(vy, vy0);
 	swap(vz, vz0);
 	Advect_PIC(0, vx, vx0, vx0, vy0, vz0);
 	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
 	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
+
+	printf("after PIC 1 1 60 and 1 1 61: %f %f\n", vz.get(1, 1, 60), vz.get(1, 1, 61));
+
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	
 	Mark_Water_By(particles, mask);
@@ -430,6 +453,7 @@ void SimulationCubic::Step_Time(void){
 	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Calc_Divergence(vx, vy, vz, s);
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
-	//Project(vx, vy, vz, p, p0);
-	Calc_Divergence(vx, vy, vz, p);
+	
+	Project(vx, vy, vz, p, p0);
+	//Calc_Divergence(vx, vy, vz, p0);
 }

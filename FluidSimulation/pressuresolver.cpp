@@ -333,9 +333,10 @@ void PressureSolver::Solver_LA_System(vector<MatCell> &A, vector<double> &b, vec
 void PressureSolver::Solve_Pressure(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask) {
 	int t0 = clock();
 	Build_Water_Index(mask);
-	pressure = vector<double>(cells.size() / 3);
-	div = vector<double>(pressure.size());
+	pressure = vector<double>(cells.size() / 3, 0);
+	div = vector<double>(pressure.size(), 0);
 	Calc_Neg_Divergence(vx, vy, vz, mask);
+	//printf("max abs: %.15f\n", Maximum_Abs(div));
 	if (Maximum_Abs(div) < TOLERANCE) return; //with pressure=0
 	vector<MatCell> A(pressure.size());
 	vector<double> precon(pressure.size());

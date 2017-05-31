@@ -287,7 +287,7 @@ void FluidSimulation::Step_Time(void){
     Calculate_Nearest_Particle();
 	int t2 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
 	//printf("before extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
-    Get_Full_Velocity();
+	Get_Full_Velocity();
 	int t3 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
 	//printf("after extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
     
