@@ -26,11 +26,12 @@ void Add_Particles_Single_Cell(vector<MarkerParticle> &particles, int i, int j, 
 	const Float dys[8] = { 0.25,0.25,0.75,0.75,0.25,0.25,0.75,0.75 };
 	const Float dzs[8] = { 0.25,0.75,0.25,0.75,0.25,0.75,0.25,0.75 };
 	for (int d = 0; d < 8; d++) {
-		particles.push_back(MarkerParticle(i + dxs[d], j + dys[d], k + dzs[d]));
+		MarkerParticle p(i + dxs[d], j + dys[d], k + dzs[d]);
+		/*p.x += (randomF() - 0.5)*0.5;
+		p.y += (randomF() - 0.5)*0.5;
+		p.z += (randomF() - 0.5)*0.5;*/
+		particles.push_back(p);
 	}
-	/*p.x += (randomF() - 0.5)*0.1;
-	p.y += (randomF() - 0.5)*0.1;
-	p.z += (randomF() - 0.5)*0.1;*/
 }
 
 void Init_Particles(vector<MarkerParticle> &particles, aryi &mask) {//should only be called once for initialization

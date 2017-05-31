@@ -304,7 +304,7 @@ void FluidSimulation::Step_Time(void){
 		//meshcubes.Dump_GOC(name, pngname, 1200, 900);
 		//getchar();
 	}
-	//if (framenum >= 1) { printf("input: \n"); getchar(); }
+	if (framenum >= 0) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
 	int t4 = clock();
 	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0)/CLOCKS_PER_SEC, (t4 - T0 + 0.0) / CLOCKS_PER_SEC);

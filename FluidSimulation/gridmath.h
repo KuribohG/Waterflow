@@ -93,3 +93,5 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 //Float Interpolation_In_Water_3D(aryf &f, Float x, Float y, Float z, aryi &mask);
 
 void Print_Velocity(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask);
+
+void Print_Density(const aryf &vx);

@@ -1,6 +1,6 @@
 #include "drawer.h"
 #include "fluid_simulation.h"
-
+#include <iostream>
 
 static void ScreenCoor_to_ClipCoor(Float &x, Float &y, SCREENID_T screenid) {
     x = (x + screenid*SHOW_SIZE_X) * 2 / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0f;
@@ -54,13 +54,21 @@ void Draw_Density_2d(aryf &density, SCREENID_T screenid) {
     LOGM("draw density\n");
     assert(screenid < 5);
     glBegin(GL_POINTS);
+	Float mx = -1;
+	for (int j = 0; j < GRIDY; j++) {
+		for (int k = 0; k < GRIDZ; k++) {
+			mx = max(mx, fabs(density.get(GRIDX / 2, j, k)));
+		}
+	}
+	mx = max(mx, (Float)1.0);
     for (int is = 0; is < SHOW_SIZE_X; is++) {
         for (int js = 0; js < SHOW_SIZE_Y; js++) {
             int i = is*GRIDY / SHOW_SIZE_X;
             int j = js*GRIDZ / SHOW_SIZE_Y;
             Float x = is, y = js;
             ScreenCoor_to_ClipCoor(x, y, screenid);
-			Float d = abs(density(GRIDX / 2, i, j));
+			Float d = fabs(density(GRIDX / 2, i, j) / mx);
+			//if (d != 0) printf("%f ", d);
             glColor3f(d, d, d);
             glVertex2f(x, y);
         }

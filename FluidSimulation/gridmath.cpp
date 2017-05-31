@@ -11,6 +11,17 @@ void Print_Velocity(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &
 	}
 }
 
+void Print_Density(const aryf & vx){
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				Float f = vx.get(i, j, k);
+				if (f != 0) printf("get: %d %d %d: %.15f\n", i, j, k, f);
+			}
+		}
+	}
+}
+
 
 Float Neighbor_Sum6(aryf &x, int i, int j, int k) {
 	Float tmp = 0;

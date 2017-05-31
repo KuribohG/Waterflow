@@ -48,7 +48,7 @@ const Float TIME_DELTA = 1.0 / (Float)FPS;
 
 const int TOTAL_SCREEN = 3;
 
-const double TOLERANCE = 1e-6;
+const double TOLERANCE = 1e-4;
 const int LINSOLVER_ITER = 100;
 
 const int SHOW_SIZE_X = 512;

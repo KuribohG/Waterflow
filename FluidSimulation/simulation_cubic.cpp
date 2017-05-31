@@ -129,6 +129,7 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 						+vx(i + 1, j, k) - vx(i, j, k)
 						+ vy(i, j + 1, k) - vy(i, j, k)
 						+ vz(i, j, k + 1) - vz(i, j, k);
+					printf("water: %d %d %d, vz: %f %f, div: %.15f\n", i, j, k, vz.get(i, j, k), vz.get(i, j, k + 1), div.get(i, j, k));
 					if (mask.is(i - 1, j, k, SOLID)) div(i, j, k) -= vx.get(i, j, k);
 					if (mask.is(i + 1, j, k, SOLID)) div(i, j, k) += vx.get(i + 1, j, k);
 					if (mask.is(i, j - 1, k, SOLID)) div(i, j, k) -= vy.get(i, j, k);
@@ -147,6 +148,7 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 	//Print_Velocity(vx, vy, vz, mask);
 	solver.Solve_Pressure(vx, vy, vz, mask);
 	solver.Send_Back_To(p);
+	Print_Density(p);
 
 	//actually, p solved here is -deltaT*p, look at [Robert Bridson, p54]
 	//Linear_Solve(-1, p, div, 1, 6 + 1, LINSOLVER_ITER);
@@ -168,8 +170,6 @@ void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
 			}
 		}
 	}
-
-
 }
 
 void Bound_Add(Float &x, Float a, Float bound_low, Float bound_high) {
@@ -421,16 +421,15 @@ void SimulationCubic::Step_Time(void){
 	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
 	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
-
+	
 	Mark_Water_By(particles, mask);
+
 	int t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
-	Project(vx, vy, vz, p, p0);
+	
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Calc_Divergence(vx, vy, vz, s);
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
-
-
-
+	//Project(vx, vy, vz, p, p0);
 	Calc_Divergence(vx, vy, vz, p);
 }
