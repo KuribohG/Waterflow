@@ -2,9 +2,12 @@
 
 #include "shared.hpp"
 #include "simulation_cubic.h"
-#include "drawer.h"
 #include "marchingcubes.h"
 #include "surface.h"
+
+#ifdef OPENGL
+#include "drawer.h"
+#endif
 
 class WaterSource {
 public:

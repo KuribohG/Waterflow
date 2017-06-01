@@ -3,6 +3,8 @@
 
 FluidSimulation fluidsim;
 
+#ifdef OPENGL
+
 void Step_Time(int value) {
 	//LOGM("tab enter\n");
 	//getchar();
@@ -30,3 +32,14 @@ int main(int argc, char *argv[])
     glutMainLoop();
     return 0;
 }
+
+#else
+
+int main(int argc, char *argv[]) {
+	while (true) {
+		fluidsim.Step_Time();
+	}
+	return 0;
+}
+
+#endif

@@ -32,6 +32,9 @@ FluidSimulation::FluidSimulation():cubic(){
     signed_dis.init(GRIDX, GRIDY, GRIDZ);
     init_Density_3d();
 }
+
+#ifdef OPENGL
+
 //#define D3
 void FluidSimulation::Draw_On_Screen(void){
 	printf("draw on screen: \n");
@@ -45,6 +48,8 @@ void FluidSimulation::Draw_On_Screen(void){
 	Draw_Velocity_2d(cubic.vx, cubic.vy, cubic.vz, cubic.mask, LEFT_SCREEN);
 	Draw_Particle_2d(cubic.particles, RIGHT_SCREEN);
 }
+
+#endif
 
 void FluidSimulation::Read_Scene_File(const char * filename) {
 	cerr << "read scene file: " << filename << endl;
@@ -304,11 +309,12 @@ void FluidSimulation::Step_Time(void){
 		//meshcubes.Dump_GOC(name, pngname, 1200, 900);
 		//getchar();
 	}
-	if (framenum >= 0) { printf("input: \n"); getchar(); }
+	//if (framenum >= 0) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
 	int t4 = clock();
 	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0)/CLOCKS_PER_SEC, (t4 - T0 + 0.0) / CLOCKS_PER_SEC);
 	printf("==========================================================================================\n");
+	if (framenum >= 200) exit(0);
 }
 
 struct P_3d

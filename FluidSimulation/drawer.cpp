@@ -1,4 +1,6 @@
+
 #include "drawer.h"
+#ifdef OPENGL
 #include "fluid_simulation.h"
 #include <iostream>
 
@@ -126,3 +128,4 @@ void Draw_Nearest(int i, MarkerParticle * nearest[GRIDX][GRIDY][GRIDZ]){
 	glFlush();
 }
 
+#endif

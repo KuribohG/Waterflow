@@ -1,5 +1,7 @@
 #pragma once
 
+//#define OPENGL
+
 #include <iostream>
 #include <cstdio>
 #include <tuple>
@@ -10,8 +12,14 @@
 #include <vector>
 #include <list>
 #include <float.h>
-#include <GL/glut.h>
 #include <ctime>
+
+#ifdef OPENGL
+
+#include <GL/glut.h>
+
+#endif
+
 using namespace std;
 typedef char BYT;
 typedef float Float;
@@ -21,6 +29,10 @@ typedef float Float;
 //#define LOGM(...) void(0);
 #else
 #define LOGM(...)  fprintf(stderr,  __VA_ARGS__)
+#endif
+
+#ifndef OPENGL
+#define WIN32
 #endif
 
 #ifdef WIN32
@@ -54,9 +66,9 @@ const int LINSOLVER_ITER = 100;
 const int SHOW_SIZE_X = 512;
 const int SHOW_SIZE_Y = 512;
 
-const int GRIDX = 10;
-const int GRIDY = 64;
-const int GRIDZ = 64;
+const int GRIDX = 256;
+const int GRIDY = 256;
+const int GRIDZ = 256;
 //#define assert(x) if (!(x)) { asm("int $3"); }
 /*inline int ID(int x, int y, int z) {
     assert(0 <= x&&x < GRIDX);
