@@ -92,9 +92,9 @@ void Bound_Surface(aryf &pressure, aryi &mask) {
 
 void SimulationCubic::Apply_External_Forces(void) {
 	printf("apply external forces\n");
-	for (int i = 0; i < GRIDX; i++) {
-		for (int j = 0; j < GRIDY; j++) {
-			for (int k = 0; k <= GRIDZ; k++) {
+	for (int i = 0; i < vz.n; i++) {
+		for (int j = 0; j < vz.m; j++) {
+			for (int k = 0; k <= vz.w; k++) {
 				vz(i, j, k) += -g*TIME_DELTA;
 			}
 		}
@@ -402,8 +402,10 @@ void swap(aryf &a, aryf &b) {
 void SimulationCubic::Step_Time(void){
     printf("cubic step time \n");
 	static int tot = 0;
+	//printf("before external forces:\n"); Print_Velocity(vx, vy, vz, mask);
     //velocity-evolution
 	Apply_External_Forces();
+	//printf("after external forces:\n"); Print_Velocity(vx, vy, vz, mask);
 	//puts("111111111");
 	//for (MarkerParticle &p : particles) {
 	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
@@ -432,7 +434,8 @@ void SimulationCubic::Step_Time(void){
 	//for (MarkerParticle &p : particles) {
 	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
 	//}
-	printf("before PIC 1 1 60 and 1 1 61: %f %f\n", vz.get(1, 1, 60), vz.get(1, 1, 61));
+	//printf("before PIC 1 1 60 and 1 1 61: %f %f\n", vz.get(1, 1, 60), vz.get(1, 1, 61));
+	//printf("before PIC:\n"); Print_Velocity(vx, vy, vz, mask);
 
     swap(vx, vx0);
 	swap(vy, vy0);
@@ -441,7 +444,7 @@ void SimulationCubic::Step_Time(void){
 	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
 	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
 
-	printf("after PIC 1 1 60 and 1 1 61: %f %f\n", vz.get(1, 1, 60), vz.get(1, 1, 61));
+	//printf("after PIC:\n"); Print_Velocity(vx, vy, vz, mask);
 
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	
@@ -455,5 +458,6 @@ void SimulationCubic::Step_Time(void){
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
 	
 	Project(vx, vy, vz, p, p0);
+	//printf("after projection:\n"); Print_Velocity(vx, vy, vz, mask);
 	//Calc_Divergence(vx, vy, vz, p0);
 }
