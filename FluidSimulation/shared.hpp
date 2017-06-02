@@ -32,7 +32,6 @@ typedef float Float;
 #endif
 
 #ifndef OPENGL
-#define WIN32
 #endif
 
 #ifdef WIN32
