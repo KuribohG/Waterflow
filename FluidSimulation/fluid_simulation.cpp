@@ -23,7 +23,7 @@ FluidSimulation::FluidSimulation():cubic(){
 	string filename;
 	cout << "please enter scene file name: ";
 	//cin >> filename;
-	filename = "scenes/test.box";
+	filename = "scenes/frog.box";
 	cout << filename << endl;
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
@@ -255,22 +255,19 @@ void FluidSimulation::Get_Full_Velocity() {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
 				if (cubic.mask(i, j, k) != WATER && i - 1 >= 0 && cubic.mask(i - 1, j, k) != WATER) {
-					Float x = nearest[i][j][k]->x, y = nearest[i][j][k]->y, z = nearest[i][j][k]->z;
-					Float xx = nearest[i - 1][j][k]->x, yy = nearest[i - 1][j][k]->y, zz = nearest[i - 1][j][k]->z;
-					cubic.vx(i, j, k) = (Interpolation_Water_Velocity(_X, cubic.vx, x, y, z, cubic.mask)
-						+ Interpolation_Water_Velocity(_X, cubic.vx, xx, yy, zz, cubic.mask)) / 2;
+					Float x = nearest[i][j][k]->vx;
+					Float xx = nearest[i - 1][j][k]->vx;
+					cubic.vx(i, j, k) = (x + xx) / 2;
 				}
                 if (cubic.mask(i, j, k) != WATER && j - 1 >= 0 && cubic.mask(i, j - 1, k) != WATER) {
-                    Float x = nearest[i][j][k]->x, y = nearest[i][j][k]->y, z = nearest[i][j][k]->z;
-                    Float xx = nearest[i][j - 1][k]->x, yy = nearest[i][j - 1][k]->y, zz = nearest[i][j - 1][k]->z;
-                    cubic.vy(i, j, k) = (Interpolation_Water_Velocity(_Y, cubic.vy, x, y, z, cubic.mask)
-                                         + Interpolation_Water_Velocity(_Y, cubic.vy, xx, yy, zz, cubic.mask)) / 2;
+                    Float y = nearest[i][j][k]->vy;
+                    Float yy = nearest[i][j - 1][k]->vy;
+                    cubic.vy(i, j, k) = (y + yy) / 2;
                 }
 				if (cubic.mask(i, j, k) != WATER && k - 1 >= 0 && cubic.mask(i, j, k - 1) != WATER) {
-					Float x = nearest[i][j][k]->x, y = nearest[i][j][k]->y, z = nearest[i][j][k]->z;
-					Float xx = nearest[i][j][k - 1]->x, yy = nearest[i][j][k - 1]->y, zz = nearest[i][j][k - 1]->z;
-					cubic.vz(i, j, k) = (Interpolation_Water_Velocity(_Z, cubic.vz, x, y, z, cubic.mask)
-						+ Interpolation_Water_Velocity(_Z, cubic.vz, xx, yy, zz, cubic.mask)) / 2;
+					Float z = nearest[i][j][k]->vz;
+					Float zz = nearest[i][j][k - 1]->vz;
+                    cubic.vz(i, j, k) = (z + zz) / 2;
 				}
 				//if (i == GRIDX / 2 && j == 2) printf("%d %d %d %f\n", i, j, k, cubic.vz(i, j, k));
             }
@@ -314,7 +311,7 @@ void FluidSimulation::Step_Time(void){
 	int t4 = clock();
 	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0)/CLOCKS_PER_SEC, (t4 - T0 + 0.0) / CLOCKS_PER_SEC);
 	printf("==========================================================================================\n");
-	if (framenum >= 200) exit(0);
+	//if (framenum >= 200) exit(0);
 }
 
 struct P_3d
