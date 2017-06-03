@@ -408,9 +408,9 @@ void SimulationCubic::Pour_Source(int framenum, vector<WaterSource> &sources) {
 		for (int i = s.x0; i <= s.x1; i++) {
 			for (int j = s.y0; j <= s.y1; j++) {
 				for (int k = s.z0; k <= s.z1; k++) {
-					vx(i, j, k) = vx(i + 1, j, k) = s.init_vx;
-					vy(i, j, k) = vy(i, j + 1, k) = s.init_vy;
-					vz(i, j, k) = vz(i, j, k + 1) = s.init_vz;
+					vx.set(i, j, k, s.init_vx), vx.set(i + 1, j, k, s.init_vx);
+					vy.set(i, j, k, s.init_vy), vy.set(i, j + 1, k, s.init_vy);
+					vz.set(i, j, k, s.init_vz), vz.set(i, j, k + 1, s.init_vz);
 					Float t = randomF();
 					if (t <= s.gen_rate) {
 						Mark_Single_Water(i, j, k);

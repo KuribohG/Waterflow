@@ -55,6 +55,9 @@ public:
 	void set(int a) {
 		memset(f, a, sizeof(T)*n*m*w);
 	}
+	void set(int i, int j, int k, T t) {
+		if (inside(i, j, k)) (*this)(i, j, k) = t;
+	}
 };
 template<typename T>
 class Vec1D {
