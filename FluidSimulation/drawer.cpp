@@ -5,8 +5,8 @@
 #include <iostream>
 
 static void ScreenCoor_to_ClipCoor(Float &x, Float &y, SCREENID_T screenid) {
-    x = (x + screenid*SHOW_SIZE_X) * 2 / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0f;
-    y = y * 2 / (SHOW_SIZE_Y) - 1.0f;
+	x = Clip((x + screenid*SHOW_SIZE_X) * 2.0f / (SHOW_SIZE_X*TOTAL_SCREEN) - 1.0f, -1.0f, 1.0f);
+	y = Clip(y * 2.0f / (SHOW_SIZE_Y)-1.0f, -1.0f, 1.0f);
 }
 static void GridCoor_to_ClipCoor(Float &x, Float &y, SCREENID_T screenid) {
     x *= (SHOW_SIZE_X / GRIDY);
@@ -65,8 +65,8 @@ void Draw_Density_2d(aryf &density, SCREENID_T screenid) {
 	mx = max(mx, (Float)1.0);
     for (int is = 0; is < SHOW_SIZE_X; is++) {
         for (int js = 0; js < SHOW_SIZE_Y; js++) {
-            int i = is*GRIDY / SHOW_SIZE_X;
-            int j = js*GRIDZ / SHOW_SIZE_Y;
+			int i = (is + 0.0)*GRIDY / SHOW_SIZE_X;
+			int j = (js + 0.0)*GRIDZ / SHOW_SIZE_Y;
             Float x = is, y = js;
             ScreenCoor_to_ClipCoor(x, y, screenid);
 			Float d = fabs(density(GRIDX / 2, i, j) / mx);
@@ -108,7 +108,7 @@ void Draw_Velocity_2d(const aryf &vxs, const aryf &vys,const aryf &vzs, const ar
     glFlush();
 }
 
-void Draw_Nearest(int i, MarkerParticle * nearest[GRIDX][GRIDY][GRIDZ]){
+void Draw_Nearest(int i, MarkerParticle * nearest[MAXGRID][MAXGRID][MAXGRID]){
 	for (int j = 0; j < GRIDY; j++) {
 		for (int k = 0; k < GRIDZ; k++) {
 			if (!nearest[i][j][k]) continue;

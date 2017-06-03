@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared.hpp"
+#include "shared.h"
 #include "surface.h"
 #include "gridmath.h"
 #include "pressuresolver.h"
@@ -15,7 +15,7 @@ public:
 	aryf p, p0;
 	aryi mask;
 	PressureSolver solver;
-	vector<MarkerParticle *> v[GRIDX][GRIDY][GRIDZ];
+	vector<MarkerParticle *> v[MAXGRID][MAXGRID][MAXGRID];
 	/*Float *vx;
 	Float *vy;
 	Float *vz;
@@ -30,6 +30,8 @@ public:
 	vector<MarkerParticle> particles;
 
 	SimulationCubic(void);
+
+	void Init(int GRIDX, int GRIDY, int GRIDZ);
 
 	~SimulationCubic();
 

@@ -64,14 +64,22 @@ const int SHOW_SIZE_Y = 512;
 
 const int MAXGRID = 256;
 
-const int GRIDX = 256;
-const int GRIDY = 256;
-const int GRIDZ = 256;
+extern int GRIDX;
+extern int GRIDY;
+extern int GRIDZ;
 
-inline int Box_Scale(int x, AXES axis) {
-	if (axis == _X) return (x + 0.0)*GRIDX / MAXGRID;
-	else if (axis == _Y) return (x + 0.0)*GRIDY / MAXGRID;
-	else if (axis == _Z) return (x + 0.0)*GRIDZ / MAXGRID;
+template<typename T>
+inline T Scale_Along(T x, AXES axis) {
+	if (axis == _X) return (T)(x + 0.0)*GRIDX / MAXGRID;
+	else if (axis == _Y) return (T)(x + 0.0)*GRIDY / MAXGRID;
+	else if (axis == _Z) return (T)(x + 0.0)*GRIDZ / MAXGRID;
+}
+
+template<typename T>
+inline T Clip(T x, T low, T high) {
+	if (x < low) return low;
+	if (x > high) return high;
+	return x;
 }
 
 //#define assert(x) if (!(x)) { asm("int $3"); }

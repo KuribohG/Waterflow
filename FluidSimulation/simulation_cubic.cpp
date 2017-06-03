@@ -2,8 +2,10 @@
 #include<fstream>
 #include<sstream>
 
+SimulationCubic::SimulationCubic(){}
 
-SimulationCubic::SimulationCubic(void){
+void SimulationCubic::Init(int GRIDX, int GRIDY, int GRIDZ){
+	printf("cubic init: %d %d %d\n", GRIDX, GRIDY, GRIDZ);
 	temp_dis.init(GRIDX + 1, GRIDY + 1, GRIDZ + 1);
 	vx.init(GRIDX + 1, GRIDY, GRIDZ); vx0.init(GRIDX + 1, GRIDY, GRIDZ);
 	vy.init(GRIDX, GRIDY + 1, GRIDZ); vy0.init(GRIDX, GRIDY + 1, GRIDZ);

@@ -1,5 +1,5 @@
 #pragma once
-#include "shared.hpp"
+#include "shared.h"
 #include "gridmath.h"
 
 class MarchingCubes {

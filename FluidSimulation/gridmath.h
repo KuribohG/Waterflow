@@ -1,5 +1,5 @@
 #pragma once
-#include "shared.hpp"
+#include "shared.h"
 
 template<typename T>
 class Array3D {
