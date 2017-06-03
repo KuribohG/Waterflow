@@ -446,7 +446,7 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
 
 	//printf("after advection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Bound_Solid();
-	int t0 = clock();
+	Float t0 = clock();
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	//puts("1.51.51.51.51.5");
 	//for (MarkerParticle &p : particles) {
@@ -474,7 +474,7 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
 	
 	Mark_Water_By(particles, mask);
 
-	int t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
+	Float t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
 	
 	//Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);

@@ -331,7 +331,7 @@ void PressureSolver::Solver_LA_System(vector<MatCell> &A, vector<double> &b, vec
 }
 
 void PressureSolver::Solve_Pressure(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask) {
-	int t0 = clock();
+	Float t0 = clock();
 	Build_Water_Index(mask);
 	pressure = vector<double>(cells.size() / 3, 0);
 	div = vector<double>(pressure.size(), 0);
