@@ -270,20 +270,20 @@ void FluidSimulation::Get_Full_Velocity() {
 
 void FluidSimulation::Step_Time(void){
 	printf("==========================================================================================\n");
-	static int T0 = clock();
-	int tstep = clock();
+	static Float T0 = clock();
+	Float tstep = clock();
 	framenum++;
 	printf("start to step frame %d\n", framenum);
     cubic.Step_Time(framenum, sources);
 	//cubic.Pour_Source(sources);
-	int t0 = clock();
+	Float t0 = clock();
     Calculate_Signed_Distance();
-	int t1 = clock(); printf("calc signed distance time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
+	Float t1 = clock(); printf("calc signed distance time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
     Calculate_Nearest_Particle();
-	int t2 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
+	Float t2 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
 	//printf("before extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
 	Get_Full_Velocity();
-	int t3 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
+	Float t3 = clock(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0) / CLOCKS_PER_SEC);
 	//printf("after extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
     
 	if (framenum % 1 == 0) {
@@ -301,7 +301,7 @@ void FluidSimulation::Step_Time(void){
 	}
 	//if (framenum >= 0) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
-	int t4 = clock();
+	Float t4 = clock();
 	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0)/CLOCKS_PER_SEC, (t4 - T0 + 0.0) / CLOCKS_PER_SEC);
 	printf("==========================================================================================\n");
 	if (framenum >= endframe) exit(0);
