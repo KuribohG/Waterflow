@@ -4,15 +4,11 @@ box x0 x1 y0 y1 z0 z1 #在初始时候增加一个装满水的长方体，坐标
 source x0 x1 y0 y1 z0 z1 rate vx vy vz #增加一个水源，同上，其中每个格子，每一秒平均生成rate次水。vx vy vz是它吐出水的初始速度（暂且不支持）。
 
 现在todo（星号为不重要）：
-1. 解决advection的自更新问题。修正PIC advection被固体速度影响的问题。
-2. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
-3. 全面切换到PIC advection方法，不再采用grid advection。
-4. 修extrapolation的bug：x,y,z=0时不计算。修“空中飞点”问题。
-5. （或许在PIC上线之后）设法支持水源的初始速度。
-6*. 监控projection的表现，之前提到的“在解方程之前apply boundary conditions”是否有必要。
-7*. 支持出surface mesh：mesh->TSDF，TSDF场的advection
-8*. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
-9*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
+1. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
+2. 支持水源的初始速度。
+3. 调研GridFluidSim，出飞沫等额外特效。
+4*. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
+5*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
 
 路线图：2D(dummies)---extended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
 
@@ -36,5 +32,8 @@ v2.0（空气和水）
 
 2017.5.31
 发现bug：advection自更新导致的速度耗散，在projection后产生了pressure爆炸。此外，把固体内部面的速度改成0会影响PIC advection。
+
+2017.6.2
+修正了extrapolation的自更新问题。因此修正了已知的所有bug。
 
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)

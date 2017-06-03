@@ -1,5 +1,9 @@
 #include "surface.h"
 
+WaterSource::WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, Float _gen_rate, Float _init_vx, Float _init_vy, Float _init_vz, int _pourend) :
+	x0(_x0), x1(_x1), y0(_y0), y1(_y1), z0(_z0), z1(_z1), gen_rate(_gen_rate / FPS), init_vx(_init_vx), init_vy(_init_vy), init_vz(_init_vz), pourend(_pourend)
+{
+}
 
 void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
 	for (int i = 0; i < GRIDX; i++) {
@@ -21,12 +25,12 @@ void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
 	}
 }
 
-void Add_Particles_Single_Cell(vector<MarkerParticle> &particles, int i, int j, int k) {
+void Add_Particles_Single_Cell(vector<MarkerParticle> &particles, int i, int j, int k, Float vx = 0, Float vy = 0, Float vz = 0) {
 	const Float dxs[8] = { 0.25,0.25,0.25,0.25,0.75,0.75,0.75,0.75 };
 	const Float dys[8] = { 0.25,0.25,0.75,0.75,0.25,0.25,0.75,0.75 };
 	const Float dzs[8] = { 0.25,0.75,0.25,0.75,0.25,0.75,0.25,0.75 };
 	for (int d = 0; d < 8; d++) {
-		MarkerParticle p(i + dxs[d], j + dys[d], k + dzs[d]);
+		MarkerParticle p(i + dxs[d], j + dys[d], k + dzs[d], vx, vy, vz);
 		/*p.x += (randomF() - 0.5)*0.5;
 		p.y += (randomF() - 0.5)*0.5;
 		p.z += (randomF() - 0.5)*0.5;*/
@@ -51,6 +55,12 @@ void Init_Particles(vector<MarkerParticle> &particles, aryi &mask) {//should onl
 void Add_Single_Particle(vector<MarkerParticle> &particles, aryi &mask, int i, int j, int k) {
 	if (mask.is(i, j, k, WATER)) {
 		Add_Particles_Single_Cell(particles, i, j, k);
+	}
+}
+
+void Add_Single_Particle(vector<MarkerParticle> &particles, aryi &mask, int i, int j, int k, Float vx, Float vy, Float vz) {
+	if (mask.is(i, j, k, WATER)) {
+		Add_Particles_Single_Cell(particles, i, j, k, vx, vy, vz);
 	}
 }
 
@@ -122,3 +132,4 @@ void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, ary
 		}
 	}
 }
+
