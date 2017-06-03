@@ -65,9 +65,18 @@ const int LINSOLVER_ITER = 100;
 const int SHOW_SIZE_X = 512;
 const int SHOW_SIZE_Y = 512;
 
-const int GRIDX = 10;
+const int MAXGRID = 256;
+
+const int GRIDX = 5;
 const int GRIDY = 64;
 const int GRIDZ = 64;
+
+inline int Box_Scale(int x, AXES axis) {
+	if (axis == _X) return (x + 0.0)*GRIDX / MAXGRID;
+	else if (axis == _Y) return (x + 0.0)*GRIDY / MAXGRID;
+	else if (axis == _Z) return (x + 0.0)*GRIDZ / MAXGRID;
+}
+
 //#define assert(x) if (!(x)) { asm("int $3"); }
 /*inline int ID(int x, int y, int z) {
     assert(0 <= x&&x < GRIDX);

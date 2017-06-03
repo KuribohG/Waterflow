@@ -57,6 +57,8 @@ public:
 
 	void Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz);
 
-	void Step_Time();
+	void Pour_Source(int framenum, vector<WaterSource>& sources);
+
+	void Step_Time(int framenum, vector<WaterSource>& sources);
 
 };

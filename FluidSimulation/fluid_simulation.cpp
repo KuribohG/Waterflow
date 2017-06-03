@@ -14,16 +14,11 @@ Float Random(void) {
 	return rand() / (RAND_MAX - 1.0);
 }
 
-WaterSource::WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, Float _gen_rate, Float _init_vx, Float _init_vy, Float _init_vz) :
-	x0(_x0), x1(_x1), y0(_y0), y1(_y1), z0(_z0), z1(_z1), gen_rate(_gen_rate / FPS), init_vx(_init_vx), init_vy(_init_vy), init_vz(_init_vz)
-{
-}
-
 FluidSimulation::FluidSimulation():cubic(){
 	string filename;
 	cout << "please enter scene file name: ";
-	//cin >> filename;
-	filename = "scenes/frog.box";
+	cin >> filename;
+	//filename = "scenes/pourbox.box";
 	cout << filename << endl;
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
@@ -61,35 +56,28 @@ void FluidSimulation::Read_Scene_File(const char * filename) {
 		sin >> cmd;
 		//cout << buff << endl;
 		if (buff[0] == '#');
+		else if (cmd == "end") {
+			sin >> endframe;
+		}
 		else if (cmd == "box") {
 			int x0, x1, y0, y1, z0, z1;
 			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
+			x0 = Box_Scale(x0, _X), x1 = Box_Scale(x1, _X);
+			y0 = Box_Scale(y0, _Y), y1 = Box_Scale(y1, _Y);
+			z0 = Box_Scale(z0, _Z), z1 = Box_Scale(z1, _Z);
 			cubic.Mark_Water(x0, x1, y0, y1, z0, z1);
 		}
 		else if (cmd == "source") {
-			int x0, x1, y0, y1, z0, z1;
+			int x0, x1, y0, y1, z0, z1, pourend;
 			Float rate, vx, vy, vz;
-			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> rate >> vx >> vy >> vz;
-			sources.emplace_back(x0, x1, y0, y1, z0, z1, rate, vx, vy, vz);
+			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> rate >> vx >> vy >> vz >> pourend;
+			x0 = Box_Scale(x0, _X), x1 = Box_Scale(x1, _X);
+			y0 = Box_Scale(y0, _Y), y1 = Box_Scale(y1, _Y);
+			z0 = Box_Scale(z0, _Z), z1 = Box_Scale(z1, _Z);
+			sources.emplace_back(x0, x1, y0, y1, z0, z1, rate, vx, vy, vz, pourend);
 		}
 	}
 	fin.close();
-}
-
-void FluidSimulation::Pour_Source(void) {
-	for (WaterSource &s : sources) {
-		for (int i = s.x0; i <= s.x1; i++) {
-			for (int j = s.y0; j <= s.y1; j++) {
-				for (int k = s.z0; k <= s.z1; k++) {
-					Float t = Random();
-					if (t <= s.gen_rate) {
-						cubic.Mark_Single_Water(i, j, k);
-						Add_Single_Particle(cubic.particles, cubic.mask, i, j, k);
-					}
-				}
-			}
-		}
-	}
 }
 
 Float Kernel_Func(Float s_square) {
@@ -241,6 +229,7 @@ void FluidSimulation::Calculate_Nearest_Particle() {
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
+				//assert(nearest[i][j][k]);
                 if (nearest[i][j][k]) {
                     signed_dis(i, j, k) = dis[i][j][k];
                 }
@@ -255,18 +244,22 @@ void FluidSimulation::Get_Full_Velocity() {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
 				if (cubic.mask(i, j, k) != WATER && i - 1 >= 0 && cubic.mask(i - 1, j, k) != WATER) {
-					Float x = nearest[i][j][k]->vx;
-					Float xx = nearest[i - 1][j][k]->vx;
+					//assert(nearest[i][j][k]);
+					//assert(nearest[i - 1][j][k]);
+					Float x = nearest[i][j][k] ? nearest[i][j][k]->vx : 0;
+					Float xx = nearest[i - 1][j][k] ? nearest[i - 1][j][k]->vx : 0;
 					cubic.vx(i, j, k) = (x + xx) / 2;
 				}
                 if (cubic.mask(i, j, k) != WATER && j - 1 >= 0 && cubic.mask(i, j - 1, k) != WATER) {
-                    Float y = nearest[i][j][k]->vy;
-                    Float yy = nearest[i][j - 1][k]->vy;
+					//assert(nearest[i][j][k]);
+					//assert(nearest[i][j - 1][k]);
+					Float y = nearest[i][j][k] ? nearest[i][j][k]->vy : 0;
+					Float yy = nearest[i][j - 1][k] ? nearest[i][j - 1][k]->vy : 0;
                     cubic.vy(i, j, k) = (y + yy) / 2;
                 }
 				if (cubic.mask(i, j, k) != WATER && k - 1 >= 0 && cubic.mask(i, j, k - 1) != WATER) {
-					Float z = nearest[i][j][k]->vz;
-					Float zz = nearest[i][j][k - 1]->vz;
+					Float z = nearest[i][j][k] ? nearest[i][j][k]->vz : 0;
+					Float zz = nearest[i][j][k - 1] ? nearest[i][j][k - 1]->vz : 0;
                     cubic.vz(i, j, k) = (z + zz) / 2;
 				}
 				//if (i == GRIDX / 2 && j == 2) printf("%d %d %d %f\n", i, j, k, cubic.vz(i, j, k));
@@ -281,8 +274,8 @@ void FluidSimulation::Step_Time(void){
 	int tstep = clock();
 	framenum++;
 	printf("start to step frame %d\n", framenum);
-	Pour_Source();
-    cubic.Step_Time();
+    cubic.Step_Time(framenum, sources);
+	//cubic.Pour_Source(sources);
 	int t0 = clock();
     Calculate_Signed_Distance();
 	int t1 = clock(); printf("calc signed distance time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
@@ -311,7 +304,7 @@ void FluidSimulation::Step_Time(void){
 	int t4 = clock();
 	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0)/CLOCKS_PER_SEC, (t4 - T0 + 0.0) / CLOCKS_PER_SEC);
 	printf("==========================================================================================\n");
-	//if (framenum >= 200) exit(0);
+	if (framenum >= endframe) exit(0);
 }
 
 struct P_3d

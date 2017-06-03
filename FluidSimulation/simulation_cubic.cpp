@@ -94,7 +94,7 @@ void SimulationCubic::Apply_External_Forces(void) {
 	printf("apply external forces\n");
 	for (int i = 0; i < vz.n; i++) {
 		for (int j = 0; j < vz.m; j++) {
-			for (int k = 0; k <= vz.w; k++) {
+			for (int k = 0; k < vz.w; k++) {
 				vz(i, j, k) += -g*TIME_DELTA;
 			}
 		}
@@ -399,12 +399,36 @@ void swap(aryf &a, aryf &b) {
 	c = a; a = b; b = c;
 }
 
-void SimulationCubic::Step_Time(void){
+
+void SimulationCubic::Pour_Source(int framenum, vector<WaterSource> &sources) {
+	for (WaterSource &s : sources) {
+		if (framenum > s.pourend) continue;
+		for (int i = s.x0; i <= s.x1; i++) {
+			for (int j = s.y0; j <= s.y1; j++) {
+				for (int k = s.z0; k <= s.z1; k++) {
+					vx(i, j, k) = vx(i + 1, j, k) = s.init_vx;
+					vy(i, j, k) = vy(i, j + 1, k) = s.init_vy;
+					vz(i, j, k) = vz(i, j, k + 1) = s.init_vz;
+					Float t = randomF();
+					if (t <= s.gen_rate) {
+						Mark_Single_Water(i, j, k);
+						//Add_Single_Particle(particles, mask, i, j, k, s.init_vx, s.init_vy, s.init_vz);
+						Add_Single_Particle(particles, mask, i, j, k);
+						//printf("%f %f %f\n", s.init_vx, s.init_vy, s.init_vz);
+					}
+				}
+			}
+		}
+	}
+}
+
+void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
     printf("cubic step time \n");
 	static int tot = 0;
 	//printf("before external forces:\n"); Print_Velocity(vx, vy, vz, mask);
     //velocity-evolution
 	Apply_External_Forces();
+	Pour_Source(framenum, sources);
 	//printf("after external forces:\n"); Print_Velocity(vx, vy, vz, mask);
 	//puts("111111111");
 	//for (MarkerParticle &p : particles) {
@@ -436,7 +460,7 @@ void SimulationCubic::Step_Time(void){
 	//}
 	//printf("before PIC 1 1 60 and 1 1 61: %f %f\n", vz.get(1, 1, 60), vz.get(1, 1, 61));
 	//printf("before PIC:\n"); Print_Velocity(vx, vy, vz, mask);
-
+	
     swap(vx, vx0);
 	swap(vy, vy0);
 	swap(vz, vz0);
@@ -452,7 +476,7 @@ void SimulationCubic::Step_Time(void){
 
 	int t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
 	
-	Get_Particles_Velocity(particles, vx, vy, vz, mask);
+	//Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);
 	//Calc_Divergence(vx, vy, vz, s);
 	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
