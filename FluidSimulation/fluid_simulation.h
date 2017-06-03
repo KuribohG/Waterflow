@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared.hpp"
+#include "shared.h"
 #include "simulation_cubic.h"
 #include "marchingcubes.h"
 #include "surface.h"
@@ -18,8 +18,8 @@ private:
 	//vector<pair<int, Float> > lightPath[SHOW_SIZE_X][SHOW_SIZE_Y];
 	aryf signed_dis;
 	MarchingCubes meshcubes;
-	Float dis[GRIDX][GRIDY][GRIDZ];
-	MarkerParticle *nearest[GRIDX][GRIDY][GRIDZ];
+	Float dis[MAXGRID][MAXGRID][MAXGRID];
+	MarkerParticle *nearest[MAXGRID][MAXGRID][MAXGRID];
 public:
 	FluidSimulation();
 	void init_Density_3d();

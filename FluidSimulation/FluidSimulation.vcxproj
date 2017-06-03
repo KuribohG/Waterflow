@@ -145,6 +145,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="marchingcubes.cpp" />
     <ClCompile Include="pressuresolver.cpp" />
+    <ClCompile Include="shared.cpp" />
     <ClCompile Include="simulation_cubic.cpp" />
     <ClCompile Include="surface.cpp" />
   </ItemGroup>
@@ -154,7 +155,7 @@
     <ClInclude Include="gridmath.h" />
     <ClInclude Include="marchingcubes.h" />
     <ClInclude Include="pressuresolver.h" />
-    <ClInclude Include="shared.hpp" />
+    <ClInclude Include="shared.h" />
     <ClInclude Include="simulation_cubic.h" />
     <ClInclude Include="surface.h" />
   </ItemGroup>

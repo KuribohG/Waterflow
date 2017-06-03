@@ -14,7 +14,7 @@ Float Random(void) {
 	return rand() / (RAND_MAX - 1.0);
 }
 
-FluidSimulation::FluidSimulation():cubic(){
+FluidSimulation::FluidSimulation(){
 	string filename;
 	cout << "please enter scene file name: ";
 	cin >> filename;
@@ -23,6 +23,7 @@ FluidSimulation::FluidSimulation():cubic(){
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
 	LOGM("velocity set\n");
+	printf("grid size: %d %d %d\n", GRIDX, GRIDY, GRIDZ);
 	Init_Particles(cubic.particles, cubic.mask);
     signed_dis.init(GRIDX, GRIDY, GRIDZ);
     init_Density_3d();
@@ -51,6 +52,7 @@ void FluidSimulation::Read_Scene_File(const char * filename) {
 	ifstream fin;
 	fin.open(filename);
 	string buff, cmd;
+	bool cubicinit = false;
 	while (getline(fin, buff)) {
 		stringstream sin(buff);
 		sin >> cmd;
@@ -59,23 +61,41 @@ void FluidSimulation::Read_Scene_File(const char * filename) {
 		else if (cmd == "end") {
 			sin >> endframe;
 		}
-		else if (cmd == "box") {
-			int x0, x1, y0, y1, z0, z1;
-			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
-			x0 = Box_Scale(x0, _X), x1 = Box_Scale(x1, _X);
-			y0 = Box_Scale(y0, _Y), y1 = Box_Scale(y1, _Y);
-			z0 = Box_Scale(z0, _Z), z1 = Box_Scale(z1, _Z);
-			cubic.Mark_Water(x0, x1, y0, y1, z0, z1);
+		else if (cmd == "gridsize") {
+			sin >> GRIDX >> GRIDY >> GRIDZ;
+			if (GRIDX > MAXGRID) throw("GRIDX > MAXGRID");
+			if (GRIDY > MAXGRID) throw("GRIDY > MAXGRID");
+			if (GRIDZ > MAXGRID) throw("GRIDZ > MAXGRID");
+			cubic.Init(GRIDX, GRIDY, GRIDZ);
+			cubicinit = true;
 		}
-		else if (cmd == "source") {
-			int x0, x1, y0, y1, z0, z1, pourend;
-			Float rate, vx, vy, vz;
-			sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> rate >> vx >> vy >> vz >> pourend;
-			x0 = Box_Scale(x0, _X), x1 = Box_Scale(x1, _X);
-			y0 = Box_Scale(y0, _Y), y1 = Box_Scale(y1, _Y);
-			z0 = Box_Scale(z0, _Z), z1 = Box_Scale(z1, _Z);
-			sources.emplace_back(x0, x1, y0, y1, z0, z1, rate, vx, vy, vz, pourend);
+		else {//must after cubic init
+			if (!cubicinit) {
+				cubic.Init(GRIDX, GRIDY, GRIDZ);
+				cubicinit = true;
+			}
+			if (cmd == "box") {
+				int x0, x1, y0, y1, z0, z1;
+				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
+				x0 = Scale_Along(x0, _X), x1 = Scale_Along(x1, _X);
+				y0 = Scale_Along(y0, _Y), y1 = Scale_Along(y1, _Y);
+				z0 = Scale_Along(z0, _Z), z1 = Scale_Along(z1, _Z);
+				cubic.Mark_Water(x0, x1, y0, y1, z0, z1);
+			}
+			else if (cmd == "source") {
+				int x0, x1, y0, y1, z0, z1, pourend;
+				Float rate, vx, vy, vz;
+				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> rate >> vx >> vy >> vz >> pourend;
+				x0 = Scale_Along(x0, _X), x1 = Scale_Along(x1, _X), vx = Scale_Along(vx, _X);
+				y0 = Scale_Along(y0, _Y), y1 = Scale_Along(y1, _Y), vy = Scale_Along(vy, _Y);
+				z0 = Scale_Along(z0, _Z), z1 = Scale_Along(z1, _Z), vz = Scale_Along(vz, _Z);
+				sources.emplace_back(x0, x1, y0, y1, z0, z1, rate, vx, vy, vz, pourend);
+			}
 		}
+	}
+	if (!cubicinit) {
+		cubic.Init(GRIDX, GRIDY, GRIDZ);
+		cubicinit = true;
 	}
 	fin.close();
 }

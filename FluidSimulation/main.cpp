@@ -1,4 +1,4 @@
-#include "shared.hpp"
+#include "shared.h"
 #include "fluid_simulation.h"
 
 FluidSimulation fluidsim;
