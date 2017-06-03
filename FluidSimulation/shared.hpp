@@ -31,7 +31,6 @@ typedef float Float;
 #define LOGM(...)  fprintf(stderr,  __VA_ARGS__)
 #endif
 
-
 #ifdef _WIN32
 #define finite _finite
 #endif
