@@ -64,9 +64,9 @@ const int SHOW_SIZE_Y = 512;
 
 const int MAXGRID = 256;
 
-const int GRIDX = 5;
-const int GRIDY = 64;
-const int GRIDZ = 64;
+const int GRIDX = 256;
+const int GRIDY = 256;
+const int GRIDZ = 256;
 
 inline int Box_Scale(int x, AXES axis) {
 	if (axis == _X) return (x + 0.0)*GRIDX / MAXGRID;
