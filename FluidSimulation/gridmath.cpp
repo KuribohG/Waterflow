@@ -67,6 +67,9 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 	if (axis == 0) y -= 0.5, z -= 0.5;
 	else if (axis == 1) x -= 0.5, z -= 0.5;
 	else if (axis == 2) x -= 0.5, y -= 0.5;
+	x = Clip(x, -1.0f, f.n - 1.0f);
+	y = Clip(y, -1.0f, f.m - 1.0f);
+	z = Clip(z, -1.0f, f.w - 1.0f);
 	int x0 = floor(x), x1 = x0 + 1;
 	int y0 = floor(y), y1 = y0 + 1;
 	int z0 = floor(z), z1 = z0 + 1;
@@ -82,24 +85,10 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 	if (f.inside(x1, y0, z1))v += s0*u1*v0*f.get(x1, y0, z1), sw += s0*u1*v0;
 	if (f.inside(x1, y1, z0))v += s0*u0*v1*f.get(x1, y1, z0), sw += s0*u0*v1;
 	if (f.inside(x1, y1, z1))v += s0*u0*v0*f.get(x1, y1, z1), sw += s0*u0*v0;
-	/*
-	if (Valid_Water(x0, y0, z0, mask)) v += s1*u1*v1*f.get(x0, y0, z0), sw += s1*u1*v1;
-	if (Valid_Water(x0, y0, z1, mask)) v += s1*u1*v0*f.get(x0, y0, z1), sw += s1*u1*v0;
-	if (Valid_Water(x0, y1, z0, mask)) v += s1*u0*v1*f.get(x0, y1, z0), sw += s1*u0*v1;
-	if (Valid_Water(x0, y1, z1, mask)) v += s1*u0*v0*f.get(x0, y1, z1), sw += s1*u0*v0;
-	if (Valid_Water(x1, y0, z0, mask)) v += s0*u1*v1*f.get(x1, y0, z0), sw += s0*u1*v1;
-	if (Valid_Water(x1, y0, z1, mask)) v += s0*u1*v0*f.get(x1, y0, z1), sw += s0*u1*v0;
-	if (Valid_Water(x1, y1, z0, mask)) v += s0*u0*v1*f.get(x1, y1, z0), sw += s0*u0*v1;
-	if (Valid_Water(x1, y1, z1, mask)) v += s0*u0*v0*f.get(x1, y1, z1), sw += s0*u0*v0;
-	//if(abs()) printf("%d %f %f %f %f %f\n", axis, x, y, z, v, sw);
-	if (sw == 0) {
-		if (!extrapolation) return 0;
-		else return Extrapolation_Water_Velocity(f, x, y, z, mask);
+	if (fabs(sw) <= 1e-10) {
+		printf("interpolation goes wrong: %f %f %f\n", x, y, z);
+		//throw("ind");
 	}
-	*/
-	//if (fabs(sw) < 1e-10) printf("++++++++++++++++++++++++++++++%f %f %f\n", x, y, z);
-	if (fabs(sw) <= 1e-10) throw("ind");
-	assert(fabs(sw) > 1e-10);
 	//assert(sw != 0);
 	return v / sw;
 }

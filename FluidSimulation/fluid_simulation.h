@@ -13,6 +13,7 @@ class FluidSimulation {
 private:
 	int framenum = 0;
 	int endframe = 0x7fffffff;
+	char dumppref[100] = "objs/";
 	SimulationCubic cubic;
 	vector<WaterSource> sources;
 	//vector<pair<int, Float> > lightPath[SHOW_SIZE_X][SHOW_SIZE_Y];
