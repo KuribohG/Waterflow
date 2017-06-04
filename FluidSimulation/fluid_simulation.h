@@ -22,7 +22,7 @@ private:
 	Float dis[MAXGRID][MAXGRID][MAXGRID];
 	MarkerParticle *nearest[MAXGRID][MAXGRID][MAXGRID];
 public:
-	FluidSimulation();
+	FluidSimulation(string filename = "", string dumppref = "");
 	void init_Density_3d();
 	//void Draw_Vel(int i);
 	//void Draw_Pixels(void);
