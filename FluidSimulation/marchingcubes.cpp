@@ -401,6 +401,10 @@ void MarchingCubes::Reconstruct(const aryf & f, Float isoval){
 void MarchingCubes::Dump_Obj(const char * filename){
 	printf("dump obj to: %s\n", filename);
 	FILE *fout = fopen(filename, "w");
+	if (fout == NULL) {
+		printf("error: path to file: %s does not exist or no access\n", filename);
+		throw - 1;
+	}
 	for (unsigned int i = 0; i < verts.size(); i += 3) {
 		fprintf(fout, "v %f %f %f\n", verts[i], verts[i + 1], verts[i + 2]);
 	}

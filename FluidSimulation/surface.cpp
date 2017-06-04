@@ -127,7 +127,6 @@ void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, ary
 	for (MarkerParticle &p : particles) {
 		int ix = floor(p.x), iy = floor(p.y), iz = floor(p.z);
 		if (!mask.inside(ix, iy, iz)) {
-			assert(false);
 			printf("when advecting marker particle flying outside: %f %f %f\n", p.x, p.y, p.z);
 		}
 		else if (mask(ix,iy,iz) != SOLID) {

@@ -67,6 +67,9 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 	if (axis == 0) y -= 0.5, z -= 0.5;
 	else if (axis == 1) x -= 0.5, z -= 0.5;
 	else if (axis == 2) x -= 0.5, y -= 0.5;
+	x = Clip(x, -1.0f, f.n - 1.0f);
+	y = Clip(y, -1.0f, f.m - 1.0f);
+	z = Clip(z, -1.0f, f.w - 1.0f);
 	int x0 = floor(x), x1 = x0 + 1;
 	int y0 = floor(y), y1 = y0 + 1;
 	int z0 = floor(z), z1 = z0 + 1;
@@ -84,7 +87,7 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 	if (f.inside(x1, y1, z1))v += s0*u0*v0*f.get(x1, y1, z1), sw += s0*u0*v0;
 	if (fabs(sw) <= 1e-10) {
 		printf("interpolation goes wrong: %f %f %f\n", x, y, z);
-		throw("ind");
+		//throw("ind");
 	}
 	//assert(sw != 0);
 	return v / sw;

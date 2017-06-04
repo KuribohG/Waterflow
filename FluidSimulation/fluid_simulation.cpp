@@ -20,6 +20,10 @@ FluidSimulation::FluidSimulation(){
 	cin >> filename;
 	//filename = "scenes/pourbox.box";
 	cout << filename << endl;
+	cout << "please enter dump path:";
+	cin >> dumppref;
+	int t = strlen(dumppref);
+	if (dumppref[t - 1] == '/') dumppref[t - 1] = '\0';
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
 	LOGM("velocity set\n");
@@ -311,7 +315,7 @@ void FluidSimulation::Step_Time(void){
 	if (framenum % 1 == 0) {
 
 		char name[50];
-		sprintf(name, "objs/meshs.%04d.obj", framenum);
+		sprintf(name, "%s/meshs.%04d.obj", dumppref, framenum);
 		meshcubes.Reconstruct(signed_dis, 0.0);
 		char pngname[100];
 		sprintf(pngname, "%04d.png", framenum);
