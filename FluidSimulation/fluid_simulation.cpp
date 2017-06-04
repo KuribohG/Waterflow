@@ -14,16 +14,22 @@ Float Random(void) {
 	return rand() / (RAND_MAX - 1.0);
 }
 
-FluidSimulation::FluidSimulation(){
-	string filename;
-	cout << "please enter scene file name: ";
-	cin >> filename;
-	//filename = "scenes/pourbox.box";
-	cout << filename << endl;
-	cout << "please enter dump path:";
-	cin >> dumppref;
-	int t = strlen(dumppref);
-	if (dumppref[t - 1] == '/') dumppref[t - 1] = '\0';
+FluidSimulation::FluidSimulation(string filename, string dumppath) {
+	if (filename == "") {
+		cout << "please enter scene file name: ";
+		cin >> filename;
+		//filename = "scenes/pourbox.box";
+		cout << filename << endl;
+		cout << "please enter dump path:";
+		cin >> dumppref;
+		int t = strlen(dumppref);
+		if (dumppref[t - 1] == '/') dumppref[t - 1] = '\0';
+	}
+	else {
+		int n = (int)dumppath.size();
+		for (int i = 0; i < n; i++) dumppref[i] = dumppath[i];
+		dumppref[n] = '\0';
+	}
 	Read_Scene_File(filename.c_str());
 	//mask(2, 30, 30) = WATER;
 	LOGM("velocity set\n");
