@@ -6,11 +6,12 @@ box x0 x1 y0 y1 z0 z1 #在初始时候增加一个装满水的长方体，坐标
 source x0 x1 y0 y1 z0 z1 rate vx vy vz end#增加一个水源，同上，其中每个格子，每一秒平均生成rate次水。vx vy vz是它吐出水的初始速度，它在第end+1帧将不再刷出水。
 
 现在todo（星号为不重要）：
-1. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
-2. 支持水源的初始速度。
-3. 调研GridFluidSim，出飞沫等额外特效。
-4*. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
-5*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
+1. 优化代码，减少运行时间。
+2. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
+3. 支持水源的初始速度：支持从水源particle的速度直接出网格速度。
+4. 调研GridFluidSim，出飞沫等额外特效。
+5*. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
+6*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
 
 路线图：2D(dummies)---extended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
 
@@ -37,5 +38,8 @@ v2.0（空气和水）
 
 2017.6.2
 修正了extrapolation的自更新问题。因此修正了已知的所有bug。
+
+2017.6.3
+更新了场景文件格式。将GRIDXYZ改为可读取。场景进一步和代码解耦。现在运行时间较长，需要优化。
 
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)
