@@ -300,6 +300,7 @@ Float Kernel(Float dx, Float dy, Float dz) {
 }
 
 void SimulationCubic::Advect_PIC_Preprocess() {
+	printf("advect PIC preprocess\n");
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
@@ -319,6 +320,7 @@ void SimulationCubic::Advect_PIC_Preprocess() {
 }
 
 void SimulationCubic::Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz) {
+	printf("advect PIC along axis %d\n", axis);
 	if (axis == _X) {
 		for (int i = 0; i <= GRIDX; i++) {
 			for (int j = 0; j < GRIDY; j++) {
@@ -403,6 +405,7 @@ void swap(aryf &a, aryf &b) {
 
 
 void SimulationCubic::Pour_Source(int framenum, vector<WaterSource> &sources) {
+	printf("pour sources\n");
 	for (WaterSource &s : sources) {
 		if (framenum > s.pourend) continue;
 		for (int i = s.x0; i <= s.x1; i++) {
@@ -426,42 +429,17 @@ void SimulationCubic::Pour_Source(int framenum, vector<WaterSource> &sources) {
 
 void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
     printf("cubic step time \n");
+	Float t0 = clock(), t;
 	static int tot = 0;
-	//printf("before external forces:\n"); Print_Velocity(vx, vy, vz, mask);
     //velocity-evolution
 	Apply_External_Forces();
 	Pour_Source(framenum, sources);
-	//printf("after external forces:\n"); Print_Velocity(vx, vy, vz, mask);
-	//puts("111111111");
-	//for (MarkerParticle &p : particles) {
-	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
-	//}
-	//printf("before advection: \n"); Print_Velocity(vx, vy, vz, mask);
-	/*if (tot++) {
-		swap(vx, vx0);
-		swap(vy, vy0);
-		swap(vz, vz0);
-		Advect_Velocity(0, vx, vx0, vx0, vy0, vz0);
-		Advect_Velocity(1, vy, vy0, vx0, vy0, vz0);
-		Advect_Velocity(2, vz, vz0, vx0, vy0, vz0);
-	}*/
+	t = clock(); printf("apply external forces&pour source time cost: %.2fs\n", (t - t0 + 0.0) / CLOCKS_PER_SEC); t0 = t;
 
-	//printf("after advection: \n"); Print_Velocity(vx, vy, vz, mask);
-	//Bound_Solid();
-	Float t0 = clock();
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
-	//puts("1.51.51.51.51.5");
-	//for (MarkerParticle &p : particles) {
-	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
-	//}
 	Advect_Particles(particles, vx, vy, vz, mask);
 	Advect_PIC_Preprocess();
-	//puts("222222");
-	//for (MarkerParticle &p : particles) {
-	//	printf("%f %f %f\n", p.vx, p.vy, p.vz);
-	//}
-	//printf("before PIC 1 1 60 and 1 1 61: %f %f\n", vz.get(1, 1, 60), vz.get(1, 1, 61));
-	//printf("before PIC:\n"); Print_Velocity(vx, vy, vz, mask);
+	t = clock(); printf("advect particles time cost: %.2fs\n", (t - t0 + 0.0) / CLOCKS_PER_SEC); t0 = t;
 	
     swap(vx, vx0);
 	swap(vy, vy0);
@@ -470,20 +448,14 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
 	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
 	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
 
-	//printf("after PIC:\n"); Print_Velocity(vx, vy, vz, mask);
+	t = clock(); printf("PIC advection time cost: %.2fs\n", (t - t0 + 0.0) / CLOCKS_PER_SEC); t0 = t;
 
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
-	
 	Mark_Water_By(particles, mask);
 
-	Float t1 = clock(); printf("update marker particles time cost: %.2fs\n", (t1 - t0 + 0.0) / CLOCKS_PER_SEC);
-	
-	//Get_Particles_Velocity(particles, vx, vy, vz, mask);
-	//printf("after projection: \n"); Print_Velocity(vx, vy, vz, mask);
-	//Calc_Divergence(vx, vy, vz, s);
-	//LOGM("velocity: %f\n", Interpolation_Water_Velocity(2, vz, 2.5, 30.5, 30.5, mask));
+	t = clock(); printf("update water mask time cost: %.2fs\n", (t - t0 + 0.0) / CLOCKS_PER_SEC); t0 = t;
 	
 	Project(vx, vy, vz, p, p0);
-	//printf("after projection:\n"); Print_Velocity(vx, vy, vz, mask);
-	//Calc_Divergence(vx, vy, vz, p0);
+
+	t = clock(); printf("project time cost: %.2fs\n", (t - t0 + 0.0) / CLOCKS_PER_SEC); t0 = t;
 }

@@ -6,6 +6,7 @@ WaterSource::WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, F
 }
 
 void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
+	printf("mark water by particles\n");
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
@@ -78,6 +79,7 @@ void Add_Particles(vector<MarkerParticle> &particles, aryi &mask, int x0, int x1
 }
 
 void Get_Particles_Velocity(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryi &mask) {
+	printf("get particles velocity\n");
 	for (MarkerParticle &p : particles) {
 		p.vx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
 		p.vy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
@@ -121,6 +123,7 @@ void RK3(MarkerParticle &p, aryf &vx, aryf &vy, aryf &vz, aryi &mask, int step =
 
 //todo: Runge_Kutta here
 void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryi &mask){
+	printf("advect particles\n");
 	for (MarkerParticle &p : particles) {
 		int ix = floor(p.x), iy = floor(p.y), iz = floor(p.z);
 		if (!mask.inside(ix, iy, iz)) {

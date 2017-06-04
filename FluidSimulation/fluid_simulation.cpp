@@ -115,6 +115,7 @@ Float Square_Dis(Float x, Float y, Float z, Float xx, Float yy, Float zz) {
 }
 
 void FluidSimulation::Calculate_Signed_Distance() {
+	printf("calculate signed distance\n");
     const Float h = 4.0;
     const Float r = 1.0;
     for (int i = 0; i < GRIDX; i++) {
@@ -189,6 +190,7 @@ struct Position {
 std::queue<Position> known;
 
 void FluidSimulation::Calculate_Nearest_Particle() {
+	printf("calculate nearest particle\n");
     const Float INF = 1e20;
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
@@ -259,7 +261,7 @@ void FluidSimulation::Calculate_Nearest_Particle() {
 }
 
 void FluidSimulation::Get_Full_Velocity() {
-	printf("extrapolating: \n");
+	printf("extrapolate\n");
     for (int i = 0; i < GRIDX; i++) {
         for (int j = 0; j < GRIDY; j++) {
             for (int k = 0; k < GRIDZ; k++) {
@@ -311,7 +313,6 @@ void FluidSimulation::Step_Time(void){
 		char name[50];
 		sprintf(name, "objs/meshs.%04d.obj", framenum);
 		meshcubes.Reconstruct(signed_dis, 0.0);
-		printf("dump to: %s\n", name);
 		char pngname[100];
 		sprintf(pngname, "%04d.png", framenum);
 		
