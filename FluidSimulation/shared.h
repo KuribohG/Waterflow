@@ -14,6 +14,8 @@
 #include <list>
 #include <float.h>
 #include <ctime>
+#include <omp.h>
+
 
 #ifdef OPENGL
 
