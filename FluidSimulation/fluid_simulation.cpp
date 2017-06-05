@@ -332,8 +332,8 @@ void FluidSimulation::Step_Time(void){
 	}
 	//if (framenum >= 0) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
-	Float t4 = clock();
-	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0)/CLOCKS_PER_SEC, (t4 - T0 + 0.0) / CLOCKS_PER_SEC);
+	Float t4 = omp_get_wtime();
+	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0), (t4 - T0 + 0.0));
 	printf("==========================================================================================\n");
 	if (framenum >= endframe) exit(0);
 }
