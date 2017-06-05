@@ -1,5 +1,6 @@
 #pragma once
 
+
 #define OPENGL
 #define OPENMP
 
@@ -14,6 +15,8 @@
 #include <list>
 #include <float.h>
 #include <ctime>
+#include <omp.h>
+
 
 #ifdef OPENGL
 
