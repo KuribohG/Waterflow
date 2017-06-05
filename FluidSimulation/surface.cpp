@@ -158,7 +158,7 @@ void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, ary
 	#pragma omp parallel
 	{
 		int n = omp_get_num_threads();
-		int base = particles.size() / n;
+		int base = (particles.size()+n-1) / n;
 		int tid = omp_get_thread_num();
 		int l = tid*base, h = min((tid + 1)*base, (int)particles.size());
 		for (int i = l; i < h; i++) {
