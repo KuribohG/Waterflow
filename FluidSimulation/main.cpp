@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 int main(int argc, char *argv[]) {
 	fluidsim = new FluidSimulation(argv[1], argv[2]);
 	while (true) {
-		fluidsim.Step_Time();
+		fluidsim->Step_Time();
 	}
 	return 0;
 }

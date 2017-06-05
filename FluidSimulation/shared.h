@@ -1,6 +1,6 @@
 #pragma once
 
-#define OPENGL
+//#define OPENGL
 
 #include <iostream>
 #include <cstdio>
@@ -31,10 +31,7 @@ typedef float Float;
 #define LOGM(...)  fprintf(stderr,  __VA_ARGS__)
 #endif
 
-#ifndef OPENGL
-#endif
-
-#ifdef WIN32
+#ifdef _WIN32
 #define finite _finite
 #endif
 
