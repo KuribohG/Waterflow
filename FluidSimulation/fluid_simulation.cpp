@@ -94,12 +94,12 @@ void FluidSimulation::Read_Scene_File(const char * filename) {
 			}
 			else if (cmd == "source") {
 				int x0, x1, y0, y1, z0, z1, pourend;
-				Float rate, vx, vy, vz;
-				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> rate >> vx >> vy >> vz >> pourend;
+				Float vx, vy, vz;
+				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> vx >> vy >> vz >> pourend;
 				x0 = Scale_Along(x0, _X), x1 = Scale_Along(x1, _X), vx = Scale_Along(vx, _X);
 				y0 = Scale_Along(y0, _Y), y1 = Scale_Along(y1, _Y), vy = Scale_Along(vy, _Y);
 				z0 = Scale_Along(z0, _Z), z1 = Scale_Along(z1, _Z), vz = Scale_Along(vz, _Z);
-				sources.emplace_back(x0, x1, y0, y1, z0, z1, rate, vx, vy, vz, pourend);
+				sources.emplace_back(x0, x1, y0, y1, z0, z1, vx, vy, vz, pourend);
 			}
 		}
 	}

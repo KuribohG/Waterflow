@@ -414,8 +414,7 @@ void SimulationCubic::Pour_Source(int framenum, vector<WaterSource> &sources) {
 					vx.set(i, j, k, s.init_vx), vx.set(i + 1, j, k, s.init_vx);
 					vy.set(i, j, k, s.init_vy), vy.set(i, j + 1, k, s.init_vy);
 					vz.set(i, j, k, s.init_vz), vz.set(i, j, k + 1, s.init_vz);
-					Float t = randomF();
-					if (t <= s.gen_rate) {
+					if (mask.is(i, j, k, AIR)) {
 						Mark_Single_Water(i, j, k);
 						//Add_Single_Particle(particles, mask, i, j, k, s.init_vx, s.init_vy, s.init_vz);
 						Add_Single_Particle(particles, mask, i, j, k);
@@ -434,6 +433,7 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
     //velocity-evolution
 	Apply_External_Forces();
 	Pour_Source(framenum, sources);
+	printf("particle num: %d\n", particles.size());
 	t = clock(); printf("apply external forces&pour source time cost: %.2fs\n", (t - t0 + 0.0) / CLOCKS_PER_SEC); t0 = t;
 
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);

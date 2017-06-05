@@ -1,7 +1,7 @@
 #include "surface.h"
 
-WaterSource::WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, Float _gen_rate, Float _init_vx, Float _init_vy, Float _init_vz, int _pourend) :
-	x0(_x0), x1(_x1), y0(_y0), y1(_y1), z0(_z0), z1(_z1), gen_rate(_gen_rate / FPS), init_vx(_init_vx), init_vy(_init_vy), init_vz(_init_vz), pourend(_pourend)
+WaterSource::WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, Float _init_vx, Float _init_vy, Float _init_vz, int _pourend) :
+	x0(_x0), x1(_x1), y0(_y0), y1(_y1), z0(_z0), z1(_z1), init_vx(_init_vx), init_vy(_init_vy), init_vz(_init_vz), pourend(_pourend)
 {
 }
 
