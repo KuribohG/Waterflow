@@ -1,4 +1,5 @@
 #include "surface.h"
+#include <omp.h>
 
 WaterSource::WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, Float _init_vx, Float _init_vy, Float _init_vz, int _pourend) :
 	x0(_x0), x1(_x1), y0(_y0), y1(_y1), z0(_z0), z1(_z1), init_vx(_init_vx), init_vy(_init_vy), init_vz(_init_vz), pourend(_pourend)
@@ -102,6 +103,35 @@ void RK3(MarkerParticle &p, aryf &vx, aryf &vy, aryf &vz, aryi &mask, int step =
 		Float pvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
 		Float pvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
 		Float delta_x = 0, delta_y = 0, delta_z = 0;
+#ifdef OPENMP
+		//OpenMP going...
+		Float sum[3][3];
+		#pragma omp parallel num_threads(9)
+		{
+			int pid = omp_get_thread_num();
+			int s = pid / 3, h = pid % 3;
+			Float px = p.x + step_size[s] * pvx * time_delta;
+			Float py = p.y + step_size[s] * pvy * time_delta;
+			Float pz = p.z + step_size[s] * pvz * time_delta;
+			if (h == 0) {
+				Float pvx1 = Interpolation_Water_Velocity(_X, vx, px, py, pz, mask);
+				sum[s][h] = pvx1 * time_delta * weight[s];
+			}
+			else if (h == 1) {
+				Float pvy1 = Interpolation_Water_Velocity(_Y, vy, px, py, pz, mask);
+				sum[s][h] = pvy1 * time_delta * weight[s];
+			}
+			else if (h == 2) {
+				Float pvz1 = Interpolation_Water_Velocity(_Z, vz, px, py, pz, mask);
+				sum[s][h] = pvz1 * time_delta * weight[s];;
+			}
+		}
+		//OpenMP ended
+
+		delta_x += sum[0][0] + sum[1][0] + sum[2][0];
+		delta_y += sum[0][1] + sum[1][1] + sum[2][1];
+		delta_z += sum[0][2] + sum[1][2] + sum[2][2];
+#else
 		for (int s = 0; s < 3; s++) {
 			Float px = p.x + step_size[s] * pvx * time_delta;
 			Float py = p.y + step_size[s] * pvy * time_delta;
@@ -113,6 +143,7 @@ void RK3(MarkerParticle &p, aryf &vx, aryf &vy, aryf &vz, aryi &mask, int step =
 			delta_y += pvy1 * time_delta * weight[s];
 			delta_z += pvz1 * time_delta * weight[s];
 		}
+#endif
 		p.x += delta_x, p.y += delta_y, p.z += delta_z;
 		//XXX: find the nearest grid which is not solid
 		p.x = clip(p.x, 1 + EPS, GRIDX - 1 - EPS);

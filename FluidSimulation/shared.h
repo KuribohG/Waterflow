@@ -1,6 +1,7 @@
 #pragma once
 
 #define OPENGL
+#define OPENMP
 
 #include <iostream>
 #include <cstdio>
