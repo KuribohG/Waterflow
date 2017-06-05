@@ -1,4 +1,5 @@
 #include "gridmath.h"
+
 void Print_Velocity(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask) {
 	printf("print velocity: \n");
 	Float vz0 = INF;
@@ -78,13 +79,13 @@ Float Interpolation_Water_Velocity(int axis, const aryf &f, Float x, Float y, Fl
 	Float v0 = z - z0, v1 = z1 - z;
 	Float v = 0, sw = 0;
 	if (f.inside(x0, y0, z0)) v += s1*u1*v1*f.get(x0, y0, z0), sw += s1*u1*v1;
-	if (f.inside(x0, y0, z1))v += s1*u1*v0*f.get(x0, y0, z1), sw += s1*u1*v0;
-	if (f.inside(x0, y1, z0))v += s1*u0*v1*f.get(x0, y1, z0), sw += s1*u0*v1;
-	if (f.inside(x0, y1, z1))v += s1*u0*v0*f.get(x0, y1, z1), sw += s1*u0*v0;
-	if (f.inside(x1, y0, z0))v += s0*u1*v1*f.get(x1, y0, z0), sw += s0*u1*v1;
-	if (f.inside(x1, y0, z1))v += s0*u1*v0*f.get(x1, y0, z1), sw += s0*u1*v0;
-	if (f.inside(x1, y1, z0))v += s0*u0*v1*f.get(x1, y1, z0), sw += s0*u0*v1;
-	if (f.inside(x1, y1, z1))v += s0*u0*v0*f.get(x1, y1, z1), sw += s0*u0*v0;
+	if (f.inside(x0, y0, z1)) v += s1*u1*v0*f.get(x0, y0, z1), sw += s1*u1*v0;
+	if (f.inside(x0, y1, z0)) v += s1*u0*v1*f.get(x0, y1, z0), sw += s1*u0*v1;
+	if (f.inside(x0, y1, z1)) v += s1*u0*v0*f.get(x0, y1, z1), sw += s1*u0*v0;
+	if (f.inside(x1, y0, z0)) v += s0*u1*v1*f.get(x1, y0, z0), sw += s0*u1*v1;
+	if (f.inside(x1, y0, z1)) v += s0*u1*v0*f.get(x1, y0, z1), sw += s0*u1*v0;
+	if (f.inside(x1, y1, z0)) v += s0*u0*v1*f.get(x1, y1, z0), sw += s0*u0*v1;
+	if (f.inside(x1, y1, z1)) v += s0*u0*v0*f.get(x1, y1, z1), sw += s0*u0*v0;
 	if (fabs(sw) <= 1e-10) {
 		printf("interpolation goes wrong: %f %f %f\n", x, y, z);
 		//throw("ind");
