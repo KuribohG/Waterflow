@@ -1,6 +1,6 @@
 #pragma once
 
-//#define OPENGL
+#define OPENGL
 
 #include <iostream>
 #include <cstdio>
