@@ -42,4 +42,7 @@ v2.0（空气和水）
 2017.6.3
 更新了场景文件格式。将GRIDXYZ改为可读取。场景进一步和代码解耦。现在运行时间较长，需要优化。
 
+2017.6.4
+修改了水源函数，改成正确的“如果是空气则刷新”。运用了OpenMP进行优化。
+
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)
