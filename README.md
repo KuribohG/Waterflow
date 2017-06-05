@@ -6,7 +6,7 @@ box x0 x1 y0 y1 z0 z1 #在初始时候增加一个装满水的长方体，坐标
 source x0 x1 y0 y1 z0 z1 vx vy vz end#增加一个水源，同上。vx vy vz是它吐出水的初始速度，它在第end+1帧将不再刷出水。
 
 现在todo（星号为不重要）：
-1. 优化代码，减少运行时间。监控运行所需的内存。当前，一个marker particle会导致6个Float和一个指针。
+1. 全部代码并行化。监控mask内部出气泡的问题。
 2. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
 3. 支持水源的初始速度：支持从水源particle的速度直接出网格速度。
 4. 调研GridFluidSim，出飞沫等额外特效。
