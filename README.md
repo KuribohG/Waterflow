@@ -3,10 +3,10 @@
 gridsize GRIDX GRIDY GRIDZ # 指定模拟网格的大小。如果没有，则默认为256*256*256. 以下所有参数均应以256*256*256的网格为基准，程序会按照真实大小进行自动缩放。
 end n #指定运算n帧后终止运行。如果没有此指令，则程序不会停止。
 box x0 x1 y0 y1 z0 z1 #在初始时候增加一个装满水的长方体，坐标为闭区间[x0,x1],[y0,y1],[z0,z1]。它不会覆盖固体格子和网格外的地方。水的初始速度为0。
-source x0 x1 y0 y1 z0 z1 rate vx vy vz end#增加一个水源，同上，其中每个格子，每一秒平均生成rate次水。vx vy vz是它吐出水的初始速度，它在第end+1帧将不再刷出水。
+source x0 x1 y0 y1 z0 z1 vx vy vz end#增加一个水源，同上。vx vy vz是它吐出水的初始速度，它在第end+1帧将不再刷出水。
 
 现在todo（星号为不重要）：
-1. 优化代码，减少运行时间。
+1. 优化代码，减少运行时间。监控运行所需的内存。当前，一个marker particle会导致6个Float和一个指针。
 2. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
 3. 支持水源的初始速度：支持从水源particle的速度直接出网格速度。
 4. 调研GridFluidSim，出飞沫等额外特效。

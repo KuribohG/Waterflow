@@ -1,3 +1,9 @@
+#full box
+gridsize 256 256 256
+box 0 256 0 256 0 256
+
+#box 0 256 0 256 0 80
+#box 0 256 64 200 150 230
 #256 "free-fall" impact scene:
 box 0 256 0 256 0 80
 box 0 256 64 200 150 230
