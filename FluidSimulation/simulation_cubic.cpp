@@ -434,12 +434,12 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
 	Apply_External_Forces();
 	Pour_Source(framenum, sources);
 	printf("particle num: %d\n", particles.size());
-	t = omp_get_wtime(); printf("apply external forces&pour source time cost: %.2fs\n", (t - t0 + 0.0) / CLOCKS_PER_SEC); t0 = t;
+	t = omp_get_wtime(); printf("apply external forces&pour source time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	Advect_Particles(particles, vx, vy, vz, mask);
 	Advect_PIC_Preprocess();
-	t = omp_get_wtime(); printf("advect particles time cost: %.2fs\n", (t - t0 + 0.0) / CLOCKS_PER_SEC); t0 = t;
+	t = omp_get_wtime(); printf("advect particles time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 	
     swap(vx, vx0);
 	swap(vy, vy0);
