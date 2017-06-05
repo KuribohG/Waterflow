@@ -315,7 +315,7 @@ void FluidSimulation::Step_Time(void){
 	Float t2 = omp_get_wtime(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0));
 	//printf("before extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
 	Get_Full_Velocity();
-	Float t3 = omp_get_wtime(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0));
+	Float t3 = omp_get_wtime(); printf("extrapolation time cost: %.2fs\n", (t3 - t2 + 0.0));
 	//printf("after extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
     
 	if (framenum % 1 == 0) {
