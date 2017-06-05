@@ -27,15 +27,29 @@ void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
 }
 
 void Add_Particles_Single_Cell(vector<MarkerParticle> &particles, int i, int j, int k, Float vx = 0, Float vy = 0, Float vz = 0) {
-	const Float dxs[8] = { 0.25,0.25,0.25,0.25,0.75,0.75,0.75,0.75 };
-	const Float dys[8] = { 0.25,0.25,0.75,0.75,0.25,0.25,0.75,0.75 };
-	const Float dzs[8] = { 0.25,0.75,0.25,0.75,0.25,0.75,0.25,0.75 };
-	for (int d = 0; d < 8; d++) {
-		MarkerParticle p(i + dxs[d], j + dys[d], k + dzs[d], vx, vy, vz);
-		/*p.x += (randomF() - 0.5)*0.5;
-		p.y += (randomF() - 0.5)*0.5;
-		p.z += (randomF() - 0.5)*0.5;*/
-		particles.push_back(p);
+	//const Float dxs[8] = { 0.25,0.25,0.25,0.25,0.75,0.75,0.75,0.75 };
+	//const Float dys[8] = { 0.25,0.25,0.75,0.75,0.25,0.25,0.75,0.75 };
+	//const Float dzs[8] = { 0.25,0.75,0.25,0.75,0.25,0.75,0.25,0.75 };
+	//for (int d = 0; d < 8; d++) {
+	//	MarkerParticle p(i + dxs[d], j + dys[d], k + dzs[d], vx, vy, vz);
+	//	p.x += (randomF() - 0.5)*0.5;
+	//	p.y += (randomF() - 0.5)*0.5;
+	//	p.z += (randomF() - 0.5)*0.5;
+	//	particles.push_back(p);
+	//}
+	const int n = 3;
+	const Float step = 1.0 / n;
+	Float dlt = step / 2;
+	for (int dx = 0; dx < n; dx++) {
+		for (int dy = 0; dy < n; dy++) {
+			for (int dz = 0; dz < n; dz++) {
+				MarkerParticle p(i + dlt + dx*step, j + dlt + dy*step, k + dlt + dz*step);
+				p.x += (randomF() - 0.5)*step;
+				p.y += (randomF() - 0.5)*step;
+				p.z += (randomF() - 0.5)*step;
+				particles.push_back(p);
+			}
+		}
 	}
 }
 
