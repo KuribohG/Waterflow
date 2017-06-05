@@ -144,33 +144,70 @@ void FluidSimulation::Calculate_Signed_Distance() {
 		if (z < 0 || z >= GRIDZ) continue;
         cubic.v[x][y][z].emplace_back(&p);
     }
-    for (int i = 0; i < GRIDX; i++) {
-        for (int j = 0; j < GRIDY; j++) {
-            for (int k = 0; k < GRIDZ; k++) {
-                Float X = 0, Y = 0, Z = 0, d = 0;
-                Float x = i + 0.5, y = j + 0.5, z = k + 0.5;
-                for (int dx = -2; dx <= 2; dx++) {
-                    for (int dy = -2; dy <= 2; dy++) {
-                        for (int dz = -2; dz <= 2; dz++) {
-                            if (std::abs(dx) + std::abs(dy) + std::abs(dz) >= 5) continue;
-                            if (i + dx < 0 || i + dx >= GRIDX) continue;
-                            if (j + dy < 0 || j + dy >= GRIDY) continue;
-                            if (k + dz < 0 || k + dz >= GRIDZ) continue;
-                            for (MarkerParticle *ptr : cubic.v[i + dx][j + dy][k + dz]) {
-                                MarkerParticle &p = *ptr;
-                                Float dis_square = Square_Dis(p.x, p.y, p.z, x, y, z);
-                                Float weight = Kernel_Func(dis_square / h);
-                                d += weight, X += weight * p.x, Y += weight * p.y, Z += weight * p.z;
-                            }
-                        }
-                    }
-                }
-                X /= d, Y /= d, Z /= d;
-                Float norm = sqrt(Square_Dis(x, y, z, X, Y, Z));
-                signed_dis(i, j, k) = norm - r;
-            }
-        }
-    }
+#ifdef OPENMP
+	#pragma omp parallel
+	{
+		int n = omp_get_num_threads();
+		int base = (GRIDX + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)GRIDX);
+		for (int i = l; i < h; i++) {
+			for (int j = 0; j < GRIDY; j++) {
+				for (int k = 0; k < GRIDZ; k++) {
+					Float X = 0, Y = 0, Z = 0, d = 0;
+					Float x = i + 0.5, y = j + 0.5, z = k + 0.5;
+					for (int dx = -2; dx <= 2; dx++) {
+						for (int dy = -2; dy <= 2; dy++) {
+							for (int dz = -2; dz <= 2; dz++) {
+								if (std::abs(dx) + std::abs(dy) + std::abs(dz) >= 5) continue;
+								if (i + dx < 0 || i + dx >= GRIDX) continue;
+								if (j + dy < 0 || j + dy >= GRIDY) continue;
+								if (k + dz < 0 || k + dz >= GRIDZ) continue;
+								for (MarkerParticle *ptr : cubic.v[i + dx][j + dy][k + dz]) {
+									MarkerParticle &p = *ptr;
+									Float dis_square = Square_Dis(p.x, p.y, p.z, x, y, z);
+									Float weight = Kernel_Func(dis_square / h);
+									d += weight, X += weight * p.x, Y += weight * p.y, Z += weight * p.z;
+								}
+							}
+						}
+					}
+					X /= d, Y /= d, Z /= d;
+					Float norm = sqrt(Square_Dis(x, y, z, X, Y, Z));
+					signed_dis(i, j, k) = norm - r;
+				}
+			}
+		}
+	}
+#else
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				Float X = 0, Y = 0, Z = 0, d = 0;
+				Float x = i + 0.5, y = j + 0.5, z = k + 0.5;
+				for (int dx = -2; dx <= 2; dx++) {
+					for (int dy = -2; dy <= 2; dy++) {
+						for (int dz = -2; dz <= 2; dz++) {
+							if (std::abs(dx) + std::abs(dy) + std::abs(dz) >= 5) continue;
+							if (i + dx < 0 || i + dx >= GRIDX) continue;
+							if (j + dy < 0 || j + dy >= GRIDY) continue;
+							if (k + dz < 0 || k + dz >= GRIDZ) continue;
+							for (MarkerParticle *ptr : cubic.v[i + dx][j + dy][k + dz]) {
+								MarkerParticle &p = *ptr;
+								Float dis_square = Square_Dis(p.x, p.y, p.z, x, y, z);
+								Float weight = Kernel_Func(dis_square / h);
+								d += weight, X += weight * p.x, Y += weight * p.y, Z += weight * p.z;
+							}
+						}
+					}
+				}
+				X /= d, Y /= d, Z /= d;
+				Float norm = sqrt(Square_Dis(x, y, z, X, Y, Z));
+				signed_dis(i, j, k) = norm - r;
+			}
+		}
+	}
+#endif
 	for (int i = 0; i < GRIDX; i++) {
 		for (int j = 0; j < GRIDY; j++) {
 			for (int k = 0; k < GRIDZ; k++) {
