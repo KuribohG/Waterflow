@@ -94,11 +94,27 @@ void Add_Particles(vector<MarkerParticle> &particles, aryi &mask, int x0, int x1
 
 void Get_Particles_Velocity(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryi &mask) {
 	printf("get particles velocity\n");
+#ifdef OPENMP
+	#pragma omp parallel
+	{
+		int n = omp_get_num_threads();
+		int base = (particles.size() + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)particles.size());
+		for (int i = l; i < h; i++) {
+			MarkerParticle &p = particles[i];
+			p.vx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
+			p.vy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
+			p.vz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
+		}
+	}
+#else
 	for (MarkerParticle &p : particles) {
 		p.vx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
 		p.vy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
 		p.vz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
 	}
+#endif
 }
 
 Float clip(Float x, Float min, Float max) {

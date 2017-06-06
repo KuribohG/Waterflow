@@ -87,6 +87,13 @@ inline T Clip(T x, T low, T high) {
 	return x;
 }
 
+inline void fluidassert(bool flag, const char *msg) {
+	if (!flag) {
+		printf("error: %s\n", msg);
+		throw msg;
+	}
+}
+
 //#define assert(x) if (!(x)) { asm("int $3"); }
 /*inline int ID(int x, int y, int z) {
     assert(0 <= x&&x < GRIDX);

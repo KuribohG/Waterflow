@@ -21,7 +21,7 @@ public:
 		idx.clear();
 	}
 	void Send_Back_To(aryf &pa);//send pressure back to a 3d-field
-	void Add_Scaled_Vector(vector<double>& v1, vector<double>& v2, double scale);
+	void Add_Scaled_Vector(vector<double>& v1, const vector<double>& v2, double scale);
 	void Add_Scaled_Vectors(vector<double>& v1, double s1, vector<double>& v2, double s2, vector<double>& result);
 	int Get_Cell_Idx(int i, int j, int k);
 	void Build_Water_Index(const aryi &mask);
