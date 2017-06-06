@@ -395,7 +395,7 @@ void MarchingCubes::Reconstruct(const aryf & f, Float isoval){
 	verts.clear(); faces.clear();
 	List_Verts(f, isoval);
 	List_Faces(f, isoval);
-	printf("reconstruction complete: %d verts & %f faces\n", verts.size(), faces.size() / 3.0);
+	printf("reconstruction complete: %d verts & %f faces\n", (int)verts.size(), faces.size() / 3.0);
 }
 
 void MarchingCubes::Dump_Obj(const char * filename){
@@ -426,7 +426,7 @@ void MarchingCubes::Dump_GOC(const char * gocname, const char *pngname, int outp
 	fprintf(fout, "shininess 1\n");
 	fprintf(fout, "emission 0.1 0.1 0.1\n");
 	fprintf(fout, "diffuse 0.8 0.8 0.8\n");
-	fprintf(fout, "maxverts %d\n", verts.size() / 3);
+	fprintf(fout, "maxverts %d\n", (int)verts.size() / 3);
 	for (unsigned int i = 0; i < verts.size(); i += 3) {
 		fprintf(fout, "vertex %f %f %f\n", verts[i], verts[i + 1], verts[i + 2]);
 	}
