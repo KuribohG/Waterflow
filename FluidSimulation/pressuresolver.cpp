@@ -7,7 +7,7 @@ double Maximum_Abs(vector<double> &d) {
 }
 
 double Dot(const vector<double> &a, const vector<double> &b) {
-	assert(a.size() == b.size());
+	fluidassert(a.size() == b.size(), "dot: a,b size does not match");
 	double ret = 0;
 	for (int i = 0; i < a.size(); i++) {
 		ret += a[i] * b[i];
@@ -21,22 +21,47 @@ double Dot(const vector<double> &a, const vector<double> &b) {
 }
 
 // v1 += v2*scale
-void PressureSolver::Add_Scaled_Vector(vector<double> &v1, vector<double> &v2, double scale) {
-	assert(v1.size() == v2.size());
-	assert(scale == scale);
+void PressureSolver::Add_Scaled_Vector(vector<double> &v1, const vector<double> &v2, double scale) {
+	fluidassert(v1.size() == v2.size(), "add scaled vector: v1.size!=v2.size");
+	fluidassert(scale == scale, "add scaled vector: scale is nan");
+#ifdef OPENMP
+#pragma omp parallel
+	{
+		int n = omp_get_num_threads();
+		int base = (v1.size() + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)v1.size());
+		for (int i = l; i < h; i++) {
+			v1[i] += v2[i] * scale;
+		}
+	}
+#else
 	for (unsigned int idx = 0; idx < v1.size(); idx++) {
 		v1[idx] += v2[idx] * scale;
 	}
+#endif
 }
 
 // result = v1*s1 + v2*s2
 void PressureSolver::Add_Scaled_Vectors(vector<double> &v1, double s1, vector<double> &v2, double s2, vector<double> &result) {
-	assert(v1.size() == v2.size() && v2.size() == result.size());
-	assert(s1 == s1);
-	assert(s2 == s2);
+	fluidassert(v1.size() == v2.size() && v2.size() == result.size(), "add scaled vectors: size wrong");
+	fluidassert(s1 == s1&&s2 == s2, "add scaled vector: s1, s2 must not be nan");
+#ifdef OPENMP
+#pragma omp parallel
+	{
+		int n = omp_get_num_threads();
+		int base = (v1.size() + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)v1.size());
+		for (int idx = l; idx < h; idx++) {
+			result[idx] = v1[idx] * s1 + v2[idx] * s2;
+		}
+	}
+#else
 	for (unsigned int idx = 0; idx < v1.size(); idx++) {
 		result[idx] = v1[idx] * s1 + v2[idx] * s2;
 	}
+#endif
 }
 
 int PressureSolver::Get_Cell_Idx(int i, int j, int k){
