@@ -356,17 +356,18 @@ void PressureSolver::Solver_LA_System(vector<MatCell> &A, vector<double> &b, vec
 }
 
 void PressureSolver::Solve_Pressure(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask) {
-	//Float t0 = clock();
+	Float t0 = omp_get_wtime(), t;
 	Build_Water_Index(mask);
 	pressure = vector<double>(cells.size() / 3, 0);
 	div = vector<double>(pressure.size(), 0);
 	Calc_Neg_Divergence(vx, vy, vz, mask);
-	//printf("max abs: %.15f\n", Maximum_Abs(div));
 	if (Maximum_Abs(div) < TOLERANCE) return; //with pressure=0
 	vector<MatCell> A(pressure.size());
 	vector<double> precon(pressure.size());
 	Calc_Matrix_Coeffs(A, mask);
 	Calc_Preconditioner(A, precon);
+	t = omp_get_wtime(); printf("pressure solve prepare time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
+
 	Solver_LA_System(A, div, precon, pressure);
-	//printf("pressure solve done, time cost: %.2fs\n", (clock() - t0 + 0.0) / CLOCKS_PER_SEC);
+	t = omp_get_wtime(); printf("solve LA system time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 }
