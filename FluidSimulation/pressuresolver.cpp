@@ -9,9 +9,26 @@ double Maximum_Abs(vector<double> &d) {
 double Dot(const vector<double> &a, const vector<double> &b) {
 	fluidassert(a.size() == b.size(), "dot: a,b size does not match");
 	double ret = 0;
+	static int n = omp_get_num_procs();
+	static vector<double> sum(n);
+#ifdef OPENMP
+#pragma omp parallel
+	{
+		fluidassert(n == omp_get_num_threads(), "threads num non-match with procs");
+		int base = (a.size() + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)a.size());
+		sum[tid] = 0;
+		for (int i = l; i < h; i++) {
+			sum[tid] += a[i] * b[i];
+		}
+	}
+	for (int i = 0; i < n; i++) ret += sum[i];
+#else
 	for (int i = 0; i < a.size(); i++) {
 		ret += a[i] * b[i];
 	}
+#endif
 	/*if (ret == 0) {
 		for (int i = 0; i < 10; i++) cout << a[i] << " "; cout << endl;
 		for (int i = 0; i < 10; i++) cout << b[i] << " "; cout << endl;
