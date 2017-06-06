@@ -44,6 +44,8 @@ typedef float Float;
 enum AXES { _X, _Y, _Z };
 enum GridMaterial { WATER, SOLID, AIR };
 
+const int MARKER_RES = 3;
+
 const double INF = 1e15;
 
 const Float TSDF_EPS = 1e-6f;

@@ -322,7 +322,14 @@ void SimulationCubic::Advect_PIC_Preprocess() {
 void SimulationCubic::Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz) {
 	printf("advect PIC along axis %d\n", axis);
 	if (axis == _X) {
-		for (int i = 0; i <= GRIDX; i++) {
+#ifdef OPENMP
+	#pragma omp parallel
+	{
+		int n = omp_get_num_threads();
+		int base = (GRIDX + 1 + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)GRIDX + 1);
+		for (int i = l; i < h; i++) {
 			for (int j = 0; j < GRIDY; j++) {
 				for (int k = 0; k < GRIDZ; k++) {
 					Float u = 0, d = 0;
@@ -346,8 +353,41 @@ void SimulationCubic::Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &
 			}
 		}
 	}
+#else
+		for (int i = 0; i <= GRIDX; i++) {
+			for (int j = 0; j < GRIDY; j++) {
+				for (int k = 0; k < GRIDZ; k++) {
+					Float u = 0, d = 0;
+					for (int dx = -1; dx <= 0; dx++) {
+						for (int dy = -1; dy <= 1; dy++) {
+							for (int dz = -1; dz <= 1; dz++) {
+								if (i + dx < 0 || i + dx >= GRIDX) continue;
+								if (j + dy < 0 || j + dy >= GRIDY) continue;
+								if (k + dz < 0 || k + dz >= GRIDZ) continue;
+								for (MarkerParticle *ptr : v[i + dx][j + dy][k + dz]) {
+									MarkerParticle &p = *ptr;
+									Float ker = Kernel(i - p.x, j + 0.5 - p.y, k + 0.5 - p.z);
+									d += ker, u += ker * p.vx;
+								}
+							}
+						}
+					}
+					if (fabs(d) < EPS) f(i, j, k) = 0;
+					else f(i, j, k) = u / d;
+				}
+			}
+		}
+#endif
+	}
 	if (axis == _Y) {
-		for (int i = 0; i < GRIDX; i++) {
+#ifdef OPENMP
+	#pragma omp parallel
+	{
+		int n = omp_get_num_threads();
+		int base = (GRIDX + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)GRIDX);
+		for (int i = l; i < h; i++) {
 			for (int j = 0; j <= GRIDY; j++) {
 				for (int k = 0; k < GRIDZ; k++) {
 					Float u = 0, d = 0;
@@ -371,7 +411,65 @@ void SimulationCubic::Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &
 			}
 		}
 	}
+#else
+		for (int i = 0; i < GRIDX; i++) {
+			for (int j = 0; j <= GRIDY; j++) {
+				for (int k = 0; k < GRIDZ; k++) {
+					Float u = 0, d = 0;
+					for (int dx = -1; dx <= 1; dx++) {
+						for (int dy = -1; dy <= 0; dy++) {
+							for (int dz = -1; dz <= 1; dz++) {
+								if (i + dx < 0 || i + dx >= GRIDX) continue;
+								if (j + dy < 0 || j + dy >= GRIDY) continue;
+								if (k + dz < 0 || k + dz >= GRIDZ) continue;
+								for (MarkerParticle *ptr : v[i + dx][j + dy][k + dz]) {
+									MarkerParticle &p = *ptr;
+									Float ker = Kernel(i + 0.5 - p.x, j - p.y, k + 0.5 - p.z);
+									d += ker, u += ker * p.vy;
+								}
+							}
+						}
+					}
+					if (fabs(d) < EPS) f(i, j, k) = 0;
+					else f(i, j, k) = u / d;
+				}
+			}
+		}
+#endif
+	}
 	if (axis == _Z) {
+#ifdef OPENMP
+	#pragma omp parallel
+	{
+		int n = omp_get_num_threads();
+		int base = (GRIDX + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)GRIDX);
+		for (int i = l; i < h; i++) {
+			for (int j = 0; j < GRIDY; j++) {
+				for (int k = 0; k <= GRIDZ; k++) {
+					Float u = 0, d = 0;
+					for (int dx = -1; dx <= 1; dx++) {
+						for (int dy = -1; dy <= 1; dy++) {
+							for (int dz = -1; dz <= 0; dz++) {
+								if (i + dx < 0 || i + dx >= GRIDX) continue;
+								if (j + dy < 0 || j + dy >= GRIDY) continue;
+								if (k + dz < 0 || k + dz >= GRIDZ) continue;
+								for (MarkerParticle *ptr : v[i + dx][j + dy][k + dz]) {
+									MarkerParticle &p = *ptr;
+									Float ker = Kernel(i + 0.5 - p.x, j + 0.5 - p.y, k - p.z);
+									d += ker, u += ker * p.vz;
+								}
+							}
+						}
+					}
+					if (fabs(d) < EPS) f(i, j, k) = 0;
+					else f(i, j, k) = u / d;
+				}
+			}
+		}
+	}
+#else
 		for (int i = 0; i < GRIDX; i++) {
 			for (int j = 0; j < GRIDY; j++) {
 				for (int k = 0; k <= GRIDZ; k++) {
@@ -395,6 +493,7 @@ void SimulationCubic::Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &
 				}
 			}
 		}
+#endif
 	}
 }
 

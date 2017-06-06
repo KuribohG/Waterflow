@@ -37,7 +37,7 @@ void Add_Particles_Single_Cell(vector<MarkerParticle> &particles, int i, int j, 
 	//	p.z += (randomF() - 0.5)*0.5;
 	//	particles.push_back(p);
 	//}
-	const int n = 3;
+	const int n = MARKER_RES;
 	const Float step = 1.0 / n;
 	Float dlt = step / 2;
 	for (int dx = 0; dx < n; dx++) {
