@@ -537,8 +537,9 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
 
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
 	Advect_Particles(particles, vx, vy, vz, mask);
-	Advect_PIC_Preprocess();
 	t = omp_get_wtime(); printf("advect particles time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
+	Advect_PIC_Preprocess();
+	t = omp_get_wtime(); printf("advect PIC preprocess time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 	
     swap(vx, vx0);
 	swap(vy, vy0);
