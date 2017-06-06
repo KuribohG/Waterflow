@@ -340,19 +340,19 @@ void FluidSimulation::Get_Full_Velocity() {
 void FluidSimulation::Step_Time(void){
 	printf("==========================================================================================\n");
 	static Float T0 = omp_get_wtime();
-	Float tstep = omp_get_wtime();
+	Float tstart = omp_get_wtime();
 	framenum++;
 	printf("start to step frame %d\n", framenum);
     cubic.Step_Time(framenum, sources);
 	//cubic.Pour_Source(sources);
-	Float t0 = omp_get_wtime();
+	Float t0 = omp_get_wtime(), t;
     Calculate_Signed_Distance();
-	Float t1 = omp_get_wtime(); printf("calc signed distance time cost: %.2fs\n", (t1 - t0 + 0.0));
+	t = omp_get_wtime(); printf("calc signed distance time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
     Calculate_Nearest_Particle();
-	Float t2 = omp_get_wtime(); printf("calc nearest particle time cost: %.2fs\n", (t2 - t1 + 0.0));
+	t = omp_get_wtime(); printf("calc nearest particle time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 	//printf("before extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
 	Get_Full_Velocity();
-	Float t3 = omp_get_wtime(); printf("extrapolation time cost: %.2fs\n", (t3 - t2 + 0.0));
+	t = omp_get_wtime(); printf("get full velocity time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 	//printf("after extrapolation: \n"); Print_Velocity(cubic.vx, cubic.vy, cubic.vz, cubic.mask);
     
 	if (framenum % 1 == 0) {
@@ -364,13 +364,14 @@ void FluidSimulation::Step_Time(void){
 		sprintf(pngname, "%04d.png", framenum);
 		
 		meshcubes.Dump_Obj(name);
+		t = omp_get_wtime(); printf("dump obj time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 		//meshcubes.Dump_GOC(name, pngname, 1200, 900);
 		//getchar();
 	}
 	//if (framenum >= 0) { printf("input: \n"); getchar(); }
 	//LOGM("continue\n");
-	Float t4 = omp_get_wtime();
-	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t4-tstep+0.0), (t4 - T0 + 0.0));
+	t = omp_get_wtime();
+	printf("frame %d step done, step time cost: %.2lfs, all time cost: %.2lfs\n", framenum, (t - tstart + 0.0), (t - T0 + 0.0));
 	printf("==========================================================================================\n");
 	if (framenum >= endframe) exit(0);
 }

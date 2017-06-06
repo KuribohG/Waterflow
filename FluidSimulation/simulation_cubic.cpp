@@ -529,15 +529,19 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
     printf("cubic step time \n");
 	Float t0 = omp_get_wtime(), t;
 	static int tot = 0;
-    //velocity-evolution
+    
+	//velocity-evolution
 	Apply_External_Forces();
 	Pour_Source(framenum, sources);
 	printf("particle num: %d\n", (int)particles.size());
 	t = omp_get_wtime(); printf("apply external forces&pour source time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
+	t = omp_get_wtime(); printf("get particles velocity time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
+	
 	Advect_Particles(particles, vx, vy, vz, mask);
 	t = omp_get_wtime(); printf("advect particles time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
+	
 	Advect_PIC_Preprocess();
 	t = omp_get_wtime(); printf("advect PIC preprocess time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 	
@@ -547,15 +551,14 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
 	Advect_PIC(0, vx, vx0, vx0, vy0, vz0);
 	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
 	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
-
 	t = omp_get_wtime(); printf("PIC advection time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
-	Mark_Water_By(particles, mask);
+	t = omp_get_wtime(); printf("get particles velocity time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 
+	Mark_Water_By(particles, mask);
 	t = omp_get_wtime(); printf("update water mask time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 	
 	Project(vx, vy, vz, p, p0);
-
-	t = omp_get_wtime(); printf("project time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
+	t = omp_get_wtime(); printf("projection time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 }
