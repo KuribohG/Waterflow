@@ -525,7 +525,26 @@ void SimulationCubic::Pour_Source(int framenum, vector<WaterSource> &sources) {
 	}
 }
 
-void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
+void SimulationCubic::Apply_PeriodBox(int framenum, vector<PeriodBox> periodboxes){
+	for (PeriodBox &p : periodboxes) {
+		if (framenum > p.end) continue;
+		int k = framenum / p.semi_period;
+		Float pvx, pvy, pvz;
+		if (k % 2 == 0) pvx = p.vx0, pvy = p.vy0, pvz = p.vz0;
+		else pvx = p.vx1, pvy = p.vy1, pvz = p.vz1;
+		for (int i = p.x0; i <= p.x1; i++) {
+			for (int j = p.y0; j <= p.y1; j++) {
+				for (int k = p.z0; k <= p.z1; k++) {
+					vx.set(i, j, k, pvx), vx.set(i + 1, j, k, pvx);
+					vy.set(i, j, k, pvy), vy.set(i, j + 1, k, pvy);
+					vz.set(i, j, k, pvz), vz.set(i, j, k + 1, pvz);
+				}
+			}
+		}
+	}
+}
+
+void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources, vector<PeriodBox> &periodboxes){
     printf("cubic step time \n");
 	Float t0 = omp_get_wtime(), t;
 	static int tot = 0;
@@ -533,6 +552,7 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources){
 	//velocity-evolution
 	Apply_External_Forces();
 	Pour_Source(framenum, sources);
+	//Apply_PeriodBox(framenum, periodboxes);
 	printf("particle num: %d\n", (int)particles.size());
 	t = omp_get_wtime(); printf("apply external forces&pour source time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 

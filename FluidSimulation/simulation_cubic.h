@@ -61,6 +61,8 @@ public:
 
 	void Pour_Source(int framenum, vector<WaterSource>& sources);
 
-	void Step_Time(int framenum, vector<WaterSource>& sources);
+	void Apply_PeriodBox(int framenum, vector<PeriodBox> periodboxes);
+
+	void Step_Time(int framenum, vector<WaterSource>& sources, vector<PeriodBox> &periodboxes);
 
 };
