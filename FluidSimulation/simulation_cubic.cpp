@@ -46,6 +46,16 @@ SimulationCubic::~SimulationCubic() {
 	mask.clear();
 }
 
+void SimulationCubic::Mark_Solid(int x0, int x1, int y0, int y1, int z0, int z1) {
+	for (int i = x0; i <= x1; i++) {
+		for (int j = y0; j <= y1; j++) {
+			for (int k = z0; k <= z1; k++) {
+				mask.set(i, j, k, SOLID);
+			}
+		}
+	}
+}
+
 void SimulationCubic::Mark_Single_Water(int i, int j, int k) {
 	if (mask.is(i, j, k, AIR)) {
 		mask(i, j, k) = WATER;
