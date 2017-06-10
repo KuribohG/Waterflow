@@ -84,7 +84,15 @@ void FluidSimulation::Read_Scene_File(const char * filename) {
 				cubic.Init(GRIDX, GRIDY, GRIDZ);
 				cubicinit = true;
 			}
-			if (cmd == "box") {
+			if (cmd == "periodbox") {
+				int x0, x1, y0, y1, z0, z1;
+				Float semi_period;
+				Float vx0, vy0, vz0, vx1, vy1, vz1;
+				int end;
+				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> semi_period >> vx0 >> vy0 >> vz0 >> vx1 >> vy1 >> vz1 >> end;
+				periodboxes.emplace_back(x0, x1, y0, y1, z0, z1, semi_period, vx0, vy0, vz0, vx1, vy1, vz1, end);
+			}
+			else if (cmd == "box") {
 				int x0, x1, y0, y1, z0, z1;
 				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
 				x0 = Scale_Along(x0, _X), x1 = Scale_Along(x1, _X);
@@ -343,7 +351,7 @@ void FluidSimulation::Step_Time(void){
 	Float tstart = omp_get_wtime();
 	framenum++;
 	printf("start to step frame %d\n", framenum);
-    cubic.Step_Time(framenum, sources);
+    cubic.Step_Time(framenum, sources, periodboxes);
 	//cubic.Pour_Source(sources);
 	Float t0 = omp_get_wtime(), t;
     Calculate_Signed_Distance();

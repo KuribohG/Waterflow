@@ -5,6 +5,10 @@ WaterSource::WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, F
 {
 }
 
+PeriodBox::PeriodBox(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, int _semi_period, Float _vx0, Float _vy0, Float _vz0, Float _vx1, Float _vy1, Float _vz1, int _end) :
+	x0(_x0), x1(_x1), y0(_y0), y1(_y1), z0(_z0), z1(_z1), semi_period(_semi_period), vx0(_vx0), vy0(_vy0), vz0(_vz0), vx1(_vx1), vy1(_vy1), vz1(_vz1), end(_end) {}
+
+
 void Mark_Water_By(vector<MarkerParticle> &particles, aryi &mask) {
 	printf("mark water by particles\n");
 	for (int i = 0; i < GRIDX; i++) {

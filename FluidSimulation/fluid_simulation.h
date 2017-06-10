@@ -16,6 +16,7 @@ private:
 	char dumppref[100] = "objs/";
 	SimulationCubic cubic;
 	vector<WaterSource> sources;
+	vector<PeriodBox> periodboxes;
 	//vector<pair<int, Float> > lightPath[SHOW_SIZE_X][SHOW_SIZE_Y];
 	aryf signed_dis;
 	MarchingCubes meshcubes;

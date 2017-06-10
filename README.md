@@ -4,11 +4,12 @@ gridsize GRIDX GRIDY GRIDZ # 指定模拟网格的大小。如果没有，则默
 end n #指定运算n帧后终止运行。如果没有此指令，则程序不会停止。
 box x0 x1 y0 y1 z0 z1 #在初始时候增加一个装满水的长方体，坐标为闭区间[x0,x1],[y0,y1],[z0,z1]。它不会覆盖固体格子和网格外的地方。水的初始速度为0。
 source x0 x1 y0 y1 z0 z1 vx vy vz end#增加一个水源，同上。vx vy vz是它吐出水的初始速度，它在第end+1帧将不再刷出水。
+periodbox x0 x1 y0 y1 z0 z1 semi_period vx0 vy0 vx1 vy1 vz0 vz1 end # 增加一块速度随时间周期振荡的区域。这块区域的位置由x0等指定，半周期由semi_period指定，单位为帧，含义是：在第0,2,4...个半周期内会设定vx0,vy0,vz0的速度，第1,3,5...个半周期则设置vx1,vy1,vz1的速度。在时间end之后不再生效。（此功能暂不支持）
 
 现在todo（星号为不重要）：
-1. 全部代码并行化。监控mask内部出气泡的问题。
+1. 监控mask内部出气泡的问题。
 2. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
-3. 支持水源的初始速度：支持从水源particle的速度直接出网格速度。
+3. 支持水源的初始速度：支持从水源particle的速度直接出网格速度。调研为什么此事挂掉了。
 4. 调研GridFluidSim，出飞沫等额外特效。
 5*. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
 6*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html

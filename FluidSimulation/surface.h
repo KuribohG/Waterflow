@@ -11,6 +11,15 @@ public:
 	WaterSource(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, Float _init_vx, Float _init_vy, Float _init_vz, int _pourend);
 };
 
+class PeriodBox {
+public:
+	int x0, x1, y0, y1, z0, z1;
+	Float semi_period;
+	Float vx0, vy0, vz0, vx1, vy1, vz1;
+	int end;
+	PeriodBox(int _x0, int _x1, int _y0, int _y1, int _z0, int _z1, int _semi_period, Float _vx0, Float _vy0, Float _vz0, Float _vx1, Float _vy1, Float _vz1, int _end);
+};
+
 class MarkerParticle {
 public:
 	Float x, y, z, vx, vy, vz;
