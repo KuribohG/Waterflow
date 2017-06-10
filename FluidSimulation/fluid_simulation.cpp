@@ -90,20 +90,9 @@ void FluidSimulation::Read_Scene_File(const char * filename) {
 				Float vx0, vy0, vz0, vx1, vy1, vz1;
 				int end;
 				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> semi_period >> vx0 >> vy0 >> vz0 >> vx1 >> vy1 >> vz1 >> end;
-				x0 = Scale_Along(x0, _X), x1 = Scale_Along(x1, _X);
-				y0 = Scale_Along(y0, _Y), y1 = Scale_Along(y1, _Y);
-				z0 = Scale_Along(z0, _Z), z1 = Scale_Along(z1, _Z);
 				periodboxes.emplace_back(x0, x1, y0, y1, z0, z1, semi_period, vx0, vy0, vz0, vx1, vy1, vz1, end);
 			}
-			else if (cmd == "solidbox") {
-				int x0, x1, y0, y1, z0, z1;
-				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
-				x0 = Scale_Along(x0, _X), x1 = Scale_Along(x1, _X);
-				y0 = Scale_Along(y0, _Y), y1 = Scale_Along(y1, _Y);
-				z0 = Scale_Along(z0, _Z), z1 = Scale_Along(z1, _Z);
-				cubic.Mark_Solid(x0, x1, y0, y1, z0, z1);
-			}
-			else if (cmd == "box") {
+			if (cmd == "box") {
 				int x0, x1, y0, y1, z0, z1;
 				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
 				x0 = Scale_Along(x0, _X), x1 = Scale_Along(x1, _X);
