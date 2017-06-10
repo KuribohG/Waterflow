@@ -92,7 +92,7 @@ void FluidSimulation::Read_Scene_File(const char * filename) {
 				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1 >> semi_period >> vx0 >> vy0 >> vz0 >> vx1 >> vy1 >> vz1 >> end;
 				periodboxes.emplace_back(x0, x1, y0, y1, z0, z1, semi_period, vx0, vy0, vz0, vx1, vy1, vz1, end);
 			}
-			if (cmd == "box") {
+			else if (cmd == "box") {
 				int x0, x1, y0, y1, z0, z1;
 				sin >> x0 >> x1 >> y0 >> y1 >> z0 >> z1;
 				x0 = Scale_Along(x0, _X), x1 = Scale_Along(x1, _X);
