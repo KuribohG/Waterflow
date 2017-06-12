@@ -8,4 +8,4 @@ if __name__ == "__main__":
 	dumppref = "objs/%s"%basename
 	os.system("mkdir -p %s"%dumppref)
 	print boxname,dumppref
-	os.system("rlaunch --cpu=16 --gpu=0 --memory=32768 -- ./FluidSimulation %s %s"%(boxname,dumppref))
+	os.system("rlaunch --cpu=32 --gpu=0 --memory=32768 -- ./FluidSimulation %s %s"%(boxname,dumppref))
