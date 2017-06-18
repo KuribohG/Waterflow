@@ -1,5 +1,16 @@
 #include "gridmath.h"
 
+void Tensor_Add(aryf &p, aryf &q, Float alpha, Float beta) {
+	for (int i = 0; i < GRIDX; i++) {
+		for (int j = 0; j < GRIDY; j++) {
+			for (int k = 0; k < GRIDZ; k++) {
+				Float res = p(i, j, k) * alpha + q(i, j, k) * beta;
+				p(i, j, k) = res;
+			}
+		}
+	}
+}
+
 void Print_Velocity(const aryf &vx, const aryf &vy, const aryf &vz, const aryi &mask) {
 	printf("print velocity: \n");
 	Float vz0 = INF;

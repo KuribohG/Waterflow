@@ -121,6 +121,43 @@ void Get_Particles_Velocity(vector<MarkerParticle> &particles, aryf &vx, aryf &v
 #endif
 }
 
+void Get_Particles_Velocity_FLIP(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryf &vx0, aryf &vy0, aryf &vz0, aryi &mask, Float flip) {
+    printf("get particles velocity FLIP\n");
+#ifdef OPENMP
+	#pragma omp parallel
+	{
+		int n = omp_get_num_threads();
+		int base = (particles.size() + n - 1) / n;
+		int tid = omp_get_thread_num();
+		int l = tid*base, h = min((tid + 1)*base, (int)particles.size());
+		for (int i = l; i < h; i++) {
+			MarkerParticle &p = particles[i];
+			Float dvx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
+			Float dvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
+			Float dvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
+			Float nvx = Interpolation_Water_Velocity(_X, vx0, p.x, p.y, p.z, mask);
+			Float nvy = Interpolation_Water_Velocity(_Y, vy0, p.x, p.y, p.z, mask);
+			Float nvz = Interpolation_Water_Velocity(_Z, vz0, p.x, p.y, p.z, mask);
+			p.vx = flip * nvx + (1 - flip) * (dvx + p.vx);
+			p.vy = flip * nvy + (1 - flip) * (dvy + p.vy);
+			p.vz = flip * nvz + (1 - flip) * (dvz + p.vz);
+		}
+	}
+#else
+    for (MarkerParticle &p : particles) {
+        Float dvx = Interpolation_Water_Velocity(_X, vx, p.x, p.y, p.z, mask);
+        Float dvy = Interpolation_Water_Velocity(_Y, vy, p.x, p.y, p.z, mask);
+        Float dvz = Interpolation_Water_Velocity(_Z, vz, p.x, p.y, p.z, mask);
+        Float nvx = Interpolation_Water_Velocity(_X, vx0, p.x, p.y, p.z, mask);
+        Float nvy = Interpolation_Water_Velocity(_Y, vy0, p.x, p.y, p.z, mask);
+        Float nvz = Interpolation_Water_Velocity(_Z, vz0, p.x, p.y, p.z, mask);
+        p.vx = flip * nvx + (1 - flip) * (dvx + p.vx);
+        p.vy = flip * nvy + (1 - flip) * (dvy + p.vy);
+        p.vz = flip * nvz + (1 - flip) * (dvz + p.vz);
+    }
+#endif
+}
+
 Float clip(Float x, Float min, Float max) {
 	x = std::max(min, x);
 	x = std::min(max, x);

@@ -145,18 +145,20 @@ void SimulationCubic::Calc_Divergence(aryf &vx, aryf &vy, aryf &vz, aryf &div) {
 	}
 }
 
-void SimulationCubic::Project(aryf &vx,aryf &vy,aryf &vz,aryf &p,aryf &div) {
-	LOGM("project\n");
-	//Cancel_Air_Velocity();
-	//Print_Velocity(vx, vy, vz, mask);
-	//Calc_Divergence(vx, vy, vz, p0);
-	solver.Solve_Pressure(vx, vy, vz, mask);
-	solver.Send_Back_To(p);
-	//printf("pressure density:\n");Print_Density(p);
-	//return;
-	//actually, p solved here is -deltaT*p, look at [Robert Bridson, p54]
-	//Linear_Solve(-1, p, div, 1, 6 + 1, LINSOLVER_ITER);
+void SimulationCubic::Solve_Pressure(aryf &vx,aryf &vy,aryf &vz,aryf &p) {
+    LOGM("project\n");
+    //Cancel_Air_Velocity();
+    //Print_Velocity(vx, vy, vz, mask);
+    //Calc_Divergence(vx, vy, vz, p0);
+    solver.Solve_Pressure(vx, vy, vz, mask);
+    solver.Send_Back_To(p);
+    //printf("pressure density:\n");Print_Density(p);
+    //return;
+    //actually, p solved here is -deltaT*p, look at [Robert Bridson, p54]
+    //Linear_Solve(-1, p, div, 1, 6 + 1, LINSOLVER_ITER);
+}
 
+void SimulationCubic::Apply_Pressure(aryf &vx, aryf &vy, aryf &vz, aryf &p) {
 	//-+ //todo: apply bound condition before, not after linear_solve
 	//-+ //todo: now this routine's solid bound fails, try to fix it
 	double scale = TIME_DELTA / DENSITY;
@@ -319,7 +321,7 @@ void SimulationCubic::Advect_PIC_Preprocess() {
 	}
 }
 
-void SimulationCubic::Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz) {
+void SimulationCubic::Advect_PIC(int axis, aryf &f) {
 	printf("advect PIC along axis %d\n", axis);
 	if (axis == _X) {
 #ifdef OPENMP
@@ -568,9 +570,9 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources, vect
     swap(vx, vx0);
 	swap(vy, vy0);
 	swap(vz, vz0);
-	Advect_PIC(0, vx, vx0, vx0, vy0, vz0);
-	Advect_PIC(1, vy, vy0, vx0, vy0, vz0);
-	Advect_PIC(2, vz, vz0, vx0, vy0, vz0);
+	Advect_PIC(0, vx);
+	Advect_PIC(1, vy);
+	Advect_PIC(2, vz);
 	t = omp_get_wtime(); printf("PIC advection time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 
 	Get_Particles_Velocity(particles, vx, vy, vz, mask);
@@ -578,7 +580,27 @@ void SimulationCubic::Step_Time(int framenum, vector<WaterSource> &sources, vect
 
 	Mark_Water_By(particles, mask);
 	t = omp_get_wtime(); printf("update water mask time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
-	
-	Project(vx, vy, vz, p, p0);
+
+	Tensor_Add(vx0, vx, 0, 1);
+	Tensor_Add(vy0, vy, 0, 1);
+	Tensor_Add(vz0, vz, 0, 1);
+	Solve_Pressure(vx, vy, vz, p);
+    Apply_Pressure(vx0, vy0, vz0, p);
+	//Tensor_Add(vx, vx0, 0, 1);
+	//Tensor_Add(vy, vy0, 0, 1);
+	//Tensor_Add(vz, vz0, 0, 1);
+
+	Tensor_Add(vx, vx0, -1, 1);
+	Tensor_Add(vy, vy0, -1, 1);
+	Tensor_Add(vz, vz0, -1, 1);
+	Float flip = 1.0;
+	Get_Particles_Velocity_FLIP(particles, vx, vy, vz, vx0, vy0, vz0, mask, flip);
+	Advect_PIC(0, vx);
+	Advect_PIC(1, vy);
+	Advect_PIC(2, vz);
+
+	Solve_Pressure(vx, vy, vz, p);
+	Apply_Pressure(vx, vy, vz, p);
+
 	t = omp_get_wtime(); printf("projection time cost: %.2fs\n", (t - t0 + 0.0)); t0 = t;
 }

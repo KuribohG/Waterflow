@@ -89,6 +89,8 @@ typedef Array3D<Float> aryf;
 typedef Array3D<int> aryi;
 typedef Vec1D<double> vecd;
 
+void Tensor_Add(aryf &p, aryf &q, Float alpha, Float beta);
+
 Float Neighbor_Sum6(aryf &x, int i, int j, int k);
 bool Valid_Water(int x, int y, int z, aryi &mask);
 

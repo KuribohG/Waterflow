@@ -49,7 +49,9 @@ public:
 
 	void Calc_Divergence(aryf & vx, aryf & vy, aryf & vz, aryf & div);
 
-	void Project(aryf & vx, aryf & vy, aryf & vz, aryf & p, aryf & div);
+	void Solve_Pressure(aryf & vx, aryf & vy, aryf & vz, aryf & p);
+
+    void Apply_Pressure(aryf & vx, aryf & vy, aryf & vz, aryf & p);
 
 	void Runge_Kutta(int axis, int i, int j, int k, Float delta, int iter, const aryf & vx, const aryf & vy, const aryf & vz, Float & x, Float & y, Float & z);
 
@@ -57,7 +59,7 @@ public:
 
 	void Advect_PIC_Preprocess();
 
-	void Advect_PIC(int axis, aryf &f, const aryf &f0, const aryf &vx, const aryf &vy, const aryf &vz);
+	void Advect_PIC(int axis, aryf &f);
 
 	void Pour_Source(int framenum, vector<WaterSource>& sources);
 

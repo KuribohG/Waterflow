@@ -32,4 +32,5 @@ void Init_Particles(vector<MarkerParticle> &particles, aryi &mask);
 void Add_Single_Particle(vector<MarkerParticle> &particles, aryi &mask, int i, int j, int k);
 void Add_Single_Particle(vector<MarkerParticle> &particles, aryi &mask, int i, int j, int k, Float vx, Float vy, Float vz);
 void Get_Particles_Velocity(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryi &mask);
+void Get_Particles_Velocity_FLIP(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryf &vx0, aryf &vy0, aryf &vz0, aryi &mask, Float flip);
 void Advect_Particles(vector<MarkerParticle> &particles, aryf &vx, aryf &vy, aryf &vz, aryi &mask);
