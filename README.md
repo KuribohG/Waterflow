@@ -13,6 +13,8 @@ periodbox x0 x1 y0 y1 z0 z1 semi_period vx0 vy0 vx1 vy1 vz0 vz1 end # 增加一�
 4. 调研GridFluidSim，出飞沫等额外特效。
 5*. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
 6*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
+7. 更好的pressure solve？
+8. 解决side.box的interpolation goes wrong问题。
 
 路线图：2D(dummies)---extended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
 
