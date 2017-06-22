@@ -11,10 +11,12 @@ periodbox x0 x1 y0 y1 z0 z1 semi_period vx0 vy0 vx1 vy1 vz0 vz1 end # 增加一�
 2. 渲染（wukan）。用blender python API出精美demo，自己实现一份光线追踪，作为代码结构上的补齐。如果wkw组photon mapping能出成果，亦可借用之。
 3. 支持水源的初始速度：支持从水源particle的速度直接出网格速度。调研为什么此事挂掉了。
 4. 调研GridFluidSim，出飞沫等额外特效。
-5*. 把marker particle增加随机扰动（这个有优化，但不用急着做，因为现在对齐的marker particle更利于debug）
+5. better method for sampling the marker particles
 6*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
-7. 更好的pressure solve？
-8. 解决side.box的interpolation goes wrong问题。
+7. zyh: Catmull-Rom interpolation in advection
+8. zyh: FLIP method, tune parameters
+9. 更好的pressure solve？
+10. 解决side.box的interpolation goes wrong问题。
 
 路线图：2D(dummies)---extended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
 
@@ -47,5 +49,8 @@ v2.0（空气和水）
 
 2017.6.4
 修改了水源函数，改成正确的“如果是空气则刷新”。运用了OpenMP进行优化。
+
+2017.6.22
+今晚跑freefall.aligned的渲染，在demo.freefall.aligned里
 
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)
