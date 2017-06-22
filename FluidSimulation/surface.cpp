@@ -48,9 +48,9 @@ void Add_Particles_Single_Cell(vector<MarkerParticle> &particles, int i, int j, 
 		for (int dy = 0; dy < n; dy++) {
 			for (int dz = 0; dz < n; dz++) {
 				MarkerParticle p(i + dlt + dx*step, j + dlt + dy*step, k + dlt + dz*step);
-				p.x += (randomF() - 0.5)*step;
-				p.y += (randomF() - 0.5)*step;
-				p.z += (randomF() - 0.5)*step;
+				//p.x += (randomF() - 0.5)*step;
+				//p.y += (randomF() - 0.5)*step;
+				//p.z += (randomF() - 0.5)*step;
 				particles.push_back(p);
 			}
 		}
