@@ -12,10 +12,11 @@ periodbox x0 x1 y0 y1 z0 z1 semi_period vx0 vy0 vx1 vy1 vz0 vz1 end # 增加一�
 3. 支持水源的初始速度：支持从水源particle的速度直接出网格速度。调研为什么此事挂掉了。
 4. 调研GridFluidSim，出飞沫等额外特效。
 5. better method for sampling the marker particles
-6\*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
+6*. Marching Cubes支持normal，材料：http://www.angelfire.com/linux/myp/MCAdvanced/MCImproved.html
 7. zyh: Catmull-Rom interpolation in advection
 8. zyh: FLIP method, tune parameters
-
+9. 更好的pressure solve？
+10. 解决side.box的interpolation goes wrong问题。
 
 路线图：2D(dummies)---extended 2D(v1.0)---better extended 2D---naive 3D---better and faster 3D
 
@@ -48,5 +49,8 @@ v2.0（空气和水）
 
 2017.6.4
 修改了水源函数，改成正确的“如果是空气则刷新”。运用了OpenMP进行优化。
+
+2017.6.22
+今晚跑freefall.aligned的渲染，在demo.freefall.aligned里
 
 有趣的材料： [http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids](http://gamedev.stackexchange.com/questions/177/what-is-some-good-examples-about-creating-2d-fluids)
