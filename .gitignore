@@ -5,3 +5,9 @@ Debug/*
 cmake-build-debug/*
 .idea/*
 FluidSimulation/objs/*
+CMakeFiles/*
+FluidSimulation/CMake*
+FluidSimulation/cmake*
+FluidSimulation/FluidSimulation
+Makefile
+*.cmake
